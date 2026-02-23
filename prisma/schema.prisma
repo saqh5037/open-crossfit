@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ──────────────────────────────────────────
+
+enum Gender {
+  M
+  F
+}
+
+enum ScoreType {
+  time
+  reps
+  weight
+}
+
+enum SortOrder {
+  asc
+  desc
+}
+
+enum AdminRole {
+  owner
+  admin
+  coach
+  judge
+}
+
+enum ScoreStatus {
+  pending
+  confirmed
+}
+
+// ── Event Config ───────────────────────────────────
+
+model EventConfig {
+  id                String   @id @default(cuid())
+  name              String   @default("CrossFit Open 2026")
+  description       String?
+  start_date        DateTime?
+  end_date          DateTime?
+  logo_url          String?
+  primary_color     String   @default("#DC2626")
+  secondary_color   String   @default("#1F2937")
+  registration_open Boolean  @default(false)
+  divisions         Json     @default("[\"rx_male\",\"rx_female\",\"scaled_male\",\"scaled_female\"]")
+  qr_base_url       String   @default("")
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  @@map("event_config")
+}
+
+// ── Athletes ───────────────────────────────────────
+
+model Athlete {
+  id                 String   @id @default(cuid())
+  participant_number Int      @unique @default(autoincrement())
+  full_name          String
+  email              String   @unique
+  phone      String
+  birth_date DateTime?
+  gender     Gender
+  division   String
+  photo_url  String?
+  created_at DateTime @default(now())
+  scores     Score[]
+
+  @@index([division])
+  @@index([gender])
+  @@map("athletes")
+}
+
+// ── WODs ───────────────────────────────────────────
+
+model Wod {
+  id               String    @id @default(cuid())
+  name             String
+  day_number       Int       @unique
+  description      String?
+  score_type       ScoreType
+  time_cap_seconds Int?
+  sort_order       SortOrder
+  display_order    Int       @default(autoincrement())
+  is_active        Boolean   @default(true)
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+  scores           Score[]
+
+  @@map("wods")
+}
+
+// ── Scores ─────────────────────────────────────────
+
+model Score {
+  id            String      @id @default(cuid())
+  athlete_id    String
+  wod_id        String
+  raw_score     Decimal
+  display_score String
+  is_rx         Boolean     @default(true)
+  scored_by     String?
+  evidence_url  String?
+  judge_notes   String?
+  status        ScoreStatus @default(pending)
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @updatedAt
+
+  athlete Athlete @relation(fields: [athlete_id], references: [id], onDelete: Cascade)
+  wod     Wod     @relation(fields: [wod_id], references: [id], onDelete: Cascade)
+
+  @@unique([athlete_id, wod_id])
+  @@index([wod_id])
+  @@index([athlete_id])
+  @@map("scores")
+}
+
+// ── Admin Users ────────────────────────────────────
+
+model AdminUser {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password_hash String
+  role          AdminRole @default(judge)
+  created_at    DateTime  @default(now())
+
+  @@map("admin_users")
+}
