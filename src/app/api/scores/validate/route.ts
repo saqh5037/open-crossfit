@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 import { requireRole } from "@/lib/auth-helpers"
 import { logScoreAudit } from "@/lib/audit"
+import { sendEmail } from "@/lib/email"
+import { ScoreApprovedEmail } from "@/emails/score-approved"
 import { z } from "zod"
 
 const validateSchema = z.object({
@@ -71,6 +73,12 @@ export async function POST(request: NextRequest) {
     const { score_ids, action, rejection_reason } = parsed.data
 
     if (action === "confirm") {
+      // Fetch scores with athlete/wod info before confirming (for emails)
+      const scoresToConfirm = await prisma.score.findMany({
+        where: { id: { in: score_ids }, status: "pending" },
+        include: { athlete: true, wod: true },
+      })
+
       // Batch confirm
       await prisma.score.updateMany({
         where: { id: { in: score_ids }, status: "pending" },
@@ -87,9 +95,50 @@ export async function POST(request: NextRequest) {
         }).catch(console.error)
       }
 
+      // Get event name for emails
+      const eventConfig = await prisma.eventConfig.findFirst()
+      const eventName = eventConfig?.name || "GRIZZLYS Open"
+
+      // Send score-approved emails (fire-and-forget)
+      for (const score of scoresToConfirm) {
+        if (!score.athlete.email) continue
+
+        // Calculate placement: count confirmed scores in same WOD+division with better ranking
+        const betterScores = await prisma.score.count({
+          where: {
+            wod_id: score.wod_id,
+            status: "confirmed",
+            athlete: { division: score.athlete.division },
+            raw_score: score.wod.sort_order === "asc"
+              ? { lt: score.raw_score }
+              : { gt: score.raw_score },
+          },
+        })
+        const totalInDivision = await prisma.score.count({
+          where: {
+            wod_id: score.wod_id,
+            status: "confirmed",
+            athlete: { division: score.athlete.division },
+          },
+        })
+
+        sendEmail({
+          to: score.athlete.email,
+          subject: `Score Confirmado: ${score.wod.name} — ${score.display_score}`,
+          react: ScoreApprovedEmail({
+            athleteName: score.athlete.full_name,
+            wodName: score.wod.name,
+            displayScore: score.display_score,
+            placement: betterScores + 1,
+            totalInDivision,
+            eventName,
+          }),
+        }).catch(console.error)
+      }
+
       return NextResponse.json({
         success: true,
-        message: `${score_ids.length} score(s) confirmado(s)`,
+        message: `${scoresToConfirm.length} score(s) confirmado(s)`,
       })
     }
 
