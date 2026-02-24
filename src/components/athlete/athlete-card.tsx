@@ -3,14 +3,18 @@
 import { useState, useEffect } from "react"
 import { QRCodeSVG } from "qrcode.react"
 import Image from "next/image"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { TimeInput } from "@/components/scores/time-input"
 import { parseScore } from "@/lib/score-utils"
-import { Printer, Trophy, Dumbbell, PenLine, Save, Loader2, X, ClipboardList } from "lucide-react"
-import Link from "next/link"
+import {
+  Printer, Trophy, Dumbbell, PenLine, Save, Loader2, X,
+  ClipboardList, QrCode, ArrowLeft, CheckCircle,
+} from "lucide-react"
 
 interface Score {
   id: string
@@ -53,13 +57,17 @@ export function AtletaCard({
   wods = [],
   isJudge = false,
 }: AtletaCardProps) {
+  const router = useRouter()
   const [qrUrl, setQrUrl] = useState("")
   const [scores, setScores] = useState<Score[]>(initialScores)
   const [scoringWodId, setScoringWodId] = useState<string | null>(null)
   const [scoreInput, setScoreInput] = useState("")
-  const [scoreIsRx, setScoreIsRx] = useState(true)
+  // Auto-detect RX based on athlete division
+  const isAthleteRx = !athlete.division.startsWith("scaled_")
+  const [scoreIsRx, setScoreIsRx] = useState(isAthleteRx)
   const [saving, setSaving] = useState(false)
   const [scoreError, setScoreError] = useState<string | null>(null)
+  const [lastSavedWod, setLastSavedWod] = useState<string | null>(null)
 
   useEffect(() => {
     fetch("/api/event-config")
@@ -80,8 +88,9 @@ export function AtletaCard({
   const openScoring = (wodId: string) => {
     setScoringWodId(wodId)
     setScoreInput("")
-    setScoreIsRx(true)
+    setScoreIsRx(isAthleteRx)
     setScoreError(null)
+    setLastSavedWod(null)
   }
 
   const cancelScoring = () => {
@@ -116,7 +125,6 @@ export function AtletaCard({
         return
       }
 
-      // Update scores locally
       const newScore: Score = {
         id: existingScore?.id || "temp-" + Date.now(),
         display_score,
@@ -132,6 +140,10 @@ export function AtletaCard({
 
       setScoringWodId(null)
       setScoreInput("")
+      setLastSavedWod(wod.name)
+
+      // Clear success message after 3s
+      setTimeout(() => setLastSavedWod(null), 3000)
     } catch (err) {
       setScoreError(err instanceof Error ? err.message : "Error al procesar score")
     } finally {
@@ -150,7 +162,7 @@ export function AtletaCard({
 
   const getScoreTypePlaceholder = (type: string) => {
     switch (type) {
-      case "time": return "mm:ss"
+      case "time": return "0:00"
       case "reps": return "Ej: 150"
       case "weight": return "Ej: 95"
       default: return ""
@@ -161,6 +173,15 @@ export function AtletaCard({
     <>
       {/* === SCREEN VIEW === */}
       <div className="print:hidden">
+        {/* Back button */}
+        <button
+          onClick={() => router.back()}
+          className="mb-4 flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Regresar
+        </button>
+
         {/* Athlete info card */}
         <Card className="border-gray-800 bg-[#111]">
           <CardContent className="flex flex-col items-center gap-4 pt-8 text-center">
@@ -223,6 +244,14 @@ export function AtletaCard({
             <Trophy className="h-5 w-5 text-primary" />
             SCORES
           </h2>
+
+          {/* Success toast */}
+          {lastSavedWod && (
+            <div className="mb-3 flex items-center gap-2 rounded-lg bg-green-950 border border-green-800 px-4 py-2 text-sm text-green-400">
+              <CheckCircle className="h-4 w-4 shrink-0" />
+              Score de {lastSavedWod} guardado
+            </div>
+          )}
 
           {/* If judge: show all WODs with score status */}
           {isJudge && wods.length > 0 ? (
@@ -300,32 +329,6 @@ export function AtletaCard({
                             )}
                           </div>
 
-                          {/* RX / Scaled toggle */}
-                          <div className="flex gap-2">
-                            <button
-                              type="button"
-                              onClick={() => setScoreIsRx(true)}
-                              className={`flex-1 rounded-md border px-3 py-1.5 text-sm font-bold transition-colors ${
-                                scoreIsRx
-                                  ? "border-green-600 bg-green-600 text-white"
-                                  : "border-gray-700 text-gray-400"
-                              }`}
-                            >
-                              RX
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setScoreIsRx(false)}
-                              className={`flex-1 rounded-md border px-3 py-1.5 text-sm font-bold transition-colors ${
-                                !scoreIsRx
-                                  ? "border-yellow-600 bg-yellow-600 text-black"
-                                  : "border-gray-700 text-gray-400"
-                              }`}
-                            >
-                              Scaled
-                            </button>
-                          </div>
-
                           {scoreError && (
                             <p className="text-xs text-red-400">{scoreError}</p>
                           )}
@@ -358,6 +361,22 @@ export function AtletaCard({
                   </Card>
                 )
               })}
+
+              {/* Judge navigation - always visible */}
+              <div className="mt-4 flex flex-col gap-2">
+                <Button asChild size="lg" className="w-full gap-2 text-base">
+                  <Link href="/judge">
+                    <QrCode className="h-5 w-5" />
+                    Escanear otro atleta
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="sm" className="w-full gap-2">
+                  <Link href="/leaderboard">
+                    <Trophy className="h-4 w-4" />
+                    Ver Leaderboard
+                  </Link>
+                </Button>
+              </div>
             </div>
           ) : scores.length === 0 ? (
             <Card className="border-gray-800 bg-[#111]">
@@ -403,19 +422,14 @@ export function AtletaCard({
       {/* === PRINT VIEW === */}
       <div className="hidden print:block">
         <div className="mx-auto flex max-w-sm flex-col items-center border-2 border-black bg-white px-8 py-6 text-black">
-          {/* Header */}
           <div className="mb-1 flex items-center gap-2">
             <img src="/logo-80.png" alt="" className="h-8 w-8 rounded" />
             <span className="text-2xl font-black tracking-wider">GRIZZLYS</span>
           </div>
           <p className="mb-4 text-xs uppercase tracking-wider text-gray-500">{eventName}</p>
-
-          {/* Number */}
           <div className="text-6xl font-black leading-none" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
             #{paddedNumber}
           </div>
-
-          {/* Photo */}
           <div className="my-4 h-32 w-32 overflow-hidden rounded-full border-2 border-black">
             {athlete.photo_url ? (
               <img src={athlete.photo_url} alt={athlete.full_name} className="h-full w-full object-cover" />
@@ -423,15 +437,9 @@ export function AtletaCard({
               <img src="/logo-80.png" alt="" className="h-full w-full object-cover opacity-30" />
             )}
           </div>
-
-          {/* Name */}
           <p className="text-center text-xl font-bold uppercase">{athlete.full_name}</p>
-
-          {/* Division + Age */}
           <p className="mt-1 text-sm text-gray-600">{divisionLabel}</p>
           {age && <p className="text-sm text-gray-500">{age} años</p>}
-
-          {/* QR Code */}
           {qrUrl && (
             <div className="mt-4">
               <QRCodeSVG value={qrUrl} size={120} level="M" />

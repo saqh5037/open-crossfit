@@ -1,6 +1,8 @@
 export const dynamic = "force-dynamic"
 
 import prisma from "@/lib/prisma"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { RegistrationForm } from "@/components/registration/registration-form"
@@ -10,12 +12,15 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 export default async function RegistroPage() {
-  const config = await prisma.eventConfig.findFirst()
+  const [config, session] = await Promise.all([
+    prisma.eventConfig.findFirst(),
+    getServerSession(authOptions),
+  ])
   const divisions = (config?.divisions as string[]) ?? []
 
   return (
     <>
-      <Header registrationOpen={config?.registration_open ?? false} />
+      <Header registrationOpen={config?.registration_open ?? false} userRole={(session?.user as { role?: string } | undefined)?.role ?? null} />
       <main className="min-h-screen bg-black px-4 py-12">
         <div className="container mx-auto max-w-lg">
           {config?.registration_open ? (

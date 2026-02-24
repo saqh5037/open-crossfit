@@ -74,7 +74,7 @@ export default async function AtletaPage({ params }: { params: { id: string } })
 
   return (
     <>
-      <Header registrationOpen={config?.registration_open ?? false} />
+      <Header registrationOpen={config?.registration_open ?? false} userRole={userRole ?? null} />
       <main className="min-h-screen bg-black px-4 py-8">
         <div className="container mx-auto max-w-lg">
           <AtletaCard

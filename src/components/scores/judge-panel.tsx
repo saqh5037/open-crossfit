@@ -343,7 +343,7 @@ export function JudgePanel() {
                         setSelectedAthlete(a)
                         setSearchQuery(a.full_name)
                         setAthletes([])
-                        setIsRx(a.division.startsWith("rx"))
+                        setIsRx(!a.division.startsWith("scaled_"))
                       }}
                       className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-gray-800 sm:px-4 sm:py-3"
                     >
@@ -388,27 +388,6 @@ export function JudgePanel() {
                       className="text-center text-lg font-mono"
                     />
                   )}
-                </div>
-
-                {/* RX Toggle */}
-                <div className="flex items-center gap-3">
-                  <Label>Modalidad:</Label>
-                  <div className="flex gap-2">
-                    {[true, false].map((rx) => (
-                      <button
-                        key={String(rx)}
-                        type="button"
-                        onClick={() => setIsRx(rx)}
-                        className={`rounded-lg px-4 py-2 text-sm font-bold transition-colors ${
-                          isRx === rx
-                            ? "bg-primary text-white"
-                            : "bg-gray-800 text-gray-300"
-                        }`}
-                      >
-                        {rx ? "RX" : "Scaled"}
-                      </button>
-                    ))}
-                  </div>
                 </div>
 
                 {/* Judge Notes */}

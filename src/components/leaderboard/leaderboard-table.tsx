@@ -1,3 +1,4 @@
+import Link from "next/link"
 import {
   Table,
   TableBody,
@@ -65,7 +66,14 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
                 <TableCell className="text-center">
                   <MedalBadge rank={rank} />
                 </TableCell>
-                <TableCell className="font-medium text-white">{entry.full_name}</TableCell>
+                <TableCell className="font-medium">
+                  <Link
+                    href={`/atleta/${entry.id}`}
+                    className="text-white hover:text-primary hover:underline transition-colors"
+                  >
+                    {entry.full_name}
+                  </Link>
+                </TableCell>
                 {wods.map((wod) => {
                   const result = entry.wod_results?.find(
                     (r) => r.wod_id === wod.id

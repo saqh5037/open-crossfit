@@ -1,4 +1,6 @@
 import prisma from "@/lib/prisma"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { HeroSection } from "@/components/landing/hero-section"
@@ -7,7 +9,7 @@ import { InfoSection } from "@/components/landing/info-section"
 export const dynamic = "force-dynamic"
 
 export default async function HomePage() {
-  const [config, athleteCount, wods] = await Promise.all([
+  const [config, athleteCount, wods, session] = await Promise.all([
     prisma.eventConfig.findFirst(),
     prisma.athlete.count(),
     prisma.wod.findMany({
@@ -15,13 +17,14 @@ export default async function HomePage() {
       orderBy: { display_order: "asc" },
       select: { name: true, day_number: true, description: true, score_type: true },
     }),
+    getServerSession(authOptions),
   ])
 
   const divisions = (config?.divisions as string[]) ?? []
 
   return (
     <>
-      <Header registrationOpen={config?.registration_open ?? false} />
+      <Header registrationOpen={config?.registration_open ?? false} userRole={(session?.user as { role?: string } | undefined)?.role ?? null} />
       <main>
         <HeroSection
           eventName={config?.name ?? "CrossFit Open 2026"}

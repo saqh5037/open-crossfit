@@ -1,13 +1,16 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Settings } from "lucide-react"
+import { Settings, ClipboardList } from "lucide-react"
 
 interface HeaderProps {
   registrationOpen?: boolean
+  userRole?: string | null
 }
 
-export function Header({ registrationOpen = false }: HeaderProps) {
+export function Header({ registrationOpen = false, userRole }: HeaderProps) {
+  const isJudge = userRole && ["judge", "coach", "admin", "owner"].includes(userRole)
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-black/95 backdrop-blur supports-[backdrop-filter]:bg-black/80">
       <div className="container flex h-16 items-center justify-between px-4">
@@ -20,16 +23,27 @@ export function Header({ registrationOpen = false }: HeaderProps) {
           <Button variant="ghost" size="sm" className="px-2 text-xs text-gray-300 hover:text-white sm:px-3 sm:text-sm" asChild>
             <Link href="/leaderboard">Leaderboard</Link>
           </Button>
+          {isJudge && (
+            <Button variant="ghost" size="sm" className="gap-1 px-2 text-xs text-gray-300 hover:text-white sm:px-3 sm:text-sm" asChild>
+              <Link href="/judge">
+                <ClipboardList className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Panel Juez</span>
+                <span className="sm:hidden">Juez</span>
+              </Link>
+            </Button>
+          )}
           {registrationOpen && (
             <Button size="sm" className="bg-primary px-3 font-display text-xs uppercase tracking-wider text-black hover:bg-orange-500 sm:px-4 sm:text-sm" asChild>
               <Link href="/registro">Inscribirme</Link>
             </Button>
           )}
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500 hover:text-white" asChild>
-            <Link href="/admin">
-              <Settings className="h-4 w-4" />
-            </Link>
-          </Button>
+          {!isJudge && (
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500 hover:text-white" asChild>
+              <Link href="/admin">
+                <Settings className="h-4 w-4" />
+              </Link>
+            </Button>
+          )}
         </nav>
       </div>
     </header>
