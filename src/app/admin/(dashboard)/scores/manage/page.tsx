@@ -206,8 +206,6 @@ export default function ScoresManagePage() {
           <option value="rx_female">RX Femenino</option>
           <option value="scaled_male">Scaled Masculino</option>
           <option value="scaled_female">Scaled Femenino</option>
-          <option value="masters35_male">Masters 35+ Masculino</option>
-          <option value="masters35_female">Masters 35+ Femenino</option>
         </select>
         <span className="text-sm text-gray-500">
           {loading ? "Cargando..." : `${scores.length} scores`}

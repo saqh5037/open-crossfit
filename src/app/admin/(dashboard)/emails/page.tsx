@@ -27,8 +27,6 @@ const DIVISIONS = [
   { key: "scaled_female", label: "Scaled Femenino" },
   { key: "foundation_male", label: "Foundation Masculino" },
   { key: "foundation_female", label: "Foundation Femenino" },
-  { key: "masters35_male", label: "Masters 35+ Masculino" },
-  { key: "masters35_female", label: "Masters 35+ Femenino" },
   { key: "masters45_male", label: "Masters 45+ Masculino" },
   { key: "masters45_female", label: "Masters 45+ Femenino" },
   { key: "teens_male", label: "Teens Masculino" },

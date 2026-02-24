@@ -54,6 +54,7 @@ export default async function LeaderboardPage({
             initialWods={initialWods}
             initialDivision={division}
             availableDivisions={availableDivisions}
+            eventName={config?.name ?? "GRIZZLYS Open 2026"}
           />
         </div>
       </main>

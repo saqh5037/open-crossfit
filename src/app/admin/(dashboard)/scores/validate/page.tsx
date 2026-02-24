@@ -69,8 +69,6 @@ const DIV_LABEL: Record<string, string> = {
   scaled_female: "Scaled F",
   foundation_male: "Found. M",
   foundation_female: "Found. F",
-  masters35_male: "M35+ M",
-  masters35_female: "M35+ F",
   masters45_male: "M45+ M",
   masters45_female: "M45+ F",
   teens_male: "Teens M",
@@ -329,8 +327,6 @@ export default function ValidateScoresPage() {
           <option value="scaled_female">Scaled Femenino</option>
           <option value="foundation_male">Foundation Masculino</option>
           <option value="foundation_female">Foundation Femenino</option>
-          <option value="masters35_male">Masters 35+ Masculino</option>
-          <option value="masters35_female">Masters 35+ Femenino</option>
           <option value="masters45_male">Masters 45+ Masculino</option>
           <option value="masters45_female">Masters 45+ Femenino</option>
           <option value="teens_male">Teens Masculino</option>

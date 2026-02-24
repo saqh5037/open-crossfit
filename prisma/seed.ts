@@ -22,7 +22,6 @@ async function main() {
       divisions: [
         "rx_male", "rx_female",
         "scaled_male", "scaled_female",
-        "masters35_male", "masters35_female",
       ],
     },
   })
@@ -34,7 +33,7 @@ async function main() {
       where: { day_number: 1 },
       update: {},
       create: {
-        name: "26.1",
+        name: "Open 26.1",
         day_number: 1,
         description: "For Time:\n3 Rounds of:\n10 Thrusters (95/65 lb)\n15 Bar-Facing Burpees\n20 Double-Unders\nTime Cap: 12 minutes",
         score_type: "time",
@@ -46,7 +45,7 @@ async function main() {
       where: { day_number: 2 },
       update: {},
       create: {
-        name: "26.2",
+        name: "Open 26.2",
         day_number: 2,
         description: "AMRAP in 15 minutes:\n5 Deadlifts (225/155 lb)\n10 Toes-to-Bar\n15 Wall Balls (20/14 lb)",
         score_type: "reps",
@@ -58,7 +57,7 @@ async function main() {
       where: { day_number: 3 },
       update: {},
       create: {
-        name: "26.3",
+        name: "Open 26.3",
         day_number: 3,
         description: "Clean & Jerk Complex:\n1 Squat Clean + 1 Hang Clean + 1 Split Jerk\nFind your 1RM in 12 minutes",
         score_type: "weight",
@@ -75,12 +74,12 @@ async function main() {
     { full_name: "Diego Ramírez", email: "diego@test.com", phone: "9991001002", gender: "M" as const, division: "rx_male" },
     { full_name: "Miguel Torres", email: "miguel@test.com", phone: "9991001003", gender: "M" as const, division: "rx_male" },
     { full_name: "Andrés López", email: "andres@test.com", phone: "9991001004", gender: "M" as const, division: "scaled_male" },
-    { full_name: "Roberto García", email: "roberto@test.com", phone: "9991001005", gender: "M" as const, division: "masters35_male" },
+    { full_name: "Roberto García", email: "roberto@test.com", phone: "9991001005", gender: "M" as const, division: "scaled_male" },
     { full_name: "Ana Martínez", email: "ana@test.com", phone: "9991001006", gender: "F" as const, division: "rx_female" },
     { full_name: "María Hernández", email: "maria@test.com", phone: "9991001007", gender: "F" as const, division: "rx_female" },
     { full_name: "Sofía Flores", email: "sofia@test.com", phone: "9991001008", gender: "F" as const, division: "rx_female" },
     { full_name: "Laura Sánchez", email: "laura@test.com", phone: "9991001009", gender: "F" as const, division: "scaled_female" },
-    { full_name: "Patricia Díaz", email: "patricia@test.com", phone: "9991001010", gender: "F" as const, division: "masters35_female" },
+    { full_name: "Patricia Díaz", email: "patricia@test.com", phone: "9991001010", gender: "F" as const, division: "scaled_female" },
   ]
 
   const athletes = await Promise.all(

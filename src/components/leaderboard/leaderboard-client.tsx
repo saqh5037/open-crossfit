@@ -5,8 +5,9 @@ import { LeaderboardTable } from "./leaderboard-table"
 import { DivisionTabs } from "./division-tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { HelpCircle } from "lucide-react"
+import { HelpCircle, FileDown, FileSpreadsheet, Loader2 } from "lucide-react"
 import { getPointsTable } from "@/lib/scoring"
+import { getDivisionLabel } from "@/lib/divisions"
 import type { LeaderboardEntry } from "@/types"
 
 interface WodHeader {
@@ -20,6 +21,7 @@ interface LeaderboardClientProps {
   initialWods: WodHeader[]
   initialDivision: string
   availableDivisions: string[]
+  eventName?: string
   autoRefresh?: boolean
   refreshInterval?: number
 }
@@ -29,6 +31,7 @@ export function LeaderboardClient({
   initialWods,
   initialDivision,
   availableDivisions,
+  eventName = "GRIZZLYS Open 2026",
   autoRefresh = true,
   refreshInterval = 30000,
 }: LeaderboardClientProps) {
@@ -36,6 +39,7 @@ export function LeaderboardClient({
   const [data, setData] = useState<LeaderboardEntry[]>(initialData)
   const [wods, setWods] = useState<WodHeader[]>(initialWods)
   const [loading, setLoading] = useState(false)
+  const [exporting, setExporting] = useState<"pdf" | "excel" | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const fetchLeaderboard = useCallback(async (div: string) => {
@@ -74,6 +78,47 @@ export function LeaderboardClient({
 
   const pointsTable = getPointsTable(20)
 
+  const handleExportPDF = async () => {
+    setExporting("pdf")
+    try {
+      const { generateLeaderboardPDF } = await import("@/lib/exports/leaderboard-pdf")
+      const blob = await generateLeaderboardPDF({
+        entries: data,
+        wods,
+        divisionLabel: getDivisionLabel(division),
+        eventName,
+      })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `leaderboard-${division}-${new Date().toISOString().split("T")[0]}.pdf`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error("PDF export error:", err)
+    } finally {
+      setExporting(null)
+    }
+  }
+
+  const handleExportExcel = async () => {
+    setExporting("excel")
+    try {
+      const { generateLeaderboardExcel } = await import("@/lib/exports/leaderboard-excel")
+      await generateLeaderboardExcel({
+        entries: data,
+        wods,
+        divisionKey: division,
+        divisionLabel: getDivisionLabel(division),
+        eventName,
+      })
+    } catch (err) {
+      console.error("Excel export error:", err)
+    } finally {
+      setExporting(null)
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
@@ -82,7 +127,28 @@ export function LeaderboardClient({
           selected={division}
           onChange={handleDivisionChange}
         />
-        <Dialog>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleExportPDF}
+            disabled={exporting !== null || data.length === 0}
+            className="gap-1 text-xs text-gray-400 hover:text-white"
+          >
+            {exporting === "pdf" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileDown className="h-3.5 w-3.5" />}
+            <span className="hidden sm:inline">PDF</span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleExportExcel}
+            disabled={exporting !== null || data.length === 0}
+            className="gap-1 text-xs text-gray-400 hover:text-white"
+          >
+            {exporting === "excel" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileSpreadsheet className="h-3.5 w-3.5" />}
+            <span className="hidden sm:inline">Excel</span>
+          </Button>
+          <Dialog>
           <DialogTrigger asChild>
             <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-gray-400 hover:text-white">
               <HelpCircle className="h-4 w-4" />
@@ -120,6 +186,7 @@ export function LeaderboardClient({
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {error && (

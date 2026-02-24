@@ -29,8 +29,6 @@ const divisionLabel: Record<string, string> = {
   rx_female: "RX Femenino",
   scaled_male: "Scaled Masculino",
   scaled_female: "Scaled Femenino",
-  masters35_male: "Masters 35+ M",
-  masters35_female: "Masters 35+ F",
   masters45_male: "Masters 45+ M",
   masters45_female: "Masters 45+ F",
   teens_male: "Teens Masculino",
