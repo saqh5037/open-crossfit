@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { TimeInput } from "@/components/scores/time-input"
 import { parseScore } from "@/lib/score-utils"
-import { Printer, Trophy, Dumbbell, PenLine, Save, Loader2, X } from "lucide-react"
+import { Printer, Trophy, Dumbbell, PenLine, Save, Loader2, X, ClipboardList } from "lucide-react"
+import Link from "next/link"
 
 interface Score {
   id: string
@@ -204,6 +205,14 @@ export function AtletaCard({
                 <Printer className="h-4 w-4" />
                 Imprimir ficha
               </Button>
+              {!isJudge && (
+                <Button asChild className="gap-2">
+                  <Link href={`/admin/login?callbackUrl=/atleta/${athlete.id}`}>
+                    <ClipboardList className="h-4 w-4" />
+                    Calificar
+                  </Link>
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
