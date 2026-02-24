@@ -44,9 +44,10 @@ export function parseScore(
       return { raw_score: reps, display_score: `${reps} reps` }
     }
     case "weight": {
-      const weight = parseFloat(input)
-      if (isNaN(weight) || weight <= 0) throw new Error("Peso debe ser un número positivo")
-      return { raw_score: weight, display_score: `${weight} kg` }
+      const lbs = parseFloat(input)
+      if (isNaN(lbs) || lbs <= 0) throw new Error("Peso debe ser un número positivo")
+      const kg = Math.round(lbs / 2.20462 * 10) / 10
+      return { raw_score: kg, display_score: `${lbs} lbs` }
     }
   }
 }

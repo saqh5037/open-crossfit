@@ -372,7 +372,7 @@ export function JudgePanel() {
               <>
                 <div>
                   <Label>
-                    Score ({selectedWod.score_type === "time" ? "mm:ss" : selectedWod.score_type === "reps" ? "repeticiones" : "kg"})
+                    Score ({selectedWod.score_type === "time" ? "mm:ss" : selectedWod.score_type === "reps" ? "repeticiones" : "libras"})
                   </Label>
                   {selectedWod.score_type === "time" ? (
                     <TimeInput value={scoreInput} onChange={setScoreInput} />
@@ -382,7 +382,7 @@ export function JudgePanel() {
                       inputMode={selectedWod.score_type === "weight" ? "decimal" : "numeric"}
                       step={selectedWod.score_type === "weight" ? "0.5" : "1"}
                       min="0"
-                      placeholder={selectedWod.score_type === "reps" ? "Ej: 150" : "Ej: 95.5"}
+                      placeholder={selectedWod.score_type === "reps" ? "Ej: 150" : "Ej: 225"}
                       value={scoreInput}
                       onChange={(e) => setScoreInput(e.target.value)}
                       className="text-center text-lg font-mono"

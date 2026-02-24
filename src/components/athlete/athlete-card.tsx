@@ -164,12 +164,12 @@ export function AtletaCard({
     switch (type) {
       case "time": return "0:00"
       case "reps": return "Ej: 150"
-      case "weight": return "Ej: 95"
+      case "weight": return "Ej: 225"
       default: return ""
     }
   }
 
-  const kgToLbs = (kg: number) => Math.round(kg * 2.20462)
+  const lbsToKg = (lbs: number) => Math.round(lbs / 2.20462 * 10) / 10
 
   return (
     <>
@@ -275,9 +275,9 @@ export function AtletaCard({
                             {wod.score_type === "weight" ? (
                               <div className="text-right">
                                 <span className="font-display text-2xl text-primary">
-                                  {kgToLbs(parseFloat(existing.display_score))} LBS
+                                  {existing.display_score}
                                 </span>
-                                <p className="text-xs text-gray-500">{existing.display_score} kg</p>
+                                <p className="text-xs text-gray-500">{lbsToKg(parseFloat(existing.display_score))} kg</p>
                               </div>
                             ) : (
                               <span className="font-display text-2xl text-primary">
@@ -330,7 +330,7 @@ export function AtletaCard({
                                 className="text-center text-lg font-mono"
                               />
                               <span className="text-xs text-gray-500 whitespace-nowrap">
-                                {wod.score_type === "reps" ? "reps" : "kg"}
+                                {wod.score_type === "reps" ? "reps" : "lbs"}
                               </span>
                             </div>
                           )}
@@ -404,9 +404,9 @@ export function AtletaCard({
                       {score.wod.score_type === "weight" ? (
                         <div className="text-right">
                           <span className="font-display text-2xl text-primary">
-                            {kgToLbs(parseFloat(score.display_score))} LBS
+                            {score.display_score}
                           </span>
-                          <p className="text-xs text-gray-500">{score.display_score} kg</p>
+                          <p className="text-xs text-gray-500">{lbsToKg(parseFloat(score.display_score))} kg</p>
                         </div>
                       ) : (
                         <span className="font-display text-2xl text-primary">

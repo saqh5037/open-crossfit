@@ -29,17 +29,17 @@ function MedalBadge({ rank }: { rank: number }) {
   return <span className="text-gray-400">{rank}</span>
 }
 
-const kgToLbs = (kg: number) => Math.round(kg * 2.20462)
+const lbsToKg = (lbs: number) => Math.round(lbs / 2.20462 * 10) / 10
 
 function formatScore(displayScore: string, scoreType: string) {
   if (scoreType === "weight") {
-    const kg = parseFloat(displayScore)
-    if (!isNaN(kg)) {
+    const lbs = parseFloat(displayScore)
+    if (!isNaN(lbs)) {
       return (
         <>
-          <span className="text-xs font-semibold text-gray-300">{kgToLbs(kg)} lbs</span>
+          <span className="text-xs font-semibold text-gray-300">{displayScore}</span>
           <br />
-          <span className="text-[10px] text-gray-500">{displayScore} kg</span>
+          <span className="text-[10px] text-gray-500">{lbsToKg(lbs)} kg</span>
         </>
       )
     }
