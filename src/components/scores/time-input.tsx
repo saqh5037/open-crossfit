@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef } from "react"
+import { useState, useRef } from "react"
 
 interface TimeInputProps {
   value: string
@@ -10,10 +10,10 @@ interface TimeInputProps {
 export function TimeInput({ value, onChange }: TimeInputProps) {
   const secRef = useRef<HTMLInputElement>(null)
 
-  // Parse current value "mm:ss" into parts
-  const parts = value.split(":")
-  const mins = parts[0] || ""
-  const secs = parts[1] || ""
+  // Initialize from value prop
+  const initialParts = value.split(":")
+  const [mins, setMins] = useState(initialParts[0] || "")
+  const [secs, setSecs] = useState(initialParts[1] || "")
 
   const emit = (m: string, s: string) => {
     if (!m && !s) {
@@ -21,14 +21,14 @@ export function TimeInput({ value, onChange }: TimeInputProps) {
       return
     }
     const mm = m || "0"
-    const ss = s.padStart(2, "0")
+    const ss = s ? s.padStart(2, "0") : "00"
     onChange(`${mm}:${ss}`)
   }
 
   const handleMinsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.replace(/\D/g, "").slice(0, 2)
+    setMins(val)
     emit(val, secs)
-    // Auto-jump to seconds after entering minutes
     if (val.length >= 2) {
       secRef.current?.focus()
       secRef.current?.select()
@@ -37,8 +37,8 @@ export function TimeInput({ value, onChange }: TimeInputProps) {
 
   const handleSecsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let val = e.target.value.replace(/\D/g, "").slice(0, 2)
-    // Cap seconds at 59
     if (Number(val) > 59) val = "59"
+    setSecs(val)
     emit(mins, val)
   }
 
