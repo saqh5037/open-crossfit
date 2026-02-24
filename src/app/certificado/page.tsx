@@ -10,22 +10,6 @@ import { Download, Loader2, AlertCircle, Lock } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
-// Brand colors (inline for html2canvas compatibility)
-const ORANGE = "#FF6600"
-const WHITE = "#ffffff"
-const GRAY_300 = "#d1d5db"
-const GRAY_400 = "#9ca3af"
-const GRAY_500 = "#6b7280"
-const GRAY_600 = "#4b5563"
-const GRAY_800 = "#1f2937"
-const DARK_BG = "#111827"
-const BLACK = "#000000"
-
-// Bebas Neue font stack — explicit for html2canvas
-const FONT_DISPLAY = "'Bebas Neue', 'Arial Narrow', Impact, sans-serif"
-const FONT_BODY = "Inter, -apple-system, sans-serif"
-const FONT_MONO = "'Courier New', Courier, monospace"
-
 interface WodResult {
   wod_id: string
   wod_name: string
@@ -96,18 +80,21 @@ export default function CertificadoPage() {
     if (!certRef.current || !certificate || downloading) return
     setDownloading(true)
     try {
-      const { default: html2canvas } = await import("html2canvas")
+      const { toPng } = await import("dom-to-image-more")
       const el = certRef.current
-      const canvas = await html2canvas(el, {
-        backgroundColor: BLACK,
-        scale: 3,
-        useCORS: true,
-        width: el.scrollWidth,
-        height: el.scrollHeight,
+      const scale = 3
+      const dataUrl = await toPng(el, {
+        width: el.scrollWidth * scale,
+        height: el.scrollHeight * scale,
+        style: {
+          transform: `scale(${scale})`,
+          transformOrigin: "top left",
+        },
+        quality: 1,
       })
       const link = document.createElement("a")
       link.download = `certificado-${certificate.athlete.full_name.replace(/\s+/g, "-").toLowerCase()}.png`
-      link.href = canvas.toDataURL("image/png")
+      link.href = dataUrl
       link.click()
     } finally {
       setDownloading(false)
@@ -231,374 +218,150 @@ export default function CertificadoPage() {
         </Button>
       </div>
 
-      {/* ====== CERTIFICATE (all inline styles for html2canvas) ====== */}
+      {/* ====== CERTIFICATE (Tailwind — dom-to-image captures computed styles) ====== */}
       <div
         ref={certRef}
-        style={{
-          position: "relative",
-          width: 540,
-          overflow: "hidden",
-          backgroundColor: BLACK,
-          fontFamily: FONT_BODY,
-        }}
+        className="relative w-full max-w-[540px] overflow-hidden bg-black"
       >
-        {/* Background image */}
+        {/* Background image — same as hero */}
         <img
           src="/open2026.png"
           alt=""
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            opacity: 0.15,
-          }}
+          className="absolute inset-0 h-full w-full object-cover opacity-20"
           crossOrigin="anonymous"
         />
-        {/* Gradient overlay */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "linear-gradient(to top, #000000 0%, rgba(0,0,0,0.75) 40%, rgba(0,0,0,0.5) 100%)",
-          }}
-        />
+        {/* Gradient overlay — same as hero */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/50" />
 
         {/* Content */}
-        <div
-          style={{
-            position: "relative",
-            zIndex: 10,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            padding: "40px 40px 36px",
-          }}
-        >
+        <div className="relative z-10 flex flex-col items-center px-10 py-10">
+
           {/* Logo */}
           <img
             src="/logo-200.png"
             alt="GRIZZLYS"
-            style={{ width: 80, height: 80, borderRadius: 8, marginBottom: 12 }}
+            className="mb-3 h-20 w-20 rounded-lg"
             crossOrigin="anonymous"
           />
 
           {/* Brand name */}
-          <div
-            style={{
-              fontFamily: FONT_DISPLAY,
-              fontSize: 52,
-              letterSpacing: "0.12em",
-              color: ORANGE,
-              lineHeight: 1,
-            }}
-          >
+          <h1 className="font-display text-[52px] leading-none tracking-wider text-primary">
             GRIZZLYS
-          </div>
+          </h1>
 
-          {/* Decorative line + subtitle */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              marginTop: 16,
-            }}
-          >
-            <div style={{ width: 32, height: 2, backgroundColor: ORANGE }} />
-            <span
-              style={{
-                fontFamily: FONT_DISPLAY,
-                fontSize: 14,
-                letterSpacing: "0.2em",
-                color: GRAY_400,
-              }}
-            >
+          {/* Decorative line + subtitle — same as hero-section.tsx */}
+          <div className="mt-4 flex items-center gap-3">
+            <div className="h-[2px] w-8 bg-primary" />
+            <span className="font-display text-sm tracking-[0.2em] text-gray-400">
               Competencia Interna
             </span>
-            <div style={{ width: 32, height: 2, backgroundColor: ORANGE }} />
+            <div className="h-[2px] w-8 bg-primary" />
           </div>
 
           {/* Event name */}
-          <div
-            style={{
-              fontFamily: FONT_DISPLAY,
-              fontSize: 26,
-              letterSpacing: "0.08em",
-              color: WHITE,
-              marginTop: 8,
-            }}
-          >
+          <h2 className="mt-2 font-display text-[26px] tracking-wider text-white">
             {event.name}
-          </div>
+          </h2>
 
           {/* Dates */}
           {event.start_date && event.end_date && (
-            <div
-              style={{
-                fontSize: 11,
-                color: GRAY_500,
-                marginTop: 4,
-              }}
-            >
+            <p className="mt-1 text-[11px] text-gray-500">
               {event.start_date} — {event.end_date}
-            </div>
+            </p>
           )}
 
           {/* Orange divider */}
-          <div
-            style={{
-              width: "75%",
-              height: 1,
-              background: `linear-gradient(90deg, transparent, ${ORANGE}, transparent)`,
-              margin: "20px 0",
-            }}
-          />
+          <div className="my-5 h-px w-3/4 bg-gradient-to-r from-transparent via-primary to-transparent" />
 
           {/* Certificate title */}
-          <div
-            style={{
-              fontFamily: FONT_DISPLAY,
-              fontSize: 20,
-              letterSpacing: "0.25em",
-              color: ORANGE,
-            }}
-          >
+          <p className="font-display text-xl tracking-[0.25em] text-primary">
             CERTIFICADO DE PARTICIPACIÓN
-          </div>
-          <div
-            style={{
-              fontSize: 13,
-              color: GRAY_500,
-              fontStyle: "italic",
-              marginTop: 8,
-            }}
-          >
+          </p>
+          <p className="mt-2 text-[13px] italic text-gray-500">
             Se otorga el presente certificado a
-          </div>
+          </p>
 
           {/* Photo */}
           {athlete.photo_url && (
-            <div
-              style={{
-                width: 96,
-                height: 96,
-                borderRadius: "50%",
-                border: `3px solid ${ORANGE}`,
-                overflow: "hidden",
-                marginTop: 20,
-                /* no shadow — clean for print */
-              }}
-            >
+            <div className="mt-5 h-24 w-24 overflow-hidden rounded-full border-[3px] border-primary">
               <img
                 src={athlete.photo_url}
                 alt={athlete.full_name}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                className="h-full w-full object-cover"
                 crossOrigin="anonymous"
               />
             </div>
           )}
 
           {/* Athlete name */}
-          <div
-            style={{
-              fontFamily: FONT_DISPLAY,
-              fontSize: 42,
-              letterSpacing: "0.08em",
-              color: WHITE,
-              textAlign: "center",
-              textTransform: "uppercase",
-              marginTop: 16,
-              lineHeight: 1.1,
-            }}
-          >
+          <h3 className="mt-4 text-center font-display text-[42px] uppercase leading-tight tracking-wider text-white">
             {athlete.full_name}
-          </div>
+          </h3>
 
-          {/* Participant number */}
-          <div
-            style={{
-              fontFamily: FONT_DISPLAY,
-              fontSize: 22,
-              letterSpacing: "0.1em",
-              color: ORANGE,
-              marginTop: 4,
-            }}
-          >
+          {/* Number */}
+          <p className="mt-1 font-display text-[22px] tracking-wider text-primary">
             #{paddedNumber}
-          </div>
+          </p>
 
-          {/* Division badge — always orange brand color */}
-          <div
-            style={{
-              display: "inline-block",
-              padding: "4px 20px",
-              borderRadius: 6,
-              fontSize: 13,
-              fontWeight: 700,
-              color: BLACK,
-              backgroundColor: ORANGE,
-              marginTop: 12,
-              letterSpacing: "0.05em",
-            }}
-          >
-            {divLabel}
+          {/* Division badge — always orange */}
+          <div className="mt-3">
+            <span className="rounded-md bg-primary px-5 py-1 text-[13px] font-bold tracking-wide text-black">
+              {divLabel}
+            </span>
           </div>
 
           {/* Gray divider */}
-          <div
-            style={{
-              width: "50%",
-              height: 1,
-              background: `linear-gradient(90deg, transparent, ${GRAY_600}, transparent)`,
-              margin: "20px 0",
-            }}
-          />
+          <div className="my-5 h-px w-1/2 bg-gradient-to-r from-transparent via-gray-700 to-transparent" />
 
-          {/* Overall position box */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 16,
-              padding: "14px 28px",
-              borderRadius: 10,
-              border: `1px solid ${GRAY_800}`,
-              backgroundColor: "#111827",
-            }}
-          >
-            {/* Trophy emoji instead of SVG icon (html2canvas compatible) */}
-            <div style={{ fontSize: 36, lineHeight: 1 }}>
+          {/* Overall position — styled like hero date box */}
+          <div className="flex items-center gap-4 rounded-lg border border-gray-800 bg-gray-900/60 px-6 py-4">
+            <span className="text-4xl">
               {overall_rank === 1 ? "🏆" : overall_rank === 2 ? "🥈" : overall_rank === 3 ? "🥉" : "⭐"}
-            </div>
+            </span>
             <div>
-              <div
-                style={{
-                  fontFamily: FONT_DISPLAY,
-                  fontSize: 32,
-                  letterSpacing: "0.08em",
-                  color: WHITE,
-                  lineHeight: 1,
-                }}
-              >
+              <p className="font-display text-[32px] leading-none tracking-wider text-white">
                 {getOrdinal(overall_rank)} LUGAR
-              </div>
-              <div style={{ fontSize: 12, color: GRAY_400, marginTop: 4 }}>
+              </p>
+              <p className="mt-1 text-xs text-gray-400">
                 de {total_athletes} atletas en {divLabel}
-              </div>
-              <div
-                style={{
-                  fontFamily: FONT_DISPLAY,
-                  fontSize: 20,
-                  letterSpacing: "0.08em",
-                  color: ORANGE,
-                  marginTop: 2,
-                }}
-              >
+              </p>
+              <p className="mt-0.5 font-display text-xl tracking-wider text-primary">
                 {total_points} PUNTOS
-              </div>
+              </p>
             </div>
           </div>
 
           {/* WOD Results */}
-          <div style={{ width: "100%", marginTop: 24 }}>
-            <div
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: "0.2em",
-                color: GRAY_600,
-                textAlign: "center",
-                textTransform: "uppercase",
-                marginBottom: 10,
-              }}
-            >
+          <div className="mt-6 w-full">
+            <p className="mb-3 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600">
               Resultados por WOD
-            </div>
-            <div
-              style={{
-                borderRadius: 8,
-                overflow: "hidden",
-                border: `1px solid ${GRAY_800}`,
-              }}
-            >
+            </p>
+            <div className="overflow-hidden rounded-lg border border-gray-800">
               {/* Header */}
-              <div
-                style={{
-                  display: "flex",
-                  backgroundColor: DARK_BG,
-                  padding: "8px 16px",
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  color: GRAY_500,
-                }}
-              >
-                <span style={{ flex: 1 }}>WOD</span>
-                <span style={{ width: 90, textAlign: "center" }}>Score</span>
-                <span style={{ width: 50, textAlign: "center" }}>Pos</span>
-                <span style={{ width: 55, textAlign: "center" }}>Pts</span>
+              <div className="flex bg-gray-900 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                <span className="flex-1">WOD</span>
+                <span className="w-[90px] text-center">Score</span>
+                <span className="w-[50px] text-center">Pos</span>
+                <span className="w-[55px] text-center">Pts</span>
               </div>
               {/* Rows */}
               {results.map((r, i) => (
                 <div
                   key={r.wod_id}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "10px 16px",
-                    backgroundColor: i % 2 === 0 ? "#0a0a0a" : "#111111",
-                    borderTop: "1px solid #1a1a1a",
-                  }}
+                  className={`flex items-center px-4 py-2.5 ${
+                    i % 2 === 0 ? "bg-[#0a0a0a]" : "bg-[#111]"
+                  } border-t border-[#1a1a1a]`}
                 >
-                  <span
-                    style={{
-                      flex: 1,
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: GRAY_300,
-                      fontFamily: FONT_BODY,
-                    }}
-                  >
+                  <span className="flex-1 text-sm font-semibold text-gray-300">
                     {r.wod_name}
                   </span>
-                  <span
-                    style={{
-                      width: 90,
-                      textAlign: "center",
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: ORANGE,
-                      fontFamily: FONT_MONO,
-                    }}
-                  >
+                  <span className="w-[90px] text-center font-mono text-sm font-bold text-primary">
                     {r.display_score}
                   </span>
-                  <span
-                    style={{
-                      width: 50,
-                      textAlign: "center",
-                      fontSize: 12,
-                      color: GRAY_500,
-                    }}
-                  >
+                  <span className="w-[50px] text-center text-xs text-gray-500">
                     {r.placement}°
                   </span>
-                  <span
-                    style={{
-                      width: 55,
-                      textAlign: "center",
-                      fontSize: 15,
-                      fontWeight: 900,
-                      color: WHITE,
-                    }}
-                  >
+                  <span className="w-[55px] text-center text-[15px] font-black text-white">
                     {r.points}
                   </span>
                 </div>
@@ -607,38 +370,17 @@ export default function CertificadoPage() {
           </div>
 
           {/* Bottom orange divider */}
-          <div
-            style={{
-              width: "75%",
-              height: 1,
-              background: `linear-gradient(90deg, transparent, ${ORANGE}, transparent)`,
-              margin: "24px 0",
-            }}
-          />
+          <div className="my-6 h-px w-3/4 bg-gradient-to-r from-transparent via-primary to-transparent" />
 
           {/* Tagline */}
-          <div
-            style={{
-              fontFamily: FONT_DISPLAY,
-              fontSize: 15,
-              letterSpacing: "0.3em",
-              color: ORANGE,
-            }}
-          >
+          <p className="font-display text-[15px] tracking-[0.3em] text-primary">
             FORJANDO ATLETAS DE ÉLITE
-          </div>
+          </p>
 
           {/* Footer */}
-          <div
-            style={{
-              fontSize: 10,
-              letterSpacing: "0.1em",
-              color: GRAY_600,
-              marginTop: 12,
-            }}
-          >
+          <p className="mt-3 text-[10px] tracking-wider text-gray-600">
             Designed by WBI México
-          </div>
+          </p>
         </div>
       </div>
     </div>
