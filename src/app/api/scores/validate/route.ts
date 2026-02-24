@@ -122,6 +122,7 @@ export async function POST(request: NextRequest) {
           },
         })
 
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || ""
         sendEmail({
           to: score.athlete.email,
           subject: `Score Confirmado: ${score.wod.name} — ${score.display_score}`,
@@ -132,6 +133,7 @@ export async function POST(request: NextRequest) {
             placement: betterScores + 1,
             totalInDivision,
             eventName,
+            appUrl,
           }),
         }).catch(console.error)
       }

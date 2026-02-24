@@ -103,6 +103,7 @@ export async function POST(request: NextRequest) {
         startDate: config.start_date?.toLocaleDateString("es-MX") || "",
         endDate: config.end_date?.toLocaleDateString("es-MX") || "",
         profileUrl: `${appUrl}/atleta/${athlete.id}`,
+        appUrl,
         isJudge,
         judgeEmail: isJudge ? athlete.email : undefined,
         loginUrl: isJudge ? `${appUrl}/admin/login` : undefined,

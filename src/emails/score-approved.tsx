@@ -6,7 +6,7 @@ import {
   Section,
   Text,
   Hr,
-  Heading,
+  Img,
   Preview,
 } from "@react-email/components"
 
@@ -17,6 +17,7 @@ interface ScoreApprovedEmailProps {
   placement: number
   totalInDivision: number
   eventName: string
+  appUrl: string
 }
 
 export function ScoreApprovedEmail({
@@ -26,120 +27,214 @@ export function ScoreApprovedEmail({
   placement,
   totalInDivision,
   eventName,
+  appUrl,
 }: ScoreApprovedEmailProps) {
+  const logoUrl = `${appUrl}/logo-200.png`
+  const medal = placement === 1 ? "🥇" : placement === 2 ? "🥈" : placement === 3 ? "🥉" : ""
+
   return (
     <Html lang="es">
-      <Head />
+      <Head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
       <Preview>
-        Score confirmado: {wodName} — {displayScore}
+        {`Score confirmado: ${wodName} — ${displayScore}`}
       </Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={heading}>GRIZZLYS</Heading>
-          <Text style={title}>Score Confirmado</Text>
-
-          <Text style={text}>
-            Hola <strong>{athleteName}</strong>,
-          </Text>
-          <Text style={text}>
-            Tu score en <strong>{wodName}</strong> ha sido validado por un coach.
-          </Text>
-
-          <Section style={scoreBox}>
-            <Text style={wodLabel}>{wodName}</Text>
-            <Text style={scoreValue}>{displayScore}</Text>
-            <Text style={placementText}>
-              Posición actual: #{placement} de {totalInDivision} en tu división
-            </Text>
+          {/* Header */}
+          <Section style={headerSection}>
+            <Img
+              src={logoUrl}
+              alt="GRIZZLYS"
+              width="60"
+              height="60"
+              style={logo}
+            />
+            <Text style={brandName}>GRIZZLYS</Text>
           </Section>
 
+          {/* Green accent bar */}
+          <Section style={accentBar} />
+
+          {/* Status badge */}
+          <Section style={{ textAlign: "center" as const, padding: "24px 32px 0" }}>
+            <Text style={statusBadge}>✓ SCORE CONFIRMADO</Text>
+          </Section>
+
+          <Text style={greeting}>
+            Hola <strong style={{ color: "#fff" }}>{athleteName}</strong>,
+          </Text>
           <Text style={text}>
+            Tu score en <strong style={{ color: "#FF6600" }}>{wodName}</strong> ha sido validado por el coach.
+          </Text>
+
+          {/* Score card */}
+          <Section style={scoreCard}>
+            <Text style={wodLabel}>{wodName}</Text>
+            <Text style={scoreValue}>{displayScore}</Text>
+            <Section style={placementSection}>
+              <Text style={placementText}>
+                {medal} #{placement} de {totalInDivision} en tu división
+              </Text>
+            </Section>
+          </Section>
+
+          <Text style={motivationText}>
             ¡Sigue así! Los resultados finales se publicarán al terminar el evento.
           </Text>
 
+          {/* Footer */}
           <Hr style={hr} />
-          <Text style={footer}>{eventName} — GRIZZLYS</Text>
+          <Section style={footerSection}>
+            <Text style={footerText}>{eventName}</Text>
+            <Text style={footerBrand}>GRIZZLYS — MÉRIDA</Text>
+          </Section>
         </Container>
       </Body>
     </Html>
   )
 }
 
+// === STYLES ===
+
 const main = {
-  backgroundColor: "#0a0a0a",
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  backgroundColor: "#000000",
+  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
 }
 
 const container = {
-  backgroundColor: "#111",
-  border: "1px solid #333",
-  borderRadius: "12px",
-  margin: "40px auto",
-  padding: "32px",
-  maxWidth: "500px",
+  backgroundColor: "#0a0a0a",
+  border: "1px solid #1a1a1a",
+  margin: "0 auto",
+  padding: "0",
+  maxWidth: "600px",
 }
 
-const heading = {
-  color: "#DC2626",
+const headerSection = {
+  padding: "32px 32px 12px",
+  textAlign: "center" as const,
+}
+
+const logo = {
+  margin: "0 auto",
+  borderRadius: "10px",
+}
+
+const brandName = {
+  fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif',
+  color: "#FF6600",
   fontSize: "28px",
   fontWeight: "bold" as const,
-  letterSpacing: "4px",
+  letterSpacing: "6px",
   textAlign: "center" as const,
-  margin: "0 0 8px",
+  margin: "8px 0 0",
 }
 
-const title = {
+const accentBar = {
+  backgroundColor: "#22c55e",
+  height: "3px",
+  margin: "0 32px",
+}
+
+const statusBadge = {
+  backgroundColor: "#052e16",
+  border: "1px solid #166534",
+  borderRadius: "6px",
   color: "#22c55e",
-  fontSize: "22px",
+  display: "inline-block",
+  fontSize: "12px",
   fontWeight: "bold" as const,
-  textAlign: "center" as const,
-  margin: "0 0 24px",
+  letterSpacing: "2px",
+  padding: "8px 20px",
+}
+
+const greeting = {
+  color: "#a3a3a3",
+  fontSize: "14px",
+  lineHeight: "24px",
+  margin: "20px 32px 4px",
 }
 
 const text = {
-  color: "#d1d5db",
+  color: "#a3a3a3",
   fontSize: "14px",
   lineHeight: "24px",
-  margin: "8px 0",
+  margin: "4px 32px",
 }
 
-const scoreBox = {
-  backgroundColor: "#052e16",
-  border: "1px solid #166534",
+const scoreCard = {
+  backgroundColor: "#111",
+  border: "2px solid #FF6600",
   borderRadius: "8px",
-  padding: "20px",
-  margin: "16px 0",
+  margin: "24px 32px",
+  padding: "24px",
   textAlign: "center" as const,
 }
 
 const wodLabel = {
-  color: "#86efac",
-  fontSize: "12px",
+  color: "#FF6600",
+  fontSize: "10px",
+  fontWeight: "bold" as const,
+  letterSpacing: "3px",
   textTransform: "uppercase" as const,
-  letterSpacing: "2px",
-  margin: "0 0 4px",
+  margin: "0 0 8px",
 }
 
 const scoreValue = {
+  fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif',
   color: "#fff",
-  fontSize: "32px",
+  fontSize: "48px",
   fontWeight: "bold" as const,
-  margin: "0 0 8px",
+  margin: "0",
+  lineHeight: "1",
+}
+
+const placementSection = {
+  backgroundColor: "#052e16",
+  borderRadius: "4px",
+  padding: "8px",
+  marginTop: "16px",
 }
 
 const placementText = {
   color: "#86efac",
   fontSize: "14px",
+  fontWeight: "bold" as const,
   margin: "0",
 }
 
-const hr = {
-  borderColor: "#333",
-  margin: "24px 0",
+const motivationText = {
+  color: "#666",
+  fontSize: "13px",
+  textAlign: "center" as const,
+  margin: "0 32px 24px",
+  fontStyle: "italic" as const,
 }
 
-const footer = {
-  color: "#666",
-  fontSize: "12px",
+const hr = {
+  borderColor: "#1a1a1a",
+  margin: "0 32px",
+}
+
+const footerSection = {
+  padding: "20px 32px",
   textAlign: "center" as const,
+}
+
+const footerText = {
+  color: "#525252",
+  fontSize: "11px",
+  margin: "0",
+}
+
+const footerBrand = {
+  color: "#404040",
+  fontSize: "10px",
+  letterSpacing: "2px",
+  fontWeight: "bold" as const,
+  margin: "4px 0 0",
 }

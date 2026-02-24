@@ -87,6 +87,7 @@ export async function POST(request: NextRequest) {
               position: Number(entry.overall_rank),
               division: getDivisionLabel(div),
               totalPoints: Number(entry.total_points),
+              appUrl: process.env.NEXT_PUBLIC_APP_URL || "",
             }),
             attachments: [
               {
