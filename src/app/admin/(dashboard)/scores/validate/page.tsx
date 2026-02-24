@@ -215,8 +215,6 @@ export default function ValidateScoresPage() {
   }
 
   const pendingScores = scores.filter((s) => s.status === "pending")
-  const _confirmedInView = scores.filter((s) => s.status === "confirmed" || justConfirmed.has(s.id))
-
   return (
     <div className="flex flex-col gap-3 pb-24 lg:gap-4 lg:pb-6">
       {/* Header */}
