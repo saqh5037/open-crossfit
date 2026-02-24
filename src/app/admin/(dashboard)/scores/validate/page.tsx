@@ -29,8 +29,10 @@ import {
   CheckCheck,
   AlertTriangle,
   User,
+  IdCard,
 } from "lucide-react"
 import { getDivisionBadge } from "@/lib/divisions"
+import { AthleteCredentialDialog, type CredentialAthlete } from "@/components/athlete/athlete-credential-dialog"
 
 interface ScoreRow {
   id: string
@@ -122,6 +124,7 @@ export default function ValidateScoresPage() {
   })
   const [rejectReason, setRejectReason] = useState("")
   const [viewingImage, setViewingImage] = useState<string | null>(null)
+  const [credentialAthlete, setCredentialAthlete] = useState<CredentialAthlete | null>(null)
 
   const expandedRef = useRef<HTMLDivElement>(null)
 
@@ -264,6 +267,14 @@ export default function ValidateScoresPage() {
     } else {
       const json = await res.json()
       alert(json.error || "Error al rechazar")
+    }
+  }
+
+  const showCredential = async (athleteId: string) => {
+    const res = await fetch(`/api/athletes/${athleteId}`)
+    if (res.ok) {
+      const json = await res.json()
+      setCredentialAthlete(json.data)
     }
   }
 
@@ -440,7 +451,13 @@ export default function ValidateScoresPage() {
                   </div>
                 </div>
 
-                {/* Expand indicator */}
+                {/* Credential + Expand */}
+                <button
+                  className="shrink-0 rounded-lg p-1.5 text-primary active:bg-gray-800"
+                  onClick={(e) => { e.stopPropagation(); showCredential(group.athleteId) }}
+                >
+                  <IdCard className="h-4 w-4" />
+                </button>
                 <ChevronDown className={`h-4 w-4 shrink-0 text-gray-600 transition-transform ${
                   isExpanded ? "rotate-180" : ""
                 }`} />
@@ -631,7 +648,16 @@ export default function ValidateScoresPage() {
                       {divBadge.text}
                     </span>
                   )}
-                  <div className="ml-auto flex gap-1">
+                  <div className="ml-auto flex items-center gap-1">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 text-xs text-primary hover:bg-primary/10"
+                      title="Ver credencial"
+                      onClick={() => showCredential(group.athleteId)}
+                    >
+                      <IdCard className="h-3.5 w-3.5" />
+                    </Button>
                     {(hasPending || hasRejected) && (
                       <>
                         <Button
@@ -807,6 +833,12 @@ export default function ValidateScoresPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Athlete Credential */}
+      <AthleteCredentialDialog
+        athlete={credentialAthlete}
+        onClose={() => setCredentialAthlete(null)}
+      />
     </div>
   )
 }

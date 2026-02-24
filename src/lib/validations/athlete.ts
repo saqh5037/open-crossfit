@@ -15,7 +15,7 @@ export const athleteSchema = z
       .min(8, "El teléfono debe tener al menos 8 dígitos")
       .max(15, "El teléfono es demasiado largo"),
     birth_date: z.string().min(1, "La fecha de nacimiento es obligatoria"),
-    gender: z.enum(["M", "F", "NB"], {
+    gender: z.enum(["M", "F"], {
       message: "Selecciona tu género",
     }),
     division: z.string().min(1, "Selecciona tu división"),

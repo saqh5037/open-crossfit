@@ -231,7 +231,7 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
             <Label>Género *</Label>
             <Select
               onValueChange={(val) => {
-                setValue("gender", val as "M" | "F" | "NB", { shouldValidate: true })
+                setValue("gender", val as "M" | "F", { shouldValidate: true })
                 setValue("division", "")
               }}
             >
@@ -241,7 +241,6 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
               <SelectContent>
                 <SelectItem value="M">Masculino</SelectItem>
                 <SelectItem value="F">Femenino</SelectItem>
-                <SelectItem value="NB">No binario</SelectItem>
               </SelectContent>
             </Select>
             {errors.gender && (

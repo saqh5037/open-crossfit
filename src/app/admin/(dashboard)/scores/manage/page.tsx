@@ -27,8 +27,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { Trash2, Pencil, Filter, CheckCircle, Image as ImageIcon, History } from "lucide-react"
+import { Trash2, Pencil, Filter, CheckCircle, Image as ImageIcon, History, IdCard } from "lucide-react"
 import { getDivisionBadge } from "@/lib/divisions"
+import { AthleteCredentialDialog, type CredentialAthlete } from "@/components/athlete/athlete-credential-dialog"
 
 interface ScoreRow {
   id: string
@@ -73,6 +74,7 @@ export default function ScoresManagePage() {
     performer: { email: string; role: string }
   }>>([])
   const [auditLoading, setAuditLoading] = useState(false)
+  const [credentialAthlete, setCredentialAthlete] = useState<CredentialAthlete | null>(null)
 
   useEffect(() => {
     fetch("/api/wods")
@@ -127,6 +129,14 @@ export default function ScoresManagePage() {
     const json = await res.json()
     setAuditData(json.data ?? [])
     setAuditLoading(false)
+  }
+
+  const showCredential = async (athleteId: string) => {
+    const res = await fetch(`/api/athletes/${athleteId}`)
+    if (res.ok) {
+      const json = await res.json()
+      setCredentialAthlete(json.data)
+    }
   }
 
   const openEdit = (score: ScoreRow) => {
@@ -223,8 +233,17 @@ export default function ScoresManagePage() {
           <TableBody>
             {scores.map((score) => (
               <TableRow key={score.id}>
-                <TableCell className="font-medium">
-                  {score.athlete.full_name}
+                <TableCell>
+                  <div className="flex items-center gap-1">
+                    <span className="font-medium">{score.athlete.full_name}</span>
+                    <button
+                      className="rounded p-1 text-primary hover:bg-primary/10"
+                      title="Ver credencial"
+                      onClick={() => showCredential(score.athlete.id)}
+                    >
+                      <IdCard className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </TableCell>
                 <TableCell className="text-xs capitalize text-gray-400">
                   {score.athlete.division.replace(/_/g, " ")}
@@ -499,6 +518,12 @@ export default function ScoresManagePage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Athlete Credential */}
+      <AthleteCredentialDialog
+        athlete={credentialAthlete}
+        onClose={() => setCredentialAthlete(null)}
+      />
     </div>
   )
 }

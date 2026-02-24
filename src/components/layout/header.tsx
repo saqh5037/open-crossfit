@@ -1,7 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Settings, ClipboardList } from "lucide-react"
+import { Settings, ClipboardList, Award } from "lucide-react"
 
 interface HeaderProps {
   registrationOpen?: boolean
@@ -22,6 +22,12 @@ export function Header({ registrationOpen = false, userRole }: HeaderProps) {
         <nav className="flex items-center gap-1 sm:gap-2">
           <Button variant="ghost" size="sm" className="px-2 text-xs text-gray-300 hover:text-white sm:px-3 sm:text-sm" asChild>
             <Link href="/leaderboard">Leaderboard</Link>
+          </Button>
+          <Button variant="ghost" size="sm" className="gap-1 px-2 text-xs text-gray-300 hover:text-white sm:px-3 sm:text-sm" asChild>
+            <Link href="/certificado">
+              <Award className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Certificado</span>
+            </Link>
           </Button>
           {isJudge && (
             <Button variant="ghost" size="sm" className="gap-1 px-2 text-xs text-gray-300 hover:text-white sm:px-3 sm:text-sm" asChild>

@@ -29,17 +29,17 @@ interface AdminSidebarProps {
 }
 
 const navItems = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, roles: ["owner", "admin", "coach", "judge"] },
-  { href: "/admin/scores", label: "Capturar Scores", icon: ClipboardList, roles: ["owner", "admin", "coach", "judge"] },
-  { href: "/admin/scores/manage", label: "Ver Scores", icon: ListChecks, roles: ["owner", "admin", "coach"] },
-  { href: "/admin/scores/validate", label: "Validar Scores", icon: ShieldCheck, roles: ["owner", "admin", "coach"] },
-  { href: "/admin/scores/print", label: "Hojas de Score", icon: Printer, roles: ["owner", "admin", "coach"] },
-  { href: "/admin/bibs", label: "Credenciales", icon: BadgeCheck, roles: ["owner", "admin", "coach"] },
-  { href: "/admin/athletes", label: "Atletas", icon: Users, roles: ["owner", "admin", "coach"] },
-  { href: "/admin/wods", label: "WODs", icon: Dumbbell, roles: ["owner", "admin", "coach"] },
-  { href: "/admin/emails", label: "Emails", icon: Mail, roles: ["owner", "admin"] },
-  { href: "/admin/settings", label: "Configuración", icon: Settings, roles: ["owner"] },
-  { href: "/admin/users", label: "Usuarios Admin", icon: Shield, roles: ["owner"] },
+  { href: "/admin", label: "Dashboard", shortLabel: "Inicio", icon: LayoutDashboard, roles: ["owner", "admin", "coach", "judge"], quickNav: true },
+  { href: "/admin/scores", label: "Capturar Scores", shortLabel: "Capturar", icon: ClipboardList, roles: ["owner", "admin", "coach", "judge"], quickNav: true },
+  { href: "/admin/scores/manage", label: "Ver Scores", shortLabel: "Scores", icon: ListChecks, roles: ["owner", "admin", "coach"], quickNav: false },
+  { href: "/admin/scores/validate", label: "Validar Scores", shortLabel: "Validar", icon: ShieldCheck, roles: ["owner", "admin", "coach"], quickNav: true },
+  { href: "/admin/scores/print", label: "Hojas de Score", shortLabel: "Imprimir", icon: Printer, roles: ["owner", "admin", "coach"], quickNav: false },
+  { href: "/admin/bibs", label: "Credenciales", shortLabel: "Credenciales", icon: BadgeCheck, roles: ["owner", "admin", "coach"], quickNav: false },
+  { href: "/admin/athletes", label: "Atletas", shortLabel: "Atletas", icon: Users, roles: ["owner", "admin", "coach"], quickNav: true },
+  { href: "/admin/wods", label: "WODs", shortLabel: "WODs", icon: Dumbbell, roles: ["owner", "admin", "coach"], quickNav: false },
+  { href: "/admin/emails", label: "Emails", shortLabel: "Emails", icon: Mail, roles: ["owner", "admin"], quickNav: false },
+  { href: "/admin/settings", label: "Configuración", shortLabel: "Config", icon: Settings, roles: ["owner"], quickNav: false },
+  { href: "/admin/users", label: "Usuarios Admin", shortLabel: "Usuarios", icon: Shield, roles: ["owner"], quickNav: false },
 ]
 
 export function AdminSidebar({ role }: AdminSidebarProps) {
@@ -47,6 +47,7 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
   const [open, setOpen] = useState(false)
 
   const filteredItems = navItems.filter((item) => item.roles.includes(role))
+  const quickNavItems = filteredItems.filter((item) => item.quickNav)
 
   const nav = (
     <nav className="flex flex-col gap-1">
@@ -85,14 +86,15 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
 
   return (
     <>
-      {/* Mobile toggle */}
+      {/* Mobile toggle - more visible */}
       <Button
-        variant="ghost"
-        size="icon"
-        className="fixed left-4 top-4 z-50 md:hidden"
+        variant="outline"
+        size="sm"
+        className="fixed left-3 top-3 z-50 gap-2 border-gray-700 bg-gray-900 text-white md:hidden"
         onClick={() => setOpen(!open)}
       >
-        {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+        Menú
       </Button>
 
       {/* Mobile overlay */}
@@ -110,12 +112,32 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
           open ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="mb-6 flex items-center gap-2 px-3">
+        <Link href="/" onClick={() => setOpen(false)} className="mb-6 flex items-center gap-2 px-3">
           <Image src="/logo-80.png" alt="GRIZZLYS" width={32} height={32} className="rounded" />
           <span className="font-display text-2xl tracking-wider text-primary">GRIZZLYS</span>
-        </div>
+        </Link>
         {nav}
       </aside>
+
+      {/* Bottom nav - mobile only */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 flex border-t border-gray-800 bg-gray-950 md:hidden">
+        {quickNavItems.map((item) => {
+          const isActive = pathname === item.href
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px]",
+                isActive ? "text-primary" : "text-gray-500"
+              )}
+            >
+              <item.icon className="h-5 w-5" />
+              {item.shortLabel}
+            </Link>
+          )
+        })}
+      </nav>
     </>
   )
 }

@@ -15,8 +15,7 @@ export const DIVISIONS: Record<string, DivisionInfo> = {
   teens_female: { key: "teens_female", label: "Teens Femenino", gender: "F", description: "13-17 años" },
 }
 
-export function getDivisionsByGender(gender: "M" | "F" | "NB"): DivisionInfo[] {
-  if (gender === "NB") return Object.values(DIVISIONS)
+export function getDivisionsByGender(gender: "M" | "F"): DivisionInfo[] {
   return Object.values(DIVISIONS).filter((d) => d.gender === gender)
 }
 

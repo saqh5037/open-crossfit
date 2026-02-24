@@ -24,7 +24,7 @@ export default async function AdminLayout({
   return (
     <div className="flex min-h-screen bg-[#0a0a0a]">
       <AdminSidebar role={adminUser.role} />
-      <main className="flex-1 px-3 pb-3 pt-14 text-white sm:px-4 sm:pb-4 sm:pt-16 md:p-6">{children}</main>
+      <main className="flex-1 px-3 pb-20 pt-14 text-white sm:px-4 sm:pt-16 md:p-6 md:pb-6">{children}</main>
     </div>
   )
 }
