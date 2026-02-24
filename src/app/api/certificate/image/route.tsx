@@ -7,14 +7,51 @@ import { join } from "path"
 export const runtime = "nodejs"
 
 const ORANGE = "#FF6600"
-const BLACK = "#000000"
-const WHITE = "#FFFFFF"
-const GRAY300 = "#d1d5db"
-const GRAY400 = "#9ca3af"
-const GRAY500 = "#6b7280"
-const GRAY600 = "#4b5563"
-const GRAY800 = "#1f2937"
-const GRAY900 = "#111827"
+
+interface ThemeColors {
+  bg: string
+  text: string
+  textSecondary: string
+  textMuted: string
+  textFaint: string
+  border: string
+  cardBg: string
+  tableHeaderBg: string
+  tableRowEven: string
+  tableRowOdd: string
+  tableRowBorder: string
+  dividerColor: string
+}
+
+const darkTheme: ThemeColors = {
+  bg: "#0a0a0a",
+  text: "#FFFFFF",
+  textSecondary: "#9ca3af",
+  textMuted: "#6b7280",
+  textFaint: "#4b5563",
+  border: "#1f2937",
+  cardBg: "#111827",
+  tableHeaderBg: "#111827",
+  tableRowEven: "#0a0a0a",
+  tableRowOdd: "#111111",
+  tableRowBorder: "#1a1a1a",
+  dividerColor: "#374151",
+}
+
+const lightTheme: ThemeColors = {
+  bg: "#FFFFFF",
+  text: "#111827",
+  textSecondary: "#6b7280",
+  textMuted: "#9ca3af",
+  textFaint: "#d1d5db",
+  border: "#e5e7eb",
+  cardBg: "#f9fafb",
+  tableHeaderBg: "#f3f4f6",
+  tableRowEven: "#FFFFFF",
+  tableRowOdd: "#f9fafb",
+  tableRowBorder: "#e5e7eb",
+  dividerColor: "#d1d5db",
+}
 
 function getOrdinal(n: number) {
   if (n === 1) return "1ER"
@@ -53,7 +90,13 @@ interface WodResult {
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json()
-    const { athlete, event, results, overall_rank, total_points, total_athletes, divLabel } = data
+    const { athlete, event, results, overall_rank, total_points, total_athletes, divLabel, theme: themeParam } = data
+
+    const isDark = themeParam !== "light"
+    const t = isDark ? darkTheme : lightTheme
+    const tableTextColor = isDark ? "#d1d5db" : "#374151"
+    const scoreColor = ORANGE
+    const pointsColor = isDark ? "#FFFFFF" : "#111827"
 
     const paddedNumber = String(athlete.participant_number).padStart(3, "0")
 
@@ -87,7 +130,7 @@ export async function POST(request: NextRequest) {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            backgroundColor: "#0a0a0a",
+            backgroundColor: t.bg,
             position: "relative",
           }}
         >
@@ -139,7 +182,7 @@ export async function POST(request: NextRequest) {
                   fontFamily: "Bebas Neue",
                   fontSize: 14,
                   letterSpacing: "0.2em",
-                  color: GRAY400,
+                  color: t.textSecondary,
                   display: "flex",
                 }}
               >
@@ -154,7 +197,7 @@ export async function POST(request: NextRequest) {
                 fontFamily: "Bebas Neue",
                 fontSize: 26,
                 letterSpacing: "0.05em",
-                color: WHITE,
+                color: t.text,
                 marginTop: 8,
                 display: "flex",
               }}
@@ -164,7 +207,7 @@ export async function POST(request: NextRequest) {
 
             {/* Dates */}
             {event.start_date && event.end_date && (
-              <div style={{ fontSize: 11, color: GRAY500, marginTop: 4, display: "flex" }}>
+              <div style={{ fontSize: 11, color: t.textMuted, marginTop: 4, display: "flex" }}>
                 {event.start_date} — {event.end_date}
               </div>
             )}
@@ -174,7 +217,9 @@ export async function POST(request: NextRequest) {
               style={{
                 width: "75%",
                 height: 1,
-                background: `linear-gradient(to right, transparent, ${ORANGE}, transparent)`,
+                background: isDark
+                  ? `linear-gradient(to right, transparent, ${ORANGE}, transparent)`
+                  : `linear-gradient(to right, ${t.bg}, ${ORANGE}, ${t.bg})`,
                 margin: "20px 0",
                 display: "flex",
               }}
@@ -196,7 +241,7 @@ export async function POST(request: NextRequest) {
               style={{
                 fontSize: 13,
                 fontStyle: "italic",
-                color: GRAY500,
+                color: t.textMuted,
                 marginTop: 8,
                 display: "flex",
               }}
@@ -233,7 +278,7 @@ export async function POST(request: NextRequest) {
                 fontFamily: "Bebas Neue",
                 fontSize: 40,
                 letterSpacing: "0.05em",
-                color: WHITE,
+                color: t.text,
                 textTransform: "uppercase",
                 textAlign: "center",
                 lineHeight: 1.1,
@@ -262,7 +307,7 @@ export async function POST(request: NextRequest) {
             <div
               style={{
                 backgroundColor: ORANGE,
-                color: BLACK,
+                color: "#000000",
                 borderRadius: 6,
                 padding: "4px 20px",
                 fontSize: 13,
@@ -280,7 +325,9 @@ export async function POST(request: NextRequest) {
               style={{
                 width: "50%",
                 height: 1,
-                background: `linear-gradient(to right, transparent, #374151, transparent)`,
+                background: isDark
+                  ? `linear-gradient(to right, transparent, ${t.dividerColor}, transparent)`
+                  : `linear-gradient(to right, ${t.bg}, ${t.dividerColor}, ${t.bg})`,
                 margin: "20px 0",
                 display: "flex",
               }}
@@ -293,8 +340,8 @@ export async function POST(request: NextRequest) {
                 alignItems: "center",
                 gap: 16,
                 borderRadius: 8,
-                border: `1px solid ${GRAY800}`,
-                backgroundColor: GRAY900,
+                border: `1px solid ${t.border}`,
+                backgroundColor: t.cardBg,
                 padding: "16px 24px",
               }}
             >
@@ -306,7 +353,7 @@ export async function POST(request: NextRequest) {
                   style={{
                     fontFamily: "Bebas Neue",
                     fontSize: 32,
-                    color: WHITE,
+                    color: t.text,
                     letterSpacing: "0.05em",
                     lineHeight: 1,
                     display: "flex",
@@ -314,7 +361,7 @@ export async function POST(request: NextRequest) {
                 >
                   {getOrdinal(overall_rank)} LUGAR
                 </div>
-                <div style={{ fontSize: 12, color: GRAY400, marginTop: 4, display: "flex" }}>
+                <div style={{ fontSize: 12, color: t.textSecondary, marginTop: 4, display: "flex" }}>
                   de {total_athletes} atletas en {divLabel}
                 </div>
                 <div
@@ -340,7 +387,7 @@ export async function POST(request: NextRequest) {
                   fontWeight: 700,
                   textTransform: "uppercase",
                   letterSpacing: "0.2em",
-                  color: GRAY600,
+                  color: t.textFaint,
                   textAlign: "center",
                   marginBottom: 12,
                   display: "flex",
@@ -352,7 +399,7 @@ export async function POST(request: NextRequest) {
               <div
                 style={{
                   borderRadius: 8,
-                  border: `1px solid ${GRAY800}`,
+                  border: `1px solid ${t.border}`,
                   overflow: "hidden",
                   display: "flex",
                   flexDirection: "column",
@@ -362,13 +409,13 @@ export async function POST(request: NextRequest) {
                 <div
                   style={{
                     display: "flex",
-                    backgroundColor: GRAY900,
+                    backgroundColor: t.tableHeaderBg,
                     padding: "8px 16px",
                     fontSize: 10,
                     fontWeight: 700,
                     textTransform: "uppercase",
                     letterSpacing: "0.1em",
-                    color: GRAY500,
+                    color: t.textMuted,
                   }}
                 >
                   <div style={{ flex: 1, display: "flex" }}>WOD</div>
@@ -384,11 +431,11 @@ export async function POST(request: NextRequest) {
                       display: "flex",
                       alignItems: "center",
                       padding: "10px 16px",
-                      backgroundColor: i % 2 === 0 ? "#0a0a0a" : "#111111",
-                      borderTop: "1px solid #1a1a1a",
+                      backgroundColor: i % 2 === 0 ? t.tableRowEven : t.tableRowOdd,
+                      borderTop: `1px solid ${t.tableRowBorder}`,
                     }}
                   >
-                    <div style={{ flex: 1, fontSize: 14, fontWeight: 600, color: GRAY300, display: "flex" }}>
+                    <div style={{ flex: 1, fontSize: 14, fontWeight: 600, color: tableTextColor, display: "flex" }}>
                       {r.wod_name}
                     </div>
                     <div
@@ -396,17 +443,17 @@ export async function POST(request: NextRequest) {
                         width: 90,
                         fontSize: 14,
                         fontWeight: 700,
-                        color: ORANGE,
+                        color: scoreColor,
                         display: "flex",
                         justifyContent: "center",
                       }}
                     >
                       {r.display_score}
                     </div>
-                    <div style={{ width: 50, fontSize: 12, color: GRAY500, display: "flex", justifyContent: "center" }}>
+                    <div style={{ width: 50, fontSize: 12, color: t.textMuted, display: "flex", justifyContent: "center" }}>
                       {r.placement}°
                     </div>
-                    <div style={{ width: 55, fontSize: 15, fontWeight: 900, color: WHITE, display: "flex", justifyContent: "center" }}>
+                    <div style={{ width: 55, fontSize: 15, fontWeight: 900, color: pointsColor, display: "flex", justifyContent: "center" }}>
                       {r.points}
                     </div>
                   </div>
@@ -419,7 +466,9 @@ export async function POST(request: NextRequest) {
               style={{
                 width: "75%",
                 height: 1,
-                background: `linear-gradient(to right, transparent, ${ORANGE}, transparent)`,
+                background: isDark
+                  ? `linear-gradient(to right, transparent, ${ORANGE}, transparent)`
+                  : `linear-gradient(to right, ${t.bg}, ${ORANGE}, ${t.bg})`,
                 margin: "24px 0",
                 display: "flex",
               }}
@@ -443,7 +492,7 @@ export async function POST(request: NextRequest) {
               style={{
                 fontSize: 10,
                 letterSpacing: "0.1em",
-                color: GRAY600,
+                color: t.textFaint,
                 marginTop: 12,
                 display: "flex",
               }}

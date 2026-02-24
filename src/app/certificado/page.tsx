@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getDivisionLabel } from "@/lib/divisions"
-import { Download, Loader2, AlertCircle, Lock } from "lucide-react"
+import { Download, Loader2, AlertCircle, Lock, Sun, Moon } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -76,7 +76,7 @@ export default function CertificadoPage() {
     setLoading(false)
   }
 
-  const downloadCertificate = async () => {
+  const downloadCertificate = async (theme: "dark" | "light") => {
     if (!certificate || downloading) return
     setDownloading(true)
     try {
@@ -88,6 +88,7 @@ export default function CertificadoPage() {
         total_points: certificate.total_points,
         total_athletes: certificate.total_athletes,
         divLabel: getDivisionLabel(certificate.athlete.division),
+        theme,
       }
       const res = await fetch("/api/certificate/image", {
         method: "POST",
@@ -98,7 +99,7 @@ export default function CertificadoPage() {
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
       const link = document.createElement("a")
-      link.download = `certificado-${certificate.athlete.full_name.replace(/\s+/g, "-").toLowerCase()}.png`
+      link.download = `certificado-${certificate.athlete.full_name.replace(/\s+/g, "-").toLowerCase()}-${theme}.png`
       link.href = url
       link.click()
       URL.revokeObjectURL(url)
@@ -210,18 +211,41 @@ export default function CertificadoPage() {
         <Link href="/" className="text-sm text-gray-500 hover:text-primary transition-colors">
           Volver al inicio
         </Link>
-        <Button
-          onClick={downloadCertificate}
-          disabled={downloading}
-          className="gap-2 bg-primary font-display uppercase tracking-wider text-black hover:bg-orange-500"
-        >
-          {downloading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Download className="h-4 w-4" />
-          )}
-          Descargar
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => downloadCertificate("dark")}
+            disabled={downloading}
+            size="sm"
+            className="gap-1.5 bg-primary font-display uppercase tracking-wider text-black hover:bg-orange-500"
+          >
+            {downloading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <>
+                <Moon className="h-3.5 w-3.5" />
+                <Download className="h-3.5 w-3.5" />
+              </>
+            )}
+            Oscuro
+          </Button>
+          <Button
+            onClick={() => downloadCertificate("light")}
+            disabled={downloading}
+            size="sm"
+            variant="outline"
+            className="gap-1.5 border-gray-700 font-display uppercase tracking-wider text-gray-300 hover:bg-gray-800"
+          >
+            {downloading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <>
+                <Sun className="h-3.5 w-3.5" />
+                <Download className="h-3.5 w-3.5" />
+              </>
+            )}
+            Claro
+          </Button>
+        </div>
       </div>
 
       {/* ====== CERTIFICATE (Tailwind — dom-to-image captures computed styles) ====== */}
