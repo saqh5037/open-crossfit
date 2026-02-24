@@ -23,7 +23,7 @@ export function HeroSection({
   registrationOpen,
 }: HeroSectionProps) {
   const formatDate = (date: Date) =>
-    date.toLocaleDateString("es-MX", { day: "numeric", month: "long" })
+    date.toLocaleDateString("es-MX", { day: "numeric", month: "long", timeZone: "UTC" })
 
   return (
     <section className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden bg-black px-4 py-20 text-center text-white">
@@ -63,7 +63,7 @@ export function HeroSection({
         {startDate && endDate && (
           <div className="rounded-lg border border-gray-800 bg-gray-900/50 px-6 py-3">
             <p className="font-display text-lg tracking-wider text-gray-300">
-              {formatDate(startDate)} — {formatDate(endDate)}, {endDate.getFullYear()}
+              {formatDate(startDate)} — {formatDate(endDate)}, {endDate.getUTCFullYear()}
             </p>
           </div>
         )}
