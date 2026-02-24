@@ -7,7 +7,12 @@ const MAX_SIZE = 5 * 1024 * 1024 // 5MB
 
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData()
+    let formData: FormData
+    try {
+      formData = await request.formData()
+    } catch {
+      return NextResponse.json({ error: "Se requiere multipart/form-data con un archivo" }, { status: 400 })
+    }
     const file = formData.get("file") as File | null
 
     if (!file) {

@@ -22,7 +22,7 @@ export async function PUT(
 
   try {
     const body = await request.json()
-    const parsed = wodSchema.safeParse(body)
+    const parsed = wodSchema.partial().safeParse(body)
 
     if (!parsed.success) {
       return NextResponse.json(
@@ -31,15 +31,22 @@ export async function PUT(
       )
     }
 
+    const existing = await prisma.wod.findUnique({ where: { id: params.id } })
+    if (!existing) {
+      return NextResponse.json({ error: "WOD no encontrado" }, { status: 404 })
+    }
+
+    const scoreType = parsed.data.score_type ?? existing.score_type
+
     const wod = await prisma.wod.update({
       where: { id: params.id },
       data: {
-        name: parsed.data.name,
-        day_number: parsed.data.day_number,
-        description: parsed.data.description || null,
-        score_type: parsed.data.score_type,
-        time_cap_seconds: parsed.data.time_cap_seconds ?? null,
-        sort_order: getSortOrder(parsed.data.score_type),
+        name: parsed.data.name ?? existing.name,
+        day_number: parsed.data.day_number ?? existing.day_number,
+        description: parsed.data.description !== undefined ? (parsed.data.description || null) : existing.description,
+        score_type: scoreType,
+        time_cap_seconds: parsed.data.time_cap_seconds !== undefined ? (parsed.data.time_cap_seconds ?? null) : existing.time_cap_seconds,
+        sort_order: getSortOrder(scoreType),
       },
     })
 
