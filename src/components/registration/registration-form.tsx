@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { athleteSchema, type AthleteFormData } from "@/lib/validations/athlete"
 import { getDivisionsByGender } from "@/lib/divisions"
+import { QRCodeSVG } from "qrcode.react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle, Loader2, User, Camera, X, AlertCircle } from "lucide-react"
+import { CheckCircle, Loader2, User, Camera, X, AlertCircle, Download, Shield } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -25,10 +26,16 @@ interface RegistrationFormProps {
 }
 
 export function RegistrationForm({ availableDivisions }: RegistrationFormProps) {
-  const [success, setSuccess] = useState<{ id: string; name: string; number: number } | null>(null)
+  const [success, setSuccess] = useState<{
+    id: string
+    name: string
+    number: number
+    isJudge: boolean
+  } | null>(null)
   const [serverError, setServerError] = useState<string | null>(null)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const [qrUrl, setQrUrl] = useState("")
   const photoInputRef = useRef<HTMLInputElement>(null)
 
   const {
@@ -39,15 +46,31 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
     formState: { errors, isSubmitting },
   } = useForm<AthleteFormData>({
     resolver: zodResolver(athleteSchema),
+    defaultValues: {
+      wants_to_judge: false,
+    },
   })
 
   const selectedGender = watch("gender")
+  const wantsToJudge = watch("wants_to_judge")
 
   const filteredDivisions = selectedGender
     ? getDivisionsByGender(selectedGender).filter((d) =>
         availableDivisions.includes(d.key)
       )
     : []
+
+  // Build QR URL when success
+  useEffect(() => {
+    if (!success) return
+    fetch("/api/event-config")
+      .then((r) => r.json())
+      .then((json) => {
+        const base = json.data?.qr_base_url || window.location.origin + "/atleta/"
+        const cleanBase = base.endsWith("/") ? base : base + "/"
+        setQrUrl(`${cleanBase}${success.id}`)
+      })
+  }, [success])
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -65,6 +88,29 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
     if (photoPreview) URL.revokeObjectURL(photoPreview)
     setPhotoPreview(null)
     if (photoInputRef.current) photoInputRef.current.value = ""
+  }
+
+  const downloadQR = (name: string) => {
+    const svg = document.querySelector("#qr-success svg") as SVGElement
+    if (!svg) return
+    const canvas = document.createElement("canvas")
+    canvas.width = 400
+    canvas.height = 400
+    const ctx = canvas.getContext("2d")!
+    const data = new XMLSerializer().serializeToString(svg)
+    const img = new window.Image()
+    img.onload = () => {
+      ctx.fillStyle = "white"
+      ctx.fillRect(0, 0, 400, 400)
+      ctx.drawImage(img, 20, 20, 360, 360)
+      const link = document.createElement("a")
+      link.download = `QR-${name.replace(/\s+/g, "-")}.png`
+      link.href = canvas.toDataURL("image/png")
+      link.click()
+    }
+    img.src =
+      "data:image/svg+xml;base64," +
+      btoa(unescape(encodeURIComponent(data)))
   }
 
   const onSubmit = async (data: AthleteFormData) => {
@@ -97,13 +143,19 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
         return
       }
 
-      setSuccess({ id: json.data.id, name: json.data.full_name, number: json.participantNumber })
+      setSuccess({
+        id: json.data.id,
+        name: json.data.full_name,
+        number: json.participantNumber,
+        isJudge: json.isJudge ?? false,
+      })
       window.scrollTo({ top: 0, behavior: "smooth" })
     } catch {
       setServerError("Error de conexión. Intenta de nuevo.")
     }
   }
 
+  // ============ SUCCESS SCREEN ============
   if (success) {
     return (
       <Card className="mx-auto max-w-md border-green-800 bg-green-950">
@@ -113,12 +165,47 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
             ¡Bienvenido al Open, {success.name}!
           </h2>
           <p className="text-lg text-gray-400">
-            Eres el participante <span className="font-bold text-green-400">#{success.number}</span>
+            Eres el participante{" "}
+            <span className="font-bold text-green-400">#{success.number}</span>
           </p>
-          <div className="mt-4 flex flex-col gap-2 w-full">
+
+          {/* QR Code */}
+          {qrUrl && (
+            <div className="mt-2 flex flex-col items-center gap-3">
+              <div id="qr-success" className="rounded-xl bg-white p-3">
+                <QRCodeSVG value={qrUrl} size={160} level="M" />
+              </div>
+              <p className="text-xs text-gray-500">
+                Escanea para ver tu perfil y scores
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => downloadQR(success.name)}
+              >
+                <Download className="h-4 w-4" />
+                Guardar QR en galería
+              </Button>
+            </div>
+          )}
+
+          {success.isJudge && (
+            <div className="mt-2 w-full rounded-lg border border-blue-800 bg-blue-950 px-4 py-3 text-sm text-blue-300">
+              <Shield className="mb-1 inline h-4 w-4" /> También eres juez. Usa
+              tu email y contraseña para entrar al panel.
+            </div>
+          )}
+
+          <div className="mt-4 flex w-full flex-col gap-2">
             <Button asChild>
               <Link href={`/atleta/${success.id}`}>Ver mi perfil</Link>
             </Button>
+            {success.isJudge && (
+              <Button asChild variant="secondary">
+                <Link href="/admin/login">Entrar como Juez</Link>
+              </Button>
+            )}
             <Button asChild variant="outline">
               <Link href="/leaderboard">Ver Leaderboard</Link>
             </Button>
@@ -128,6 +215,7 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
     )
   }
 
+  // ============ REGISTRATION FORM ============
   return (
     <Card className="mx-auto max-w-md">
       <CardHeader>
@@ -141,8 +229,8 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
           {/* Gender selection - big buttons */}
           <div>
             <Label className="mb-2 block">Género *</Label>
-            <div className="grid grid-cols-2 gap-3">
-              {(["M", "F"] as const).map((g) => (
+            <div className="grid grid-cols-3 gap-3">
+              {(["M", "F", "NB"] as const).map((g) => (
                 <button
                   key={g}
                   type="button"
@@ -150,13 +238,13 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
                     setValue("gender", g, { shouldValidate: true })
                     setValue("division", "")
                   }}
-                  className={`rounded-lg border-2 px-4 py-3 text-center font-bold transition-colors ${
+                  className={`rounded-lg border-2 px-3 py-3 text-center font-bold transition-colors ${
                     selectedGender === g
                       ? "border-primary bg-primary text-black font-bold"
                       : "border-gray-700 text-gray-300 hover:border-gray-500"
                   }`}
                 >
-                  {g === "M" ? "Masculino" : "Femenino"}
+                  {g === "M" ? "Masculino" : g === "F" ? "Femenino" : "No binario"}
                 </button>
               ))}
             </div>
@@ -295,6 +383,44 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
                   </button>
                 </div>
                 <span className="text-sm text-gray-400">Foto seleccionada</span>
+              </div>
+            )}
+          </div>
+
+          {/* Judge toggle */}
+          <div className="rounded-lg border border-gray-800 bg-[#0a0a0a] p-4">
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                className="mt-1 h-5 w-5 rounded border-gray-600 accent-primary"
+                {...register("wants_to_judge")}
+              />
+              <div>
+                <span className="font-semibold text-white">¿Quieres ser juez?</span>
+                <p className="mt-0.5 text-xs text-gray-500">
+                  Podrás calificar WODs de otros atletas desde tu celular
+                </p>
+              </div>
+            </label>
+
+            {wantsToJudge && (
+              <div className="mt-3">
+                <Label htmlFor="judge_password">Contraseña de juez *</Label>
+                <Input
+                  id="judge_password"
+                  type="password"
+                  placeholder="Mínimo 8 caracteres"
+                  className={errors.judge_password ? "border-red-500" : ""}
+                  {...register("judge_password")}
+                />
+                {errors.judge_password && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.judge_password.message}
+                  </p>
+                )}
+                <p className="mt-1 text-xs text-gray-500">
+                  Usarás tu email + esta contraseña para entrar al panel de juez
+                </p>
               </div>
             )}
           </div>

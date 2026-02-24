@@ -20,5 +20,5 @@ export interface LeaderboardEntry {
 export interface DivisionInfo {
   key: string
   label: string
-  gender: "M" | "F"
+  gender: "M" | "F" | "NB"
 }

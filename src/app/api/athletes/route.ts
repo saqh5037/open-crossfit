@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
+import { hash } from "bcryptjs"
 import { athleteSchema } from "@/lib/validations/athlete"
 
 export async function GET(request: NextRequest) {
@@ -64,8 +65,30 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    // Create judge user if athlete wants to be a judge
+    let isJudge = false
+    if (parsed.data.wants_to_judge && parsed.data.judge_password) {
+      const existingAdmin = await prisma.adminUser.findUnique({
+        where: { email: parsed.data.email },
+      })
+
+      if (!existingAdmin) {
+        const password_hash = await hash(parsed.data.judge_password, 12)
+        await prisma.adminUser.create({
+          data: {
+            email: parsed.data.email,
+            password_hash,
+            role: "judge",
+          },
+        })
+        isJudge = true
+      } else {
+        isJudge = true
+      }
+    }
+
     return NextResponse.json(
-      { data: athlete, participantNumber: athlete.participant_number },
+      { data: athlete, participantNumber: athlete.participant_number, isJudge },
       { status: 201 }
     )
   } catch (error) {

@@ -1,6 +1,8 @@
 export const dynamic = "force-dynamic"
 
 import prisma from "@/lib/prisma"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { notFound } from "next/navigation"
@@ -31,6 +33,19 @@ export default async function AtletaPage({ params }: { params: { id: string } })
 
   if (!athlete) notFound()
 
+  // Detect if user is a judge
+  const session = await getServerSession(authOptions)
+  const userRole = (session?.user as { role?: string } | undefined)?.role
+  const isJudge = !!userRole && ["judge", "coach", "admin", "owner"].includes(userRole)
+
+  // Fetch WODs for judges
+  const wods = isJudge
+    ? await prisma.wod.findMany({
+        where: { is_active: true },
+        orderBy: { display_order: "asc" },
+      })
+    : []
+
   const serializedAthlete = {
     id: athlete.id,
     participant_number: athlete.participant_number,
@@ -50,6 +65,13 @@ export default async function AtletaPage({ params }: { params: { id: string } })
     },
   }))
 
+  const serializedWods = wods.map((w) => ({
+    id: w.id,
+    name: w.name,
+    score_type: w.score_type,
+    time_cap_seconds: w.time_cap_seconds,
+  }))
+
   return (
     <>
       <Header registrationOpen={config?.registration_open ?? false} />
@@ -60,6 +82,8 @@ export default async function AtletaPage({ params }: { params: { id: string } })
             scores={serializedScores}
             eventName={config?.name ?? "CrossFit Open 2026"}
             divisionLabel={getDivisionLabel(athlete.division)}
+            wods={serializedWods}
+            isJudge={isJudge}
           />
         </div>
       </main>

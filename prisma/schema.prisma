@@ -12,6 +12,7 @@ datasource db {
 enum Gender {
   M
   F
+  NB
 }
 
 enum ScoreType {
