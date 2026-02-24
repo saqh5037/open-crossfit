@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, Loader2, User, Camera, X, AlertCircle, Download, Shield } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import confetti from "canvas-confetti"
 
 interface RegistrationFormProps {
   availableDivisions: string[]
@@ -32,6 +33,7 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
     number: number
     isJudge: boolean
   } | null>(null)
+  const [showDetails, setShowDetails] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
@@ -60,9 +62,46 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
       )
     : []
 
-  // Build QR URL when success
+  // Build QR URL + trigger confetti on success
   useEffect(() => {
     if (!success) return
+
+    // Fire confetti burst
+    const duration = 2500
+    const end = Date.now() + duration
+    const colors = ["#FF6600", "#FFB800", "#FFFFFF", "#FF3D00"]
+
+    const frame = () => {
+      confetti({
+        particleCount: 3,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.6 },
+        colors,
+      })
+      confetti({
+        particleCount: 3,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.6 },
+        colors,
+      })
+      if (Date.now() < end) requestAnimationFrame(frame)
+    }
+    frame()
+
+    // Big center burst
+    confetti({
+      particleCount: 100,
+      spread: 100,
+      origin: { y: 0.5 },
+      colors,
+    })
+
+    // Show details after a delay
+    const timer = setTimeout(() => setShowDetails(true), 1200)
+
+    // Fetch QR base URL
     fetch("/api/event-config")
       .then((r) => r.json())
       .then((json) => {
@@ -70,6 +109,8 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
         const cleanBase = base.endsWith("/") ? base : base + "/"
         setQrUrl(`${cleanBase}${success.id}`)
       })
+
+    return () => clearTimeout(timer)
   }, [success])
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -158,20 +199,37 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
   // ============ SUCCESS SCREEN ============
   if (success) {
     return (
-      <Card className="mx-auto max-w-md border-green-800 bg-green-950">
-        <CardContent className="flex flex-col items-center gap-4 pt-8 text-center">
-          <CheckCircle className="h-16 w-16 text-green-500" />
-          <h2 className="text-2xl font-bold">
-            ¡Bienvenido al Open, {success.name}!
+      <div className="mx-auto flex max-w-md flex-col items-center gap-6">
+        {/* Hero: Participant number reveal */}
+        <div className="flex w-full flex-col items-center gap-3 animate-in fade-in zoom-in-50 duration-700">
+          <CheckCircle className="h-12 w-12 text-green-500 animate-in fade-in zoom-in duration-500" />
+          <h2 className="text-xl font-bold text-white sm:text-2xl">
+            ¡Bienvenido al Open!
           </h2>
-          <p className="text-lg text-gray-400">
-            Eres el participante{" "}
-            <span className="font-bold text-green-400">#{success.number}</span>
-          </p>
+          <p className="text-gray-400">{success.name}</p>
 
+          {/* Big participant number */}
+          <div className="mt-2 flex flex-col items-center gap-1 rounded-2xl border border-primary/30 bg-gradient-to-b from-primary/20 to-primary/5 px-10 py-6 animate-in fade-in zoom-in-75 duration-1000 delay-300">
+            <span className="text-xs font-semibold uppercase tracking-widest text-primary/70">
+              Tu número de participante
+            </span>
+            <span className="font-display text-6xl font-black text-primary sm:text-7xl">
+              #{String(success.number).padStart(3, "0")}
+            </span>
+          </div>
+        </div>
+
+        {/* Details: fade in after confetti */}
+        <div
+          className={`flex w-full flex-col items-center gap-4 transition-all duration-700 ${
+            showDetails
+              ? "translate-y-0 opacity-100"
+              : "translate-y-4 opacity-0"
+          }`}
+        >
           {/* QR Code */}
           {qrUrl && (
-            <div className="mt-2 flex flex-col items-center gap-3">
+            <div className="flex flex-col items-center gap-3">
               <div id="qr-success" className="rounded-xl bg-white p-3">
                 <QRCodeSVG value={qrUrl} size={160} level="M" />
               </div>
@@ -191,13 +249,13 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
           )}
 
           {success.isJudge && (
-            <div className="mt-2 w-full rounded-lg border border-blue-800 bg-blue-950 px-4 py-3 text-sm text-blue-300">
+            <div className="w-full rounded-lg border border-blue-800 bg-blue-950 px-4 py-3 text-sm text-blue-300">
               <Shield className="mb-1 inline h-4 w-4" /> También eres juez. Usa
               tu email y contraseña para entrar al panel.
             </div>
           )}
 
-          <div className="mt-4 flex w-full flex-col gap-2">
+          <div className="flex w-full flex-col gap-2">
             <Button asChild>
               <Link href={`/atleta/${success.id}`}>Ver mi perfil</Link>
             </Button>
@@ -210,8 +268,8 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
               <Link href="/leaderboard">Ver Leaderboard</Link>
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     )
   }
 
