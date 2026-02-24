@@ -1,4 +1,5 @@
 import { getResend, FROM_EMAIL } from "@/lib/resend"
+import { render } from "@react-email/components"
 import type { ReactElement } from "react"
 
 interface SendEmailParams {
@@ -11,11 +12,12 @@ interface SendEmailParams {
 export async function sendEmail({ to, subject, react, attachments }: SendEmailParams) {
   try {
     const resend = getResend()
+    const html = await render(react)
     const { data, error } = await resend.emails.send({
       from: `GRIZZLYS Open <${FROM_EMAIL}>`,
       to,
       subject,
-      react,
+      html,
       attachments: attachments?.map((a) => ({
         filename: a.filename,
         content: a.content,
