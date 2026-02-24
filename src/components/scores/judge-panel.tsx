@@ -23,7 +23,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { TimeInput } from "./time-input"
 import { parseScore } from "@/lib/score-utils"
-import { Search, Save, Loader2, CheckCircle, Camera, X } from "lucide-react"
+import { Search, Save, Loader2, CheckCircle, Camera, X, QrCode } from "lucide-react"
+import { useRouter } from "next/navigation"
 import type { ScoreType } from "@/types"
 
 interface Wod {
@@ -40,6 +41,7 @@ interface Athlete {
 }
 
 export function JudgePanel() {
+  const router = useRouter()
   const [wods, setWods] = useState<Wod[]>([])
   const [selectedWod, setSelectedWod] = useState<Wod | null>(null)
   const [athletes, setAthletes] = useState<Athlete[]>([])
@@ -59,6 +61,8 @@ export function JudgePanel() {
     athleteName: string
   }>({ open: false, existingScore: "", athleteName: "" })
   const [error, setError] = useState<string | null>(null)
+  const [scanning, setScanning] = useState(false)
+  const scannerRef = useRef<HTMLDivElement>(null)
 
   // Progress
   const [totalAthletes, setTotalAthletes] = useState(0)
@@ -207,8 +211,62 @@ export function JudgePanel() {
 
   const progressPct = totalAthletes > 0 ? Math.round((scoredCount / totalAthletes) * 100) : 0
 
+  const startScanner = async () => {
+    setScanning(true)
+    // Dynamic import to avoid SSR issues
+    const { Html5Qrcode } = await import("html5-qrcode")
+
+    // Wait for the DOM element to render
+    await new Promise((r) => setTimeout(r, 100))
+
+    const scannerId = "qr-scanner"
+    const scanner = new Html5Qrcode(scannerId)
+
+    try {
+      await scanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+          // Extract athlete ID from QR URL (e.g. .../atleta/uuid)
+          const match = decodedText.match(/atleta\/([a-zA-Z0-9_-]+)/)
+          if (match) {
+            scanner.stop().catch(() => {})
+            setScanning(false)
+            router.push(`/atleta/${match[1]}`)
+          }
+        },
+        () => {} // ignore errors (no QR found in frame)
+      )
+    } catch {
+      setScanning(false)
+      setError("No se pudo acceder a la cámara")
+    }
+  }
+
+  const stopScanner = async () => {
+    setScanning(false)
+    // html5-qrcode cleans up when the element unmounts
+  }
+
   return (
     <div className="flex flex-col gap-6">
+      {/* QR Scanner Button */}
+      <Button
+        size="lg"
+        variant="secondary"
+        className="w-full gap-2 text-base"
+        onClick={scanning ? stopScanner : startScanner}
+      >
+        <QrCode className="h-5 w-5" />
+        {scanning ? "Cerrar cámara" : "Escanear QR de atleta"}
+      </Button>
+
+      {scanning && (
+        <div className="overflow-hidden rounded-xl border border-gray-700">
+          <div id="qr-scanner" ref={scannerRef} className="w-full" />
+        </div>
+      )}
+
       {/* WOD Selector */}
       <Card>
         <CardHeader className="pb-3">
