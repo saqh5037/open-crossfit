@@ -36,6 +36,7 @@ enum AdminRole {
 enum ScoreStatus {
   pending
   confirmed
+  rejected
 }
 
 enum ScoreAction {
@@ -117,8 +118,9 @@ model Score {
   scored_by     String?
   confirmed_by  String?
   evidence_url  String?
-  judge_notes   String?
-  status        ScoreStatus @default(pending)
+  judge_notes        String?
+  rejection_reason   String?
+  status             ScoreStatus @default(pending)
   created_at    DateTime    @default(now())
   updated_at    DateTime    @updatedAt
 

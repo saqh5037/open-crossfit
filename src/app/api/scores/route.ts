@@ -7,9 +7,13 @@ import { logScoreAudit } from "@/lib/audit"
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const wod_id = searchParams.get("wod_id")
+  const athlete_id = searchParams.get("athlete_id")
+  const status = searchParams.get("status")
 
   const where: Record<string, unknown> = {}
   if (wod_id) where.wod_id = wod_id
+  if (athlete_id) where.athlete_id = athlete_id
+  if (status) where.status = status
 
   const scores = await prisma.score.findMany({
     where,
@@ -81,6 +85,8 @@ export async function POST(request: NextRequest) {
         scored_by: auth.userId,
         evidence_url: parsed.data.evidence_url ?? undefined,
         judge_notes: parsed.data.judge_notes ?? undefined,
+        status: "pending",
+        rejection_reason: null,
       },
       create: {
         athlete_id: parsed.data.athlete_id,

@@ -24,7 +24,7 @@ import { Badge } from "@/components/ui/badge"
 import { TimeInput } from "./time-input"
 import { parseScore } from "@/lib/score-utils"
 import { isDivisionRx } from "@/lib/divisions"
-import { Search, Save, Loader2, CheckCircle, Camera, X, QrCode } from "lucide-react"
+import { Search, Save, Loader2, CheckCircle, Camera, X, QrCode, AlertTriangle } from "lucide-react"
 import type { ScoreType } from "@/types"
 
 interface Wod {
@@ -63,9 +63,26 @@ export function JudgePanel() {
   const [scanning, setScanning] = useState(false)
   const scannerRef = useRef<HTMLDivElement>(null)
 
+  // Rejected scores for selected athlete
+  const [rejectedScores, setRejectedScores] = useState<
+    { id: string; wod: { id: string; name: string; score_type: string }; display_score: string; rejection_reason: string | null }[]
+  >([])
+
   // Progress
   const [totalAthletes, setTotalAthletes] = useState(0)
   const [scoredCount, setScoredCount] = useState(0)
+
+  // Fetch rejected scores for the selected athlete
+  useEffect(() => {
+    if (!selectedAthlete) {
+      setRejectedScores([])
+      return
+    }
+    fetch(`/api/scores?athlete_id=${selectedAthlete.id}&status=rejected`)
+      .then((r) => r.json())
+      .then((json) => setRejectedScores(json.data ?? []))
+      .catch(() => setRejectedScores([]))
+  }, [selectedAthlete, showSuccess])
 
   // Fetch WODs
   useEffect(() => {
@@ -340,6 +357,50 @@ export function JudgePanel() {
           )}
         </CardContent>
       </Card>
+
+      {/* Rejected scores alert */}
+      {rejectedScores.length > 0 && (
+        <Card className="border-red-900 bg-red-950/30">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base text-red-400">
+              <AlertTriangle className="h-4 w-4" />
+              Scores Rechazados ({rejectedScores.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-2">
+            <p className="text-xs text-red-300/70">
+              Estos scores fueron rechazados por el coach. Corrige y vuelve a capturar.
+            </p>
+            {rejectedScores.map((rs) => (
+              <div key={rs.id} className="rounded-lg border border-red-900/50 bg-red-950/50 p-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-red-300">{rs.wod.name}</span>
+                  <span className="font-mono text-sm font-bold text-red-400">{rs.display_score}</span>
+                </div>
+                {rs.rejection_reason && (
+                  <p className="mt-1 text-xs text-red-300/80">
+                    Razón: {rs.rejection_reason}
+                  </p>
+                )}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="mt-2 h-7 w-full border-red-800 text-xs text-red-300 hover:bg-red-900/50"
+                  onClick={() => {
+                    const wod = wods.find((w) => w.id === rs.wod.id)
+                    if (wod) {
+                      setSelectedWod(wod)
+                      setScoreInput("")
+                    }
+                  }}
+                >
+                  Corregir este score
+                </Button>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       {/* WOD Selector */}
       <Card>

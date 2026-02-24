@@ -75,14 +75,14 @@ export async function POST(request: NextRequest) {
     if (action === "confirm") {
       // Fetch scores with athlete/wod info before confirming (for emails)
       const scoresToConfirm = await prisma.score.findMany({
-        where: { id: { in: score_ids }, status: "pending" },
+        where: { id: { in: score_ids }, status: { in: ["pending", "rejected"] } },
         include: { athlete: true, wod: true },
       })
 
-      // Batch confirm
+      // Batch confirm (works for both pending and rejected scores)
       await prisma.score.updateMany({
-        where: { id: { in: score_ids }, status: "pending" },
-        data: { status: "confirmed", confirmed_by: auth.userId },
+        where: { id: { in: score_ids }, status: { in: ["pending", "rejected"] } },
+        data: { status: "confirmed", confirmed_by: auth.userId, rejection_reason: null },
       })
 
       // Log audit for each
@@ -145,38 +145,30 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === "reject") {
-      // Fetch scores before deleting for audit
-      const scores = await prisma.score.findMany({
-        where: { id: { in: score_ids } },
-        include: { athlete: true, wod: true },
-      })
+      const reason = rejection_reason || "Sin razón especificada"
 
-      // Delete rejected scores
-      await prisma.score.deleteMany({
+      // Update scores to rejected status (keep the record for judge to correct)
+      await prisma.score.updateMany({
         where: { id: { in: score_ids } },
+        data: {
+          status: "rejected",
+          rejection_reason: reason,
+        },
       })
 
       // Log audit for each
-      for (const score of scores) {
+      for (const scoreId of score_ids) {
         logScoreAudit({
-          scoreId: score.id,
+          scoreId,
           action: "rejected",
-          oldValues: {
-            athlete_id: score.athlete_id,
-            athlete_name: score.athlete.full_name,
-            wod_id: score.wod_id,
-            wod_name: score.wod.name,
-            raw_score: Number(score.raw_score),
-            display_score: score.display_score,
-          },
-          newValues: { rejection_reason: rejection_reason || "Sin razón especificada" },
+          newValues: { status: "rejected", rejection_reason: reason },
           performedBy: auth.userId,
         }).catch(console.error)
       }
 
       return NextResponse.json({
         success: true,
-        message: `${scores.length} score(s) rechazado(s)`,
+        message: `${score_ids.length} score(s) rechazado(s)`,
       })
     }
 
