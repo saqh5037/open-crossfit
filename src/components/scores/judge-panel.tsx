@@ -285,7 +285,7 @@ export function JudgePanel() {
             <SelectContent>
               {wods.map((wod) => (
                 <SelectItem key={wod.id} value={wod.id}>
-                  {wod.name} — {wod.score_type === "time" ? "For Time" : wod.score_type === "reps" ? "Reps" : "Max Load"}
+                  {wod.name} — {wod.score_type === "time" ? "For Time" : wod.score_type === "reps" ? "Reps" : "Peso Máximo"}
                 </SelectItem>
               ))}
             </SelectContent>

@@ -63,7 +63,7 @@
   .print\:hidden {
     display: none !important;
   }
-  aside, nav, header, .print\:hidden {
+  aside, nav, header, footer, .print\:hidden {
     display: none !important;
   }
   main {

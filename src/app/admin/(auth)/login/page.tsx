@@ -66,7 +66,7 @@ function LoginForm() {
       <CardHeader className="text-center">
         <Image src="/logo-200.png" alt="GRIZZLYS" width={100} height={100} className="mx-auto mb-2 rounded-lg" />
         <span className="mx-auto font-display text-4xl tracking-wider text-primary">GRIZZLYS</span>
-        <CardTitle className="font-display text-xl tracking-wider text-gray-300">Panel de Administración</CardTitle>
+        <CardTitle className="font-display text-xl tracking-wider text-gray-300">Iniciar Sesión</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
@@ -77,7 +77,7 @@ function LoginForm() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@tubox.com"
+              placeholder="tu@email.com"
               className="border-2 border-gray-700 bg-black text-white placeholder:text-gray-600 focus:border-primary"
               required
             />

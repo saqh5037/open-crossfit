@@ -94,15 +94,15 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
     const svg = document.querySelector("#qr-success svg") as SVGElement
     if (!svg) return
     const canvas = document.createElement("canvas")
-    canvas.width = 400
-    canvas.height = 400
+    canvas.width = 500
+    canvas.height = 500
     const ctx = canvas.getContext("2d")!
     const data = new XMLSerializer().serializeToString(svg)
     const img = new window.Image()
     img.onload = () => {
       ctx.fillStyle = "white"
-      ctx.fillRect(0, 0, 400, 400)
-      ctx.drawImage(img, 20, 20, 360, 360)
+      ctx.fillRect(0, 0, 500, 500)
+      ctx.drawImage(img, 50, 50, 400, 400)
       const link = document.createElement("a")
       link.download = `QR-${name.replace(/\s+/g, "-")}.png`
       link.href = canvas.toDataURL("image/png")
@@ -363,7 +363,7 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
                   onClick={() => photoInputRef.current?.click()}
                 >
                   <Camera className="mr-2 h-4 w-4" />
-                  Tomar / Subir foto
+                  Tomar o subir foto
                 </Button>
               </div>
             ) : (

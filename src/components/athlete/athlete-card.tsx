@@ -456,12 +456,12 @@ export function AtletaCard({
           <p className="mt-1 text-sm text-gray-600">{divisionLabel}</p>
           {age && <p className="text-sm text-gray-500">{age} años</p>}
           {qrUrl && (
-            <div className="mt-4">
-              <QRCodeSVG value={qrUrl} size={120} level="M" />
+            <div className="mt-4 rounded-lg border border-gray-300 bg-white p-3">
+              <QRCodeSVG value={qrUrl} size={160} level="H" />
             </div>
           )}
           <p className="mt-2 text-center text-[10px] text-gray-400">
-            Escanea para ver perfil y capturar scores
+            Escanea el QR para ver el perfil del atleta
           </p>
         </div>
       </div>

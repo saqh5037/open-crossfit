@@ -18,7 +18,7 @@ export function Footer() {
 
           {/* Location */}
           <div className="flex flex-col items-center gap-2 text-center md:items-start md:text-left">
-            <h4 className="font-display text-sm tracking-wider text-gray-300">UBICACION</h4>
+            <h4 className="font-display text-sm tracking-wider text-gray-300">UBICACIÓN</h4>
             <p className="text-sm">AV 31 395B-X 78A</p>
             <p className="text-sm">Plaza Benedetta, Local 12</p>
             <p className="text-sm">Mérida, Yucatán 97314</p>
@@ -33,7 +33,7 @@ export function Footer() {
 
           {/* Social */}
           <div className="flex flex-col items-center gap-3 md:items-start">
-            <h4 className="font-display text-sm tracking-wider text-gray-300">SIGUENOS</h4>
+            <h4 className="font-display text-sm tracking-wider text-gray-300">SÍGUENOS</h4>
             <div className="flex flex-col gap-2">
               <Link
                 href="https://www.instagram.com/grizzlysmerida"
