@@ -303,13 +303,13 @@ export function AtletaCard({
                       {/* Inline score form */}
                       {isScoring && (
                         <div className="mt-3 flex flex-col gap-2 rounded-lg border border-gray-700 bg-black p-3">
-                          <div className="flex items-center gap-2">
-                            {wod.score_type === "time" ? (
-                              <TimeInput
-                                value={scoreInput}
-                                onChange={setScoreInput}
-                              />
-                            ) : (
+                          {wod.score_type === "time" ? (
+                            <TimeInput
+                              value={scoreInput}
+                              onChange={setScoreInput}
+                            />
+                          ) : (
+                            <div className="flex items-center gap-2">
                               <Input
                                 type="number"
                                 inputMode="numeric"
@@ -318,16 +318,11 @@ export function AtletaCard({
                                 onChange={(e) => setScoreInput(e.target.value)}
                                 className="text-center text-lg font-mono"
                               />
-                            )}
-                            {wod.score_type !== "weight" && (
                               <span className="text-xs text-gray-500 whitespace-nowrap">
-                                {wod.score_type === "time" ? "min:seg" : "reps"}
+                                {wod.score_type === "reps" ? "reps" : "kg"}
                               </span>
-                            )}
-                            {wod.score_type === "weight" && (
-                              <span className="text-xs text-gray-500">kg</span>
-                            )}
-                          </div>
+                            </div>
+                          )}
 
                           {scoreError && (
                             <p className="text-xs text-red-400">{scoreError}</p>
