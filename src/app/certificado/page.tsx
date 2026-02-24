@@ -307,7 +307,7 @@ export default function CertificadoPage() {
               display: "flex",
               alignItems: "center",
               gap: 12,
-              marginTop: 6,
+              marginTop: 16,
             }}
           >
             <div style={{ width: 32, height: 2, backgroundColor: ORANGE }} />
@@ -392,7 +392,7 @@ export default function CertificadoPage() {
                 border: `3px solid ${ORANGE}`,
                 overflow: "hidden",
                 marginTop: 20,
-                boxShadow: "0 0 20px rgba(255, 102, 0, 0.3)",
+                /* no shadow — clean for print */
               }}
             >
               <img
@@ -469,7 +469,7 @@ export default function CertificadoPage() {
               padding: "14px 28px",
               borderRadius: 10,
               border: `1px solid ${GRAY_800}`,
-              backgroundColor: "rgba(17, 24, 39, 0.6)",
+              backgroundColor: "#111827",
             }}
           >
             {/* Trophy emoji instead of SVG icon (html2canvas compatible) */}
@@ -553,8 +553,8 @@ export default function CertificadoPage() {
                     display: "flex",
                     alignItems: "center",
                     padding: "10px 16px",
-                    backgroundColor: i % 2 === 0 ? "rgba(0,0,0,0.4)" : "rgba(17,24,39,0.3)",
-                    borderTop: `1px solid rgba(31,41,55,0.5)`,
+                    backgroundColor: i % 2 === 0 ? "#0a0a0a" : "#111111",
+                    borderTop: "1px solid #1a1a1a",
                   }}
                 >
                   <span
@@ -637,7 +637,7 @@ export default function CertificadoPage() {
               marginTop: 12,
             }}
           >
-            crossfit.52-55-189-120.sslip.io
+            Designed by WBI México
           </div>
         </div>
       </div>
