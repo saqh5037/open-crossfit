@@ -226,28 +226,24 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
-          {/* Gender selection - big buttons */}
+          {/* Gender selection - dropdown */}
           <div>
-            <Label className="mb-2 block">Género *</Label>
-            <div className="grid grid-cols-3 gap-3">
-              {(["M", "F", "NB"] as const).map((g) => (
-                <button
-                  key={g}
-                  type="button"
-                  onClick={() => {
-                    setValue("gender", g, { shouldValidate: true })
-                    setValue("division", "")
-                  }}
-                  className={`rounded-lg border-2 px-3 py-3 text-center font-bold transition-colors ${
-                    selectedGender === g
-                      ? "border-primary bg-primary text-black font-bold"
-                      : "border-gray-700 text-gray-300 hover:border-gray-500"
-                  }`}
-                >
-                  {g === "M" ? "Masculino" : g === "F" ? "Femenino" : "No binario"}
-                </button>
-              ))}
-            </div>
+            <Label>Género *</Label>
+            <Select
+              onValueChange={(val) => {
+                setValue("gender", val as "M" | "F" | "NB", { shouldValidate: true })
+                setValue("division", "")
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona tu género" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="M">Masculino</SelectItem>
+                <SelectItem value="F">Femenino</SelectItem>
+                <SelectItem value="NB">No binario</SelectItem>
+              </SelectContent>
+            </Select>
             {errors.gender && (
               <p className="mt-1 text-sm text-red-500">{errors.gender.message}</p>
             )}
@@ -284,7 +280,7 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
                 <SelectContent>
                   {filteredDivisions.map((d) => (
                     <SelectItem key={d.key} value={d.key}>
-                      {d.label}
+                      {d.label} ({d.description})
                     </SelectItem>
                   ))}
                 </SelectContent>

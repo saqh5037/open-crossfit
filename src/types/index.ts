@@ -21,4 +21,5 @@ export interface DivisionInfo {
   key: string
   label: string
   gender: "M" | "F" | "NB"
+  description: string
 }
