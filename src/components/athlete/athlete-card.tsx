@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { TimeInput } from "@/components/scores/time-input"
 import { parseScore } from "@/lib/score-utils"
+import { isDivisionRx, getDivisionBadge } from "@/lib/divisions"
 import {
   Printer, Trophy, Dumbbell, PenLine, Save, Loader2, X,
   ClipboardList, QrCode, ArrowLeft, CheckCircle,
@@ -63,8 +64,9 @@ export function AtletaCard({
   const [scoringWodId, setScoringWodId] = useState<string | null>(null)
   const [scoreInput, setScoreInput] = useState("")
   // Auto-detect RX based on athlete division
-  const isAthleteRx = !athlete.division.startsWith("scaled_")
+  const isAthleteRx = isDivisionRx(athlete.division)
   const [scoreIsRx, setScoreIsRx] = useState(isAthleteRx)
+  const divisionBadge = getDivisionBadge(athlete.division)
   const [saving, setSaving] = useState(false)
   const [scoreError, setScoreError] = useState<string | null>(null)
   const [lastSavedWod, setLastSavedWod] = useState<string | null>(null)
@@ -285,10 +287,10 @@ export function AtletaCard({
                               </span>
                             )}
                             <Badge
-                              variant={existing.is_rx ? "default" : "outline"}
-                              className={existing.is_rx ? "bg-green-600" : ""}
+                              variant={divisionBadge.colorClass ? "default" : "outline"}
+                              className={divisionBadge.colorClass}
                             >
-                              {existing.is_rx ? "RX" : "Scaled"}
+                              {divisionBadge.text}
                             </Badge>
                             <Button
                               size="sm"
@@ -414,10 +416,10 @@ export function AtletaCard({
                         </span>
                       )}
                       <Badge
-                        variant={score.is_rx ? "default" : "outline"}
-                        className={score.is_rx ? "bg-green-600" : ""}
+                        variant={divisionBadge.colorClass ? "default" : "outline"}
+                        className={divisionBadge.colorClass}
                       >
-                        {score.is_rx ? "RX" : "Scaled"}
+                        {divisionBadge.text}
                       </Badge>
                     </div>
                   </CardContent>

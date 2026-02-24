@@ -346,7 +346,6 @@ export function RegistrationForm({ availableDivisions }: RegistrationFormProps) 
               ref={photoInputRef}
               type="file"
               accept="image/*"
-              capture="user"
               onChange={handlePhotoChange}
               className="hidden"
             />

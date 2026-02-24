@@ -23,8 +23,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { TimeInput } from "./time-input"
 import { parseScore } from "@/lib/score-utils"
+import { isDivisionRx } from "@/lib/divisions"
 import { Search, Save, Loader2, CheckCircle, Camera, X, QrCode } from "lucide-react"
-import { useRouter } from "next/navigation"
 import type { ScoreType } from "@/types"
 
 interface Wod {
@@ -41,7 +41,6 @@ interface Athlete {
 }
 
 export function JudgePanel() {
-  const router = useRouter()
   const [wods, setWods] = useState<Wod[]>([])
   const [selectedWod, setSelectedWod] = useState<Wod | null>(null)
   const [athletes, setAthletes] = useState<Athlete[]>([])
@@ -226,13 +225,24 @@ export function JudgePanel() {
       await scanner.start(
         { facingMode: "environment" },
         { fps: 10, qrbox: { width: 250, height: 250 } },
-        (decodedText) => {
-          // Extract athlete ID from QR URL (e.g. .../atleta/uuid)
+        async (decodedText) => {
           const match = decodedText.match(/atleta\/([a-zA-Z0-9_-]+)/)
           if (match) {
             scanner.stop().catch(() => {})
             setScanning(false)
-            router.push(`/atleta/${match[1]}`)
+            try {
+              const res = await fetch(`/api/athletes/${match[1]}`)
+              const json = await res.json()
+              if (json.data) {
+                const a = json.data
+                setSelectedAthlete({ id: a.id, full_name: a.full_name, division: a.division })
+                setSearchQuery(a.full_name)
+                setAthletes([])
+                setIsRx(isDivisionRx(a.division))
+              }
+            } catch {
+              setError("No se pudo cargar el atleta")
+            }
           }
         },
         () => {} // ignore errors (no QR found in frame)
@@ -266,6 +276,70 @@ export function JudgePanel() {
           <div id="qr-scanner" ref={scannerRef} className="w-full" />
         </div>
       )}
+
+      {/* Athlete Search — always visible */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Buscar Atleta</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Input
+              placeholder="Escribe el nombre..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
+                setSelectedAthlete(null)
+              }}
+              className="pl-10"
+            />
+          </div>
+
+          {/* Search results */}
+          {athletes.length > 0 && !selectedAthlete && (
+            <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border">
+              {athletes.map((a) => (
+                <button
+                  key={a.id}
+                  onClick={() => {
+                    setSelectedAthlete(a)
+                    setSearchQuery(a.full_name)
+                    setAthletes([])
+                    setIsRx(isDivisionRx(a.division))
+                  }}
+                  className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-gray-800 sm:px-4 sm:py-3"
+                >
+                  <span className="truncate text-sm font-medium">{a.full_name}</span>
+                  <Badge variant="secondary" className="shrink-0 text-xs">
+                    {a.division.replace(/_/g, " ")}
+                  </Badge>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {selectedAthlete && (
+            <div className="mt-2 flex items-center gap-2 rounded-lg bg-green-950 px-3 py-2">
+              <CheckCircle className="h-4 w-4 text-green-500" />
+              <span className="font-medium">{selectedAthlete.full_name}</span>
+              <Badge variant="secondary" className="text-xs">
+                {selectedAthlete.division.replace(/_/g, " ")}
+              </Badge>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedAthlete(null)
+                  setSearchQuery("")
+                }}
+                className="ml-auto"
+              >
+                <X className="h-4 w-4 text-gray-400" />
+              </button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* WOD Selector */}
       <Card>
@@ -311,62 +385,12 @@ export function JudgePanel() {
         </CardContent>
       </Card>
 
-      {selectedWod && (
+      {selectedWod && selectedAthlete && (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-lg">Capturar Score</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            {/* Athlete Search */}
-            <div>
-              <Label>Buscar Atleta</Label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <Input
-                  placeholder="Escribe el nombre..."
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value)
-                    setSelectedAthlete(null)
-                  }}
-                  className="pl-10"
-                />
-              </div>
-
-              {/* Search results */}
-              {athletes.length > 0 && !selectedAthlete && (
-                <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border">
-                  {athletes.map((a) => (
-                    <button
-                      key={a.id}
-                      onClick={() => {
-                        setSelectedAthlete(a)
-                        setSearchQuery(a.full_name)
-                        setAthletes([])
-                        setIsRx(!a.division.startsWith("scaled_"))
-                      }}
-                      className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-gray-800 sm:px-4 sm:py-3"
-                    >
-                      <span className="truncate text-sm font-medium">{a.full_name}</span>
-                      <Badge variant="secondary" className="shrink-0 text-xs">
-                        {a.division.replace(/_/g, " ")}
-                      </Badge>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {selectedAthlete && (
-                <div className="mt-2 flex items-center gap-2 rounded-lg bg-green-950 px-3 py-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="font-medium">{selectedAthlete.full_name}</span>
-                  <Badge variant="secondary" className="text-xs">
-                    {selectedAthlete.division.replace(/_/g, " ")}
-                  </Badge>
-                </div>
-              )}
-            </div>
-
             {/* Score Input */}
             {selectedAthlete && (
               <>

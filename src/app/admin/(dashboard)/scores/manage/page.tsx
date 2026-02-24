@@ -28,6 +28,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Trash2, Pencil, Filter, CheckCircle, Image as ImageIcon, History } from "lucide-react"
+import { getDivisionBadge } from "@/lib/divisions"
 
 interface ScoreRow {
   id: string
@@ -233,9 +234,14 @@ export default function ScoresManagePage() {
                   {score.display_score}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={score.is_rx ? "default" : "secondary"}>
-                    {score.is_rx ? "RX" : "Scaled"}
-                  </Badge>
+                  {(() => {
+                    const badge = getDivisionBadge(score.athlete.division)
+                    return (
+                      <Badge variant={badge.colorClass ? "default" : "secondary"} className={badge.colorClass}>
+                        {badge.text}
+                      </Badge>
+                    )
+                  })()}
                 </TableCell>
                 <TableCell>
                   <Badge
