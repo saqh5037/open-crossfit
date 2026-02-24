@@ -3,14 +3,15 @@ export const dynamic = "force-dynamic"
 import prisma from "@/lib/prisma"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Users, Dumbbell, ClipboardList, Trophy } from "lucide-react"
+import { Users, Dumbbell, ClipboardList, ShieldCheck } from "lucide-react"
 import Link from "next/link"
 
 export default async function AdminDashboard() {
-  const [athleteCount, wodCount, scoreCount, config] = await Promise.all([
+  const [athleteCount, wodCount, scoreCount, pendingCount, config] = await Promise.all([
     prisma.athlete.count(),
     prisma.wod.count({ where: { is_active: true } }),
     prisma.score.count(),
+    prisma.score.count({ where: { status: "pending" } }),
     prisma.eventConfig.findFirst(),
   ])
 
@@ -72,21 +73,21 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className={pendingCount > 0 ? "border-yellow-800" : ""}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-400">
-              Completitud
+              Pendientes
             </CardTitle>
-            <Trophy className="h-4 w-4 text-gray-400" />
+            <ShieldCheck className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{completionPct}%</p>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-800">
-              <div
-                className="h-full rounded-full bg-primary transition-all"
-                style={{ width: `${completionPct}%` }}
-              />
-            </div>
+            <p className="text-3xl font-bold text-yellow-400">{pendingCount}</p>
+            <Link
+              href="/admin/scores/validate"
+              className="text-xs text-primary hover:underline"
+            >
+              Validar scores →
+            </Link>
           </CardContent>
         </Card>
       </div>

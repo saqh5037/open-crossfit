@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
+import { Prisma } from "@prisma/client"
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const division = searchParams.get("division") || "rx_male"
+  const includePending = searchParams.get("include_pending") === "true"
+
+  const statusFilter = includePending
+    ? Prisma.sql``
+    : Prisma.sql`AND s.status = 'confirmed'`
 
   try {
     const leaderboard = await prisma.$queryRaw`
@@ -27,6 +33,7 @@ export async function GET(request: NextRequest) {
         JOIN athletes a ON s.athlete_id = a.id
         WHERE a.division = ${division}
           AND w.is_active = true
+          ${statusFilter}
       ),
       total_points AS (
         SELECT

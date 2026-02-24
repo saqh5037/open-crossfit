@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { Trash2, Pencil, Filter, CheckCircle, Image as ImageIcon } from "lucide-react"
+import { Trash2, Pencil, Filter, CheckCircle, Image as ImageIcon, History } from "lucide-react"
 
 interface ScoreRow {
   id: string
@@ -62,6 +62,16 @@ export default function ScoresManagePage() {
   const [editSaving, setEditSaving] = useState(false)
 
   const [viewingImage, setViewingImage] = useState<string | null>(null)
+  const [auditScoreId, setAuditScoreId] = useState<string | null>(null)
+  const [auditData, setAuditData] = useState<Array<{
+    id: string
+    action: string
+    old_values: Record<string, unknown> | null
+    new_values: Record<string, unknown> | null
+    performed_at: string
+    performer: { email: string; role: string }
+  }>>([])
+  const [auditLoading, setAuditLoading] = useState(false)
 
   useEffect(() => {
     fetch("/api/wods")
@@ -106,6 +116,16 @@ export default function ScoresManagePage() {
       body: JSON.stringify({ status: "confirmed" }),
     })
     if (res.ok) fetchScores()
+  }
+
+  const openAudit = async (scoreId: string) => {
+    setAuditScoreId(scoreId)
+    setAuditLoading(true)
+    setAuditData([])
+    const res = await fetch(`/api/scores/${scoreId}/audit`)
+    const json = await res.json()
+    setAuditData(json.data ?? [])
+    setAuditLoading(false)
   }
 
   const openEdit = (score: ScoreRow) => {
@@ -277,6 +297,14 @@ export default function ScoresManagePage() {
                     <Button
                       size="sm"
                       variant="ghost"
+                      title="Historial"
+                      onClick={() => openAudit(score.id)}
+                    >
+                      <History className="h-4 w-4 text-blue-400" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
                       onClick={() => openEdit(score)}
                     >
                       <Pencil className="h-4 w-4" />
@@ -381,6 +409,85 @@ export default function ScoresManagePage() {
               className="w-full rounded-lg"
             />
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Audit Trail Dialog */}
+      <Dialog
+        open={!!auditScoreId}
+        onOpenChange={(open) => !open && setAuditScoreId(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="h-5 w-5" />
+              Historial de Cambios
+            </DialogTitle>
+          </DialogHeader>
+          <div className="max-h-80 overflow-y-auto">
+            {auditLoading ? (
+              <p className="py-6 text-center text-sm text-gray-400">Cargando...</p>
+            ) : auditData.length === 0 ? (
+              <p className="py-6 text-center text-sm text-gray-400">Sin historial</p>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {auditData.map((audit) => (
+                  <div
+                    key={audit.id}
+                    className="rounded-lg border border-gray-800 bg-gray-900 p-3"
+                  >
+                    <div className="mb-1 flex items-center justify-between">
+                      <Badge
+                        className={
+                          audit.action === "created"
+                            ? "bg-blue-950 text-blue-400"
+                            : audit.action === "confirmed"
+                              ? "bg-green-950 text-green-400"
+                              : audit.action === "rejected"
+                                ? "bg-red-950 text-red-400"
+                                : audit.action === "deleted"
+                                  ? "bg-red-950 text-red-400"
+                                  : "bg-yellow-950 text-yellow-400"
+                        }
+                      >
+                        {audit.action === "created"
+                          ? "Creado"
+                          : audit.action === "confirmed"
+                            ? "Confirmado"
+                            : audit.action === "rejected"
+                              ? "Rechazado"
+                              : audit.action === "deleted"
+                                ? "Eliminado"
+                                : "Editado"}
+                      </Badge>
+                      <span className="text-xs text-gray-500">
+                        {new Date(audit.performed_at).toLocaleString("es-MX", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-400">
+                      Por: {audit.performer.email} ({audit.performer.role})
+                    </p>
+                    {audit.old_values && (
+                      <p className="mt-1 text-xs text-gray-500">
+                        Anterior: {JSON.stringify(audit.old_values)}
+                      </p>
+                    )}
+                    {audit.new_values && (
+                      <p className="text-xs text-gray-500">
+                        Nuevo: {JSON.stringify(audit.new_values)}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>

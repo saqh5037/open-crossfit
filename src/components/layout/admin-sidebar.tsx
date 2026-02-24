@@ -14,6 +14,8 @@ import {
   Trophy,
   Settings,
   Shield,
+  ShieldCheck,
+  Mail,
   Menu,
   X,
 } from "lucide-react"
@@ -30,10 +32,12 @@ const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, roles: ["owner", "admin", "coach", "judge"] },
   { href: "/admin/scores", label: "Capturar Scores", icon: ClipboardList, roles: ["owner", "admin", "coach", "judge"] },
   { href: "/admin/scores/manage", label: "Ver Scores", icon: ListChecks, roles: ["owner", "admin", "coach"] },
+  { href: "/admin/scores/validate", label: "Validar Scores", icon: ShieldCheck, roles: ["owner", "admin", "coach"] },
   { href: "/admin/scores/print", label: "Hojas de Score", icon: Printer, roles: ["owner", "admin", "coach"] },
   { href: "/admin/bibs", label: "Credenciales", icon: BadgeCheck, roles: ["owner", "admin", "coach"] },
   { href: "/admin/athletes", label: "Atletas", icon: Users, roles: ["owner", "admin", "coach"] },
   { href: "/admin/wods", label: "WODs", icon: Dumbbell, roles: ["owner", "admin", "coach"] },
+  { href: "/admin/emails", label: "Emails", icon: Mail, roles: ["owner", "admin"] },
   { href: "/admin/settings", label: "Configuración", icon: Settings, roles: ["owner"] },
   { href: "/admin/users", label: "Usuarios Admin", icon: Shield, roles: ["owner"] },
 ]

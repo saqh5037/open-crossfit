@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 import { scoreSchema } from "@/lib/validations/score"
 import { requireRole } from "@/lib/auth-helpers"
+import { logScoreAudit } from "@/lib/audit"
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -58,6 +59,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Guard: judges cannot overwrite confirmed scores
+    if (existing && existing.status === "confirmed" && auth.role === "judge") {
+      return NextResponse.json(
+        { error: "Este score ya fue confirmado. Solo un coach puede modificarlo." },
+        { status: 403 }
+      )
+    }
+
     const score = await prisma.score.upsert({
       where: {
         athlete_id_wod_id: {
@@ -84,6 +93,17 @@ export async function POST(request: NextRequest) {
         judge_notes: parsed.data.judge_notes ?? null,
       },
     })
+
+    // Audit log
+    logScoreAudit({
+      scoreId: score.id,
+      action: existing ? "updated" : "created",
+      oldValues: existing
+        ? { raw_score: Number(existing.raw_score), display_score: existing.display_score, is_rx: existing.is_rx }
+        : null,
+      newValues: { raw_score: parsed.data.raw_score, display_score: parsed.data.display_score, is_rx: parsed.data.is_rx },
+      performedBy: auth.userId,
+    }).catch(console.error)
 
     return NextResponse.json({ data: score }, { status: 201 })
   } catch (error) {

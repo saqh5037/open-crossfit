@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 import { hash } from "bcryptjs"
 import { athleteSchema } from "@/lib/validations/athlete"
+import { getDivisionLabel } from "@/lib/divisions"
+import { sendEmail } from "@/lib/email"
+import { WelcomeEmail } from "@/emails/welcome"
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -86,6 +89,25 @@ export async function POST(request: NextRequest) {
         isJudge = true
       }
     }
+
+    // Fire-and-forget welcome email
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || ""
+    sendEmail({
+      to: athlete.email,
+      subject: `Bienvenido a ${config.name} — #${athlete.participant_number}`,
+      react: WelcomeEmail({
+        athleteName: athlete.full_name,
+        participantNumber: athlete.participant_number,
+        division: getDivisionLabel(athlete.division),
+        eventName: config.name,
+        startDate: config.start_date?.toLocaleDateString("es-MX") || "",
+        endDate: config.end_date?.toLocaleDateString("es-MX") || "",
+        profileUrl: `${appUrl}/atleta/${athlete.id}`,
+        isJudge,
+        judgeEmail: isJudge ? athlete.email : undefined,
+        loginUrl: isJudge ? `${appUrl}/admin/login` : undefined,
+      }),
+    }).catch((err) => console.error("Welcome email error:", err))
 
     return NextResponse.json(
       { data: athlete, participantNumber: athlete.participant_number, isJudge },

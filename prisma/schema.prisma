@@ -38,6 +38,14 @@ enum ScoreStatus {
   confirmed
 }
 
+enum ScoreAction {
+  created
+  updated
+  confirmed
+  rejected
+  deleted
+}
+
 // ── Event Config ───────────────────────────────────
 
 model EventConfig {
@@ -107,6 +115,7 @@ model Score {
   display_score String
   is_rx         Boolean     @default(true)
   scored_by     String?
+  confirmed_by  String?
   evidence_url  String?
   judge_notes   String?
   status        ScoreStatus @default(pending)
@@ -120,6 +129,22 @@ model Score {
   @@index([wod_id])
   @@index([athlete_id])
   @@map("scores")
+}
+
+// ── Score Audits ──────────────────────────────────
+
+model ScoreAudit {
+  id           String      @id @default(cuid())
+  score_id     String
+  action       ScoreAction
+  old_values   Json?
+  new_values   Json?
+  performed_by String
+  performed_at DateTime    @default(now())
+
+  @@index([score_id])
+  @@index([performed_by])
+  @@map("score_audits")
 }
 
 // ── Admin Users ────────────────────────────────────

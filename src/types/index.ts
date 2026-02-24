@@ -1,5 +1,5 @@
-export type { EventConfig, Athlete, Wod, Score, AdminUser } from "@prisma/client"
-export type { Gender, ScoreType, SortOrder, AdminRole, ScoreStatus } from "@prisma/client"
+export type { EventConfig, Athlete, Wod, Score, AdminUser, ScoreAudit } from "@prisma/client"
+export type { Gender, ScoreType, SortOrder, AdminRole, ScoreStatus, ScoreAction } from "@prisma/client"
 
 export interface LeaderboardWodResult {
   wod_id: string
