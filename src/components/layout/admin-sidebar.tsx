@@ -14,10 +14,10 @@ import {
   Trophy,
   Settings,
   Shield,
-  LogOut,
   Menu,
   X,
 } from "lucide-react"
+import { SignOutButton } from "./sign-out-button"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
@@ -74,15 +74,7 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
           <Trophy className="h-4 w-4" />
           Ver Leaderboard
         </Link>
-        <form action="/api/auth/signout" method="POST">
-          <button
-            type="submit"
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-400 hover:bg-gray-800 hover:text-red-400"
-          >
-            <LogOut className="h-4 w-4" />
-            Cerrar Sesión
-          </button>
-        </form>
+        <SignOutButton variant="full" />
       </div>
     </nav>
   )

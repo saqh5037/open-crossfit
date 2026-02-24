@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import Image from "next/image"
-import { LogOut } from "lucide-react"
+import { SignOutButton } from "@/components/layout/sign-out-button"
 
 export default async function JudgeLayout({
   children,
@@ -32,15 +32,7 @@ export default async function JudgeLayout({
             <span className="text-xs text-gray-500">
               {session.user.email}
             </span>
-            <form action="/api/auth/signout" method="POST">
-              <button
-                type="submit"
-                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-gray-400 transition-colors hover:bg-gray-800 hover:text-red-400"
-              >
-                <LogOut className="h-3.5 w-3.5" />
-                Salir
-              </button>
-            </form>
+            <SignOutButton />
           </div>
         </div>
       </header>
