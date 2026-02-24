@@ -77,25 +77,31 @@ export default function CertificadoPage() {
   }
 
   const downloadCertificate = async () => {
-    if (!certRef.current || !certificate || downloading) return
+    if (!certificate || downloading) return
     setDownloading(true)
     try {
-      const { toPng } = await import("dom-to-image-more")
-      const el = certRef.current
-      const scale = 3
-      const dataUrl = await toPng(el, {
-        width: el.scrollWidth * scale,
-        height: el.scrollHeight * scale,
-        style: {
-          transform: `scale(${scale})`,
-          transformOrigin: "top left",
-        },
-        quality: 1,
+      const payload = {
+        athlete: certificate.athlete,
+        event: certificate.event,
+        results: certificate.results,
+        overall_rank: certificate.overall_rank,
+        total_points: certificate.total_points,
+        total_athletes: certificate.total_athletes,
+        divLabel: getDivisionLabel(certificate.athlete.division),
+      }
+      const res = await fetch("/api/certificate/image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       })
+      if (!res.ok) throw new Error("Failed to generate image")
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
       const link = document.createElement("a")
       link.download = `certificado-${certificate.athlete.full_name.replace(/\s+/g, "-").toLowerCase()}.png`
-      link.href = dataUrl
+      link.href = url
       link.click()
+      URL.revokeObjectURL(url)
     } finally {
       setDownloading(false)
     }
