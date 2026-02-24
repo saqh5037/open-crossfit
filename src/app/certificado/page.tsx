@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getDivisionLabel, getDivisionBadge } from "@/lib/divisions"
-import { Download, Loader2, AlertCircle, Lock } from "lucide-react"
+import { Download, Loader2, AlertCircle, Lock, Trophy, Medal, Star } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -41,6 +41,7 @@ export default function CertificadoPage() {
   const [email, setEmail] = useState("")
   const [birthDate, setBirthDate] = useState("")
   const [loading, setLoading] = useState(false)
+  const [downloading, setDownloading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [missingWods, setMissingWods] = useState<string[]>([])
   const [certificate, setCertificate] = useState<CertificateData | null>(null)
@@ -76,19 +77,25 @@ export default function CertificadoPage() {
   }
 
   const downloadCertificate = async () => {
-    if (!certRef.current || !certificate) return
-    const { default: html2canvas } = await import("html2canvas")
-    const canvas = await html2canvas(certRef.current, {
-      backgroundColor: "#000000",
-      scale: 2,
-      useCORS: true,
-      width: 816,
-      height: 1056,
-    })
-    const link = document.createElement("a")
-    link.download = `certificado-${certificate.athlete.full_name.replace(/\s+/g, "-").toLowerCase()}.png`
-    link.href = canvas.toDataURL("image/png")
-    link.click()
+    if (!certRef.current || !certificate || downloading) return
+    setDownloading(true)
+    try {
+      const { default: html2canvas } = await import("html2canvas")
+      const el = certRef.current
+      const canvas = await html2canvas(el, {
+        backgroundColor: "#000000",
+        scale: 3,
+        useCORS: true,
+        width: el.scrollWidth,
+        height: el.scrollHeight,
+      })
+      const link = document.createElement("a")
+      link.download = `certificado-${certificate.athlete.full_name.replace(/\s+/g, "-").toLowerCase()}.png`
+      link.href = canvas.toDataURL("image/png")
+      link.click()
+    } finally {
+      setDownloading(false)
+    }
   }
 
   const getOrdinal = (n: number) => {
@@ -98,10 +105,17 @@ export default function CertificadoPage() {
     return `${n}to`
   }
 
+  const getRankIcon = (rank: number) => {
+    if (rank === 1) return <Trophy className="h-8 w-8 text-yellow-400" />
+    if (rank === 2) return <Medal className="h-8 w-8 text-gray-300" />
+    if (rank === 3) return <Medal className="h-8 w-8 text-amber-600" />
+    return <Star className="h-8 w-8 text-primary" />
+  }
+
   // ============ VERIFICATION FORM ============
   if (!certificate) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a] p-4">
+      <div className="flex min-h-screen items-center justify-center bg-black p-4">
         <Card className="w-full max-w-md border-gray-800 bg-[#111]">
           <CardHeader className="text-center">
             <div className="mx-auto mb-2 flex items-center gap-2">
@@ -189,255 +203,194 @@ export default function CertificadoPage() {
   const paddedNumber = String(athlete.participant_number).padStart(3, "0")
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-[#0a0a0a] p-4 pb-20">
-      {/* Download controls */}
-      <div className="mb-4 flex w-full max-w-[860px] items-center justify-between">
-        <Link href="/" className="text-sm text-gray-500 hover:text-primary">
+    <div className="flex min-h-screen flex-col items-center bg-black p-4 pb-20">
+      {/* Controls */}
+      <div className="mb-6 flex w-full max-w-[540px] items-center justify-between">
+        <Link href="/" className="text-sm text-gray-500 hover:text-primary transition-colors">
           Volver al inicio
         </Link>
-        <Button onClick={downloadCertificate} className="gap-2">
-          <Download className="h-4 w-4" />
-          Descargar certificado
+        <Button
+          onClick={downloadCertificate}
+          disabled={downloading}
+          className="gap-2 bg-primary font-display uppercase tracking-wider text-black hover:bg-orange-500"
+        >
+          {downloading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Download className="h-4 w-4" />
+          )}
+          Descargar
         </Button>
       </div>
 
-      {/* Certificate - Letter size 8.5" x 11" */}
+      {/* ====== CERTIFICATE ====== */}
       <div
         ref={certRef}
-        className="overflow-hidden"
-        style={{
-          width: 816,
-          height: 1056,
-          background: "linear-gradient(180deg, #0a0a0a 0%, #0f0f0f 50%, #0a0a0a 100%)",
-          position: "relative",
-        }}
+        className="relative w-full max-w-[540px] overflow-hidden bg-black"
       >
-        {/* Outer gold border */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 12,
-            border: "2px solid #D4AF37",
-            pointerEvents: "none",
-          }}
+        {/* Background image (same as hero) */}
+        <img
+          src="/open2026.png"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-20"
+          crossOrigin="anonymous"
         />
-        {/* Inner gold border */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 18,
-            border: "1px solid rgba(212, 175, 55, 0.3)",
-            pointerEvents: "none",
-          }}
-        />
-
-        {/* Corner ornaments */}
-        {[
-          { top: 8, left: 8 },
-          { top: 8, right: 8 },
-          { bottom: 8, left: 8 },
-          { bottom: 8, right: 8 },
-        ].map((pos, i) => (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              ...pos,
-              width: 24,
-              height: 24,
-              borderColor: "#D4AF37",
-              borderWidth: 3,
-              borderStyle: "solid",
-              borderTopColor: pos.top !== undefined ? "#D4AF37" : "transparent",
-              borderBottomColor: pos.bottom !== undefined ? "#D4AF37" : "transparent",
-              borderLeftColor: pos.left !== undefined ? "#D4AF37" : "transparent",
-              borderRightColor: pos.right !== undefined ? "#D4AF37" : "transparent",
-            }}
-          />
-        ))}
+        {/* Gradient overlay (same as hero) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/50" />
 
         {/* Content */}
-        <div style={{ padding: "40px 48px", display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
-          {/* Header - Logo + Event Name */}
-          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 4 }}>
-            <img src="/logo-200.png" alt="" style={{ width: 72, height: 72, borderRadius: 8 }} crossOrigin="anonymous" />
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontFamily: "var(--font-display), system-ui", fontSize: 40, fontWeight: 800, letterSpacing: "0.1em", color: "#ffffff" }}>
-                GRIZZLYS
-              </div>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.35em", color: "#D4AF37", marginTop: -4 }}>
-                CROSSFIT
-              </div>
-            </div>
+        <div className="relative z-10 flex flex-col items-center px-8 py-10 sm:px-12">
+
+          {/* Logo */}
+          <img
+            src="/logo-200.png"
+            alt="GRIZZLYS"
+            className="mb-3 h-20 w-20 rounded-lg"
+            crossOrigin="anonymous"
+          />
+
+          {/* Brand name */}
+          <h1 className="font-display text-5xl tracking-wider text-primary">
+            GRIZZLYS
+          </h1>
+
+          {/* Decorative line + subtitle (same pattern as hero) */}
+          <div className="mt-2 flex items-center gap-3">
+            <div className="h-[2px] w-8 bg-primary" />
+            <span className="font-display text-sm tracking-[0.2em] text-gray-400">
+              Competencia Interna
+            </span>
+            <div className="h-[2px] w-8 bg-primary" />
           </div>
 
-          {/* Tagline */}
-          <div style={{ fontSize: 10, letterSpacing: "0.4em", color: "rgba(212, 175, 55, 0.6)", fontWeight: 600, marginBottom: 20 }}>
-            FORJANDO ATLETAS DE ÉLITE
-          </div>
+          {/* Event name */}
+          <h2 className="mt-2 font-display text-2xl tracking-wider text-white">
+            {event.name}
+          </h2>
 
-          {/* Gold divider */}
-          <div style={{ width: "70%", height: 1, background: "linear-gradient(90deg, transparent, #D4AF37, transparent)", marginBottom: 20 }} />
+          {/* Dates */}
+          {event.start_date && event.end_date && (
+            <p className="mt-1 text-xs text-gray-500">
+              {event.start_date} — {event.end_date}
+            </p>
+          )}
+
+          {/* Divider */}
+          <div className="my-5 h-px w-3/4 bg-gradient-to-r from-transparent via-primary to-transparent" />
 
           {/* Certificate title */}
-          <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: "0.25em", color: "#D4AF37", marginBottom: 4 }}>
-            CERTIFICADO
-          </div>
-          <div style={{ fontSize: 12, letterSpacing: "0.3em", color: "rgba(212, 175, 55, 0.7)", fontWeight: 600, marginBottom: 16 }}>
-            DE PARTICIPACIÓN
-          </div>
-
-          {/* "Se otorga a" */}
-          <div style={{ fontSize: 13, color: "#888", marginBottom: 12, fontStyle: "italic" }}>
+          <p className="font-display text-lg tracking-[0.25em] text-primary">
+            CERTIFICADO DE PARTICIPACIÓN
+          </p>
+          <p className="mt-2 text-sm italic text-gray-500">
             Se otorga el presente certificado a
-          </div>
+          </p>
 
           {/* Photo */}
           {athlete.photo_url && (
-            <div style={{
-              width: 88,
-              height: 88,
-              borderRadius: "50%",
-              border: "3px solid #D4AF37",
-              overflow: "hidden",
-              marginBottom: 12,
-            }}>
+            <div className="mt-5 h-24 w-24 overflow-hidden rounded-full border-[3px] border-primary shadow-[0_0_20px_rgba(255,102,0,0.3)]">
               <img
                 src={athlete.photo_url}
                 alt={athlete.full_name}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                className="h-full w-full object-cover"
                 crossOrigin="anonymous"
               />
             </div>
           )}
 
           {/* Athlete name */}
-          <div style={{
-            fontFamily: "var(--font-display), system-ui",
-            fontSize: 34,
-            fontWeight: 800,
-            letterSpacing: "0.08em",
-            color: "#F5E6A3",
-            textAlign: "center",
-            textTransform: "uppercase",
-            marginBottom: 6,
-            lineHeight: 1.1,
-          }}>
+          <h3 className="mt-4 text-center font-display text-4xl uppercase tracking-wider text-white sm:text-5xl">
             {athlete.full_name}
-          </div>
+          </h3>
 
-          {/* Participant number */}
-          <div style={{ fontFamily: "var(--font-display), system-ui", fontSize: 18, letterSpacing: "0.1em", color: "#D4AF37", marginBottom: 8 }}>
+          {/* Number */}
+          <p className="mt-1 font-display text-xl tracking-wider text-primary">
             #{paddedNumber}
-          </div>
+          </p>
 
           {/* Division badge */}
-          <div style={{
-            display: "inline-flex",
-            padding: "4px 16px",
-            borderRadius: 6,
-            fontSize: 12,
-            fontWeight: 700,
-            color: "#fff",
-            backgroundColor: divBadge.bgColor || "rgba(255,255,255,0.1)",
-            border: divBadge.bgColor ? "none" : "1px solid #555",
-            marginBottom: 16,
-          }}>
-            {divLabel}
+          <div className="mt-3">
+            {divBadge.bgColor ? (
+              <span
+                className="rounded-md px-4 py-1 text-sm font-bold text-white"
+                style={{ backgroundColor: divBadge.bgColor }}
+              >
+                {divLabel}
+              </span>
+            ) : (
+              <span className="rounded-md border border-gray-600 px-4 py-1 text-sm font-medium text-gray-300">
+                {divLabel}
+              </span>
+            )}
           </div>
 
           {/* Divider */}
-          <div style={{ width: "50%", height: 1, background: "linear-gradient(90deg, transparent, #333, transparent)", marginBottom: 16 }} />
+          <div className="my-5 h-px w-1/2 bg-gradient-to-r from-transparent via-gray-700 to-transparent" />
 
-          {/* Overall position box */}
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            padding: "12px 28px",
-            borderRadius: 12,
-            backgroundColor: "rgba(212, 175, 55, 0.08)",
-            border: "1px solid rgba(212, 175, 55, 0.25)",
-            marginBottom: 20,
-          }}>
-            <div style={{ fontSize: 36, fontWeight: 900, color: "#F5E6A3", lineHeight: 1 }}>
-              {getOrdinal(overall_rank)}
-            </div>
-            <div style={{ textAlign: "left" }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#F5E6A3" }}>
-                Lugar General
-              </div>
-              <div style={{ fontSize: 11, color: "#888" }}>
+          {/* Overall position (styled like hero date box) */}
+          <div className="flex items-center gap-4 rounded-lg border border-gray-800 bg-gray-900/50 px-6 py-4">
+            {getRankIcon(overall_rank)}
+            <div>
+              <p className="font-display text-3xl tracking-wider text-white">
+                {getOrdinal(overall_rank)} Lugar
+              </p>
+              <p className="text-xs text-gray-400">
                 de {total_athletes} atletas en {divLabel}
-              </div>
-              <div style={{ fontSize: 11, color: "#D4AF37", fontWeight: 700 }}>
-                {total_points} puntos totales
-              </div>
+              </p>
+              <p className="mt-0.5 font-display text-lg tracking-wider text-primary">
+                {total_points} puntos
+              </p>
             </div>
           </div>
 
-          {/* WOD Results table */}
-          <div style={{ width: "80%", marginBottom: 20 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.25em", color: "#555", textAlign: "center", marginBottom: 8, textTransform: "uppercase" }}>
+          {/* WOD Results */}
+          <div className="mt-6 w-full">
+            <p className="mb-3 text-center text-xs font-bold uppercase tracking-[0.2em] text-gray-600">
               Resultados por WOD
-            </div>
-            <div style={{ borderRadius: 8, overflow: "hidden", border: "1px solid #222" }}>
-              {/* Table header */}
-              <div style={{ display: "flex", backgroundColor: "#161616", padding: "8px 16px", fontSize: 10, fontWeight: 700, color: "#666", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                <div style={{ flex: 1 }}>WOD</div>
-                <div style={{ width: 100, textAlign: "center" }}>Score</div>
-                <div style={{ width: 60, textAlign: "center" }}>Pos.</div>
-                <div style={{ width: 60, textAlign: "center" }}>Puntos</div>
+            </p>
+            <div className="overflow-hidden rounded-lg border border-gray-800">
+              {/* Header */}
+              <div className="flex bg-gray-900 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                <span className="flex-1">WOD</span>
+                <span className="w-20 text-center">Score</span>
+                <span className="w-12 text-center">Pos</span>
+                <span className="w-14 text-center">Pts</span>
               </div>
-              {/* Table rows */}
+              {/* Rows */}
               {results.map((r, i) => (
                 <div
                   key={r.wod_id}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "8px 16px",
-                    backgroundColor: i % 2 === 0 ? "#0d0d0d" : "#111",
-                    borderTop: "1px solid #1a1a1a",
-                  }}
+                  className={`flex items-center px-4 py-2.5 ${i % 2 === 0 ? "bg-black/40" : "bg-gray-900/30"}`}
                 >
-                  <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: "#ccc" }}>
+                  <span className="flex-1 text-sm font-medium text-gray-300">
                     {r.wod_name}
-                  </div>
-                  <div style={{ width: 100, textAlign: "center", fontSize: 13, fontFamily: "monospace", color: "#D4AF37", fontWeight: 700 }}>
+                  </span>
+                  <span className="w-20 text-center font-mono text-sm font-bold text-primary">
                     {r.display_score}
-                  </div>
-                  <div style={{ width: 60, textAlign: "center", fontSize: 12, color: "#888" }}>
+                  </span>
+                  <span className="w-12 text-center text-xs text-gray-500">
                     {r.placement}°
-                  </div>
-                  <div style={{ width: 60, textAlign: "center", fontSize: 14, fontWeight: 800, color: "#F5E6A3" }}>
+                  </span>
+                  <span className="w-14 text-center text-sm font-black text-white">
                     {r.points}
-                  </div>
+                  </span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Spacer to push footer down */}
-          <div style={{ flex: 1 }} />
+          {/* Bottom divider */}
+          <div className="my-6 h-px w-3/4 bg-gradient-to-r from-transparent via-primary to-transparent" />
 
-          {/* Event info */}
-          <div style={{ fontSize: 13, color: "#888", textAlign: "center", marginBottom: 4 }}>
-            {event.name}
-          </div>
-          {event.start_date && event.end_date && (
-            <div style={{ fontSize: 11, color: "#555", textAlign: "center", marginBottom: 12 }}>
-              {event.start_date} — {event.end_date}
-            </div>
-          )}
-
-          {/* Bottom gold divider */}
-          <div style={{ width: "60%", height: 1, background: "linear-gradient(90deg, transparent, #D4AF37, transparent)", marginBottom: 12 }} />
+          {/* Tagline */}
+          <p className="font-display text-sm tracking-[0.3em] text-primary">
+            FORJANDO ATLETAS DE ÉLITE
+          </p>
 
           {/* Footer */}
-          <div style={{ fontSize: 9, color: "#444", textAlign: "center", letterSpacing: "0.1em" }}>
-            Certificado generado digitalmente · GRIZZLYS CrossFit · crossfit.52-55-189-120.sslip.io
-          </div>
+          <p className="mt-3 text-[10px] tracking-wider text-gray-700">
+            crossfit.52-55-189-120.sslip.io
+          </p>
         </div>
       </div>
     </div>
