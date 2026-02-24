@@ -32,12 +32,12 @@ export function isDivisionRx(divisionKey: string): boolean {
   return divisionKey.startsWith("rx_")
 }
 
-export function getDivisionBadge(divisionKey: string): { text: string; colorClass: string } {
-  if (divisionKey.startsWith("rx_")) return { text: "RX", colorClass: "bg-green-600" }
-  if (divisionKey.startsWith("scaled_")) return { text: "Scaled", colorClass: "" }
-  if (divisionKey.startsWith("foundation_")) return { text: "Foundation", colorClass: "bg-blue-600" }
-  if (divisionKey.startsWith("masters45_")) return { text: "Masters 45+", colorClass: "bg-purple-600" }
-  if (divisionKey.startsWith("masters35_")) return { text: "Masters 35+", colorClass: "bg-purple-600" }
-  if (divisionKey.startsWith("teens_")) return { text: "Teens", colorClass: "bg-orange-600" }
-  return { text: divisionKey.replace(/_/g, " "), colorClass: "" }
+export function getDivisionBadge(divisionKey: string): { text: string; bgColor: string } {
+  if (divisionKey.startsWith("rx_")) return { text: "RX", bgColor: "#16a34a" }
+  if (divisionKey.startsWith("scaled_")) return { text: "Scaled", bgColor: "" }
+  if (divisionKey.startsWith("foundation_")) return { text: "Foundation", bgColor: "#2563eb" }
+  if (divisionKey.startsWith("masters45_")) return { text: "Masters 45+", bgColor: "#9333ea" }
+  if (divisionKey.startsWith("masters35_")) return { text: "Masters 35+", bgColor: "#9333ea" }
+  if (divisionKey.startsWith("teens_")) return { text: "Teens", bgColor: "#ea580c" }
+  return { text: divisionKey.replace(/_/g, " "), bgColor: "" }
 }

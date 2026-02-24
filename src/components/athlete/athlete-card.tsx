@@ -287,8 +287,8 @@ export function AtletaCard({
                               </span>
                             )}
                             <Badge
-                              variant={divisionBadge.colorClass ? "default" : "outline"}
-                              className={divisionBadge.colorClass}
+                              variant={divisionBadge.bgColor ? "default" : "outline"}
+                              style={divisionBadge.bgColor ? { backgroundColor: divisionBadge.bgColor } : undefined}
                             >
                               {divisionBadge.text}
                             </Badge>
@@ -416,8 +416,8 @@ export function AtletaCard({
                         </span>
                       )}
                       <Badge
-                        variant={divisionBadge.colorClass ? "default" : "outline"}
-                        className={divisionBadge.colorClass}
+                        variant={divisionBadge.bgColor ? "default" : "outline"}
+                        style={divisionBadge.bgColor ? { backgroundColor: divisionBadge.bgColor } : undefined}
                       >
                         {divisionBadge.text}
                       </Badge>

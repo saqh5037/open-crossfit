@@ -237,7 +237,10 @@ export default function ScoresManagePage() {
                   {(() => {
                     const badge = getDivisionBadge(score.athlete.division)
                     return (
-                      <Badge variant={badge.colorClass ? "default" : "secondary"} className={badge.colorClass}>
+                      <Badge
+                        variant={badge.bgColor ? "default" : "secondary"}
+                        style={badge.bgColor ? { backgroundColor: badge.bgColor } : undefined}
+                      >
                         {badge.text}
                       </Badge>
                     )
