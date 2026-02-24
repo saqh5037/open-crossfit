@@ -39,8 +39,7 @@ function LoginForm() {
 
       // If callbackUrl exists, go there (e.g. /atleta/{id} after QR scan)
       if (callbackUrl) {
-        router.push(callbackUrl)
-        router.refresh()
+        window.location.href = callbackUrl
         return
       }
 
@@ -50,11 +49,10 @@ function LoginForm() {
       const role = sessionData?.user?.role
 
       if (role === "judge") {
-        router.push("/judge")
+        window.location.href = "/judge"
       } else {
-        router.push("/admin")
+        window.location.href = "/admin"
       }
-      router.refresh()
     } catch {
       setError("Error de conexión. Intenta de nuevo.")
       setLoading(false)
