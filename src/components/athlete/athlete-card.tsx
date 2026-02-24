@@ -169,6 +169,8 @@ export function AtletaCard({
     }
   }
 
+  const kgToLbs = (kg: number) => Math.round(kg * 2.20462)
+
   return (
     <>
       {/* === SCREEN VIEW === */}
@@ -270,9 +272,18 @@ export function AtletaCard({
                         </div>
                         {existing && !isScoring ? (
                           <div className="flex items-center gap-2">
-                            <span className="font-display text-2xl text-primary">
-                              {existing.display_score}
-                            </span>
+                            {wod.score_type === "weight" ? (
+                              <div className="text-right">
+                                <span className="font-display text-2xl text-primary">
+                                  {kgToLbs(parseFloat(existing.display_score))} LBS
+                                </span>
+                                <p className="text-xs text-gray-500">{existing.display_score} kg</p>
+                              </div>
+                            ) : (
+                              <span className="font-display text-2xl text-primary">
+                                {existing.display_score}
+                              </span>
+                            )}
                             <Badge
                               variant={existing.is_rx ? "default" : "outline"}
                               className={existing.is_rx ? "bg-green-600" : ""}
@@ -390,9 +401,18 @@ export function AtletaCard({
                       <p className="text-xs text-gray-500">{getScoreTypeLabel(score.wod.score_type)}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-display text-2xl text-primary">
-                        {score.display_score}
-                      </span>
+                      {score.wod.score_type === "weight" ? (
+                        <div className="text-right">
+                          <span className="font-display text-2xl text-primary">
+                            {kgToLbs(parseFloat(score.display_score))} LBS
+                          </span>
+                          <p className="text-xs text-gray-500">{score.display_score} kg</p>
+                        </div>
+                      ) : (
+                        <span className="font-display text-2xl text-primary">
+                          {score.display_score}
+                        </span>
+                      )}
                       <Badge
                         variant={score.is_rx ? "default" : "outline"}
                         className={score.is_rx ? "bg-green-600" : ""}

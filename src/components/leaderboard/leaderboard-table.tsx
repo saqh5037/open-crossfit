@@ -14,6 +14,7 @@ import type { LeaderboardEntry } from "@/types"
 interface WodHeader {
   id: string
   name: string
+  score_type: string
 }
 
 interface LeaderboardTableProps {
@@ -26,6 +27,24 @@ function MedalBadge({ rank }: { rank: number }) {
   if (rank === 2) return <Badge className="bg-gray-400 text-white">🥈</Badge>
   if (rank === 3) return <Badge className="bg-amber-700 text-white">🥉</Badge>
   return <span className="text-gray-400">{rank}</span>
+}
+
+const kgToLbs = (kg: number) => Math.round(kg * 2.20462)
+
+function formatScore(displayScore: string, scoreType: string) {
+  if (scoreType === "weight") {
+    const kg = parseFloat(displayScore)
+    if (!isNaN(kg)) {
+      return (
+        <>
+          <span className="text-xs font-semibold text-gray-300">{kgToLbs(kg)} lbs</span>
+          <br />
+          <span className="text-[10px] text-gray-500">{displayScore} kg</span>
+        </>
+      )
+    }
+  }
+  return <span className="text-xs text-gray-400">{displayScore}</span>
 }
 
 export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
@@ -82,9 +101,7 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
                     <TableCell key={wod.id} className="text-center">
                       {result ? (
                         <div>
-                          <span className="text-xs text-gray-400">
-                            {result.display_score}
-                          </span>
+                          {formatScore(result.display_score ?? "", wod.score_type)}
                           <br />
                           <span className="font-bold text-white">{result.placement}</span>
                         </div>
