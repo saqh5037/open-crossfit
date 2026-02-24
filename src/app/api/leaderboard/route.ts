@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       total_points AS (
         SELECT
           athlete_id,
-          SUM(placement)::int as total_points
+          SUM(GREATEST(0, 100 - (placement::int - 1) * 3))::int as total_points
         FROM wod_rankings
         GROUP BY athlete_id
       )
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         a.full_name,
         a.division,
         COALESCE(tp.total_points, 0) as total_points,
-        RANK() OVER (ORDER BY COALESCE(tp.total_points, 999999) ASC)::int as overall_rank,
+        RANK() OVER (ORDER BY COALESCE(tp.total_points, 0) DESC)::int as overall_rank,
         COALESCE(
           (
             SELECT json_agg(
@@ -55,7 +55,8 @@ export async function GET(request: NextRequest) {
                 'wod_id', wr2.wod_id,
                 'wod_name', wr2.wod_name,
                 'display_score', wr2.display_score,
-                'placement', wr2.placement
+                'placement', wr2.placement,
+                'points', GREATEST(0, 100 - (wr2.placement::int - 1) * 3)
               ) ORDER BY wr2.display_order
             )
             FROM wod_rankings wr2
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
       FROM athletes a
       LEFT JOIN total_points tp ON a.id = tp.athlete_id
       WHERE a.division = ${division}
-      ORDER BY COALESCE(tp.total_points, 999999) ASC, a.full_name ASC
+      ORDER BY COALESCE(tp.total_points, 0) DESC, a.full_name ASC
     `
 
     // Get WOD list for column headers

@@ -70,7 +70,7 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
                 {wod.name}
               </TableHead>
             ))}
-            <TableHead className="text-center font-bold text-gray-300">Total</TableHead>
+            <TableHead className="text-center font-bold text-gray-300">Puntos</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -103,7 +103,8 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
                         <div>
                           {formatScore(result.display_score ?? "", wod.score_type)}
                           <br />
-                          <span className="font-bold text-white">{result.placement}</span>
+                          <span className="text-sm font-bold text-primary">{result.points ?? 0}</span>
+                          <span className="ml-1 text-[10px] text-gray-600">({result.placement}°)</span>
                         </div>
                       ) : (
                         <span className="text-gray-500">—</span>

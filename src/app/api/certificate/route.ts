@@ -102,19 +102,19 @@ export async function POST(request: NextRequest) {
       total_points AS (
         SELECT
           athlete_id,
-          SUM(placement)::int as total_points
+          SUM(GREATEST(0, 100 - (placement::int - 1) * 3))::int as total_points
         FROM wod_rankings
         GROUP BY athlete_id
       )
       SELECT
         a.id,
-        RANK() OVER (ORDER BY COALESCE(tp.total_points, 999999) ASC)::int as overall_rank,
+        RANK() OVER (ORDER BY COALESCE(tp.total_points, 0) DESC)::int as overall_rank,
         COALESCE(tp.total_points, 0)::int as total_points,
         COUNT(*) OVER ()::int as total_athletes
       FROM athletes a
       LEFT JOIN total_points tp ON a.id = tp.athlete_id
       WHERE a.division = ${division}
-      ORDER BY COALESCE(tp.total_points, 999999) ASC
+      ORDER BY COALESCE(tp.total_points, 0) DESC
     `
 
     const athleteRank = leaderboard.find((r) => r.id === athlete.id)
@@ -129,6 +129,7 @@ export async function POST(request: NextRequest) {
       wod_name: string
       display_score: string
       placement: number
+      points: number
     }> = await prisma.$queryRaw`
       WITH wod_rankings AS (
         SELECT
@@ -150,7 +151,8 @@ export async function POST(request: NextRequest) {
           AND w.is_active = true
           AND s.status = 'confirmed'
       )
-      SELECT wod_id, wod_name, display_score, placement
+      SELECT wod_id, wod_name, display_score, placement,
+        GREATEST(0, 100 - (placement::int - 1) * 3)::int as points
       FROM wod_rankings
       WHERE athlete_id = ${athlete.id}
       ORDER BY display_order

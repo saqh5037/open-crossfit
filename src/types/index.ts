@@ -6,6 +6,7 @@ export interface LeaderboardWodResult {
   wod_name: string
   display_score: string | null
   placement: number | null
+  points: number | null
 }
 
 export interface LeaderboardEntry {

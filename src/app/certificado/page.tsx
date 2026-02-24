@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getDivisionLabel, getDivisionBadge } from "@/lib/divisions"
-import { Download, Loader2, AlertCircle, Trophy, Medal, Star, Lock } from "lucide-react"
+import { Download, Loader2, AlertCircle, Lock } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -15,6 +15,7 @@ interface WodResult {
   wod_name: string
   display_score: string
   placement: number
+  points: number
 }
 
 interface CertificateData {
@@ -79,22 +80,15 @@ export default function CertificadoPage() {
     const { default: html2canvas } = await import("html2canvas")
     const canvas = await html2canvas(certRef.current, {
       backgroundColor: "#000000",
-      scale: 3,
+      scale: 2,
       useCORS: true,
-      width: certRef.current.scrollWidth,
-      height: certRef.current.scrollHeight,
+      width: 816,
+      height: 1056,
     })
     const link = document.createElement("a")
     link.download = `certificado-${certificate.athlete.full_name.replace(/\s+/g, "-").toLowerCase()}.png`
     link.href = canvas.toDataURL("image/png")
     link.click()
-  }
-
-  const getRankIcon = (rank: number) => {
-    if (rank === 1) return <Trophy className="h-6 w-6" style={{ color: "#FFD700" }} />
-    if (rank === 2) return <Medal className="h-6 w-6" style={{ color: "#C0C0C0" }} />
-    if (rank === 3) return <Medal className="h-6 w-6" style={{ color: "#CD7F32" }} />
-    return <Star className="h-6 w-6" style={{ color: "#D4AF37" }} />
   }
 
   const getOrdinal = (n: number) => {
@@ -196,8 +190,8 @@ export default function CertificadoPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-[#0a0a0a] p-4 pb-20">
-      {/* Download button */}
-      <div className="mb-4 flex w-full max-w-lg items-center justify-between">
+      {/* Download controls */}
+      <div className="mb-4 flex w-full max-w-[860px] items-center justify-between">
         <Link href="/" className="text-sm text-gray-500 hover:text-primary">
           Volver al inicio
         </Link>
@@ -207,169 +201,244 @@ export default function CertificadoPage() {
         </Button>
       </div>
 
-      {/* Certificate */}
+      {/* Certificate - Letter size 8.5" x 11" */}
       <div
         ref={certRef}
-        className="w-full max-w-lg overflow-hidden rounded-2xl"
+        className="overflow-hidden"
         style={{
-          background: "linear-gradient(180deg, #0a0a0a 0%, #111111 30%, #0a0a0a 100%)",
+          width: 816,
+          height: 1056,
+          background: "linear-gradient(180deg, #0a0a0a 0%, #0f0f0f 50%, #0a0a0a 100%)",
+          position: "relative",
         }}
       >
-        {/* Top decorative bar */}
+        {/* Outer gold border */}
         <div
-          className="h-2"
           style={{
-            background: "linear-gradient(90deg, #D4AF37 0%, #F5E6A3 25%, #D4AF37 50%, #F5E6A3 75%, #D4AF37 100%)",
+            position: "absolute",
+            inset: 12,
+            border: "2px solid #D4AF37",
+            pointerEvents: "none",
+          }}
+        />
+        {/* Inner gold border */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 18,
+            border: "1px solid rgba(212, 175, 55, 0.3)",
+            pointerEvents: "none",
           }}
         />
 
-        <div className="flex flex-col items-center px-6 pb-8 pt-6 sm:px-10">
-          {/* Logo */}
-          <div className="mb-1 flex items-center gap-3">
-            <img src="/logo-80.png" alt="" className="h-10 w-10 rounded" />
-            <span className="font-display text-3xl tracking-wider text-white">GRIZZLYS</span>
-          </div>
-          <p
-            className="mb-6 text-xs font-bold uppercase tracking-[0.3em]"
-            style={{ color: "#D4AF37" }}
-          >
-            CERTIFICADO DE PARTICIPACIÓN
-          </p>
+        {/* Corner ornaments */}
+        {[
+          { top: 8, left: 8 },
+          { top: 8, right: 8 },
+          { bottom: 8, left: 8 },
+          { bottom: 8, right: 8 },
+        ].map((pos, i) => (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              ...pos,
+              width: 24,
+              height: 24,
+              borderColor: "#D4AF37",
+              borderWidth: 3,
+              borderStyle: "solid",
+              borderTopColor: pos.top !== undefined ? "#D4AF37" : "transparent",
+              borderBottomColor: pos.bottom !== undefined ? "#D4AF37" : "transparent",
+              borderLeftColor: pos.left !== undefined ? "#D4AF37" : "transparent",
+              borderRightColor: pos.right !== undefined ? "#D4AF37" : "transparent",
+            }}
+          />
+        ))}
 
-          {/* Divider */}
-          <div className="mb-6 flex w-full items-center gap-4">
-            <div className="h-px flex-1" style={{ background: "linear-gradient(90deg, transparent, #D4AF37, transparent)" }} />
-            <Star className="h-4 w-4" style={{ color: "#D4AF37" }} />
-            <div className="h-px flex-1" style={{ background: "linear-gradient(90deg, transparent, #D4AF37, transparent)" }} />
+        {/* Content */}
+        <div style={{ padding: "40px 48px", display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
+          {/* Header - Logo + Event Name */}
+          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 4 }}>
+            <img src="/logo-200.png" alt="" style={{ width: 72, height: 72, borderRadius: 8 }} crossOrigin="anonymous" />
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontFamily: "var(--font-display), system-ui", fontSize: 40, fontWeight: 800, letterSpacing: "0.1em", color: "#ffffff" }}>
+                GRIZZLYS
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.35em", color: "#D4AF37", marginTop: -4 }}>
+                CROSSFIT
+              </div>
+            </div>
           </div>
 
-          {/* Recognition text */}
-          <p className="mb-2 text-center text-sm text-gray-400">
+          {/* Tagline */}
+          <div style={{ fontSize: 10, letterSpacing: "0.4em", color: "rgba(212, 175, 55, 0.6)", fontWeight: 600, marginBottom: 20 }}>
+            FORJANDO ATLETAS DE ÉLITE
+          </div>
+
+          {/* Gold divider */}
+          <div style={{ width: "70%", height: 1, background: "linear-gradient(90deg, transparent, #D4AF37, transparent)", marginBottom: 20 }} />
+
+          {/* Certificate title */}
+          <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: "0.25em", color: "#D4AF37", marginBottom: 4 }}>
+            CERTIFICADO
+          </div>
+          <div style={{ fontSize: 12, letterSpacing: "0.3em", color: "rgba(212, 175, 55, 0.7)", fontWeight: 600, marginBottom: 16 }}>
+            DE PARTICIPACIÓN
+          </div>
+
+          {/* "Se otorga a" */}
+          <div style={{ fontSize: 13, color: "#888", marginBottom: 12, fontStyle: "italic" }}>
             Se otorga el presente certificado a
-          </p>
+          </div>
 
           {/* Photo */}
           {athlete.photo_url && (
-            <div className="my-4 h-24 w-24 overflow-hidden rounded-full" style={{ border: "3px solid #D4AF37" }}>
+            <div style={{
+              width: 88,
+              height: 88,
+              borderRadius: "50%",
+              border: "3px solid #D4AF37",
+              overflow: "hidden",
+              marginBottom: 12,
+            }}>
               <img
                 src={athlete.photo_url}
                 alt={athlete.full_name}
-                className="h-full w-full object-cover"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 crossOrigin="anonymous"
               />
             </div>
           )}
 
           {/* Athlete name */}
-          <h2
-            className="mb-1 text-center font-display text-3xl uppercase tracking-wider sm:text-4xl"
-            style={{ color: "#F5E6A3" }}
-          >
+          <div style={{
+            fontFamily: "var(--font-display), system-ui",
+            fontSize: 34,
+            fontWeight: 800,
+            letterSpacing: "0.08em",
+            color: "#F5E6A3",
+            textAlign: "center",
+            textTransform: "uppercase",
+            marginBottom: 6,
+            lineHeight: 1.1,
+          }}>
             {athlete.full_name}
-          </h2>
-          <p className="mb-1 font-display text-xl tracking-wider text-primary">
-            #{paddedNumber}
-          </p>
+          </div>
 
-          {/* Division */}
-          <div className="mb-6">
-            {divBadge.bgColor ? (
-              <span
-                className="rounded-md px-4 py-1 text-sm font-bold text-white"
-                style={{ backgroundColor: divBadge.bgColor }}
-              >
-                {divLabel}
-              </span>
-            ) : (
-              <span className="rounded-md border border-gray-600 px-4 py-1 text-sm font-medium text-gray-300">
-                {divLabel}
-              </span>
-            )}
+          {/* Participant number */}
+          <div style={{ fontFamily: "var(--font-display), system-ui", fontSize: 18, letterSpacing: "0.1em", color: "#D4AF37", marginBottom: 8 }}>
+            #{paddedNumber}
+          </div>
+
+          {/* Division badge */}
+          <div style={{
+            display: "inline-flex",
+            padding: "4px 16px",
+            borderRadius: 6,
+            fontSize: 12,
+            fontWeight: 700,
+            color: "#fff",
+            backgroundColor: divBadge.bgColor || "rgba(255,255,255,0.1)",
+            border: divBadge.bgColor ? "none" : "1px solid #555",
+            marginBottom: 16,
+          }}>
+            {divLabel}
           </div>
 
           {/* Divider */}
-          <div className="mb-6 flex w-full items-center gap-4">
-            <div className="h-px flex-1" style={{ background: "linear-gradient(90deg, transparent, #333, transparent)" }} />
-          </div>
+          <div style={{ width: "50%", height: 1, background: "linear-gradient(90deg, transparent, #333, transparent)", marginBottom: 16 }} />
 
-          {/* Overall position */}
-          <div className="mb-6 flex items-center gap-3 rounded-xl px-6 py-4" style={{ backgroundColor: "rgba(212, 175, 55, 0.08)", border: "1px solid rgba(212, 175, 55, 0.2)" }}>
-            {getRankIcon(overall_rank)}
-            <div className="text-center">
-              <p className="text-3xl font-bold" style={{ color: "#F5E6A3" }}>
-                {getOrdinal(overall_rank)} Lugar
-              </p>
-              <p className="text-xs text-gray-400">
+          {/* Overall position box */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            padding: "12px 28px",
+            borderRadius: 12,
+            backgroundColor: "rgba(212, 175, 55, 0.08)",
+            border: "1px solid rgba(212, 175, 55, 0.25)",
+            marginBottom: 20,
+          }}>
+            <div style={{ fontSize: 36, fontWeight: 900, color: "#F5E6A3", lineHeight: 1 }}>
+              {getOrdinal(overall_rank)}
+            </div>
+            <div style={{ textAlign: "left" }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#F5E6A3" }}>
+                Lugar General
+              </div>
+              <div style={{ fontSize: 11, color: "#888" }}>
                 de {total_athletes} atletas en {divLabel}
-              </p>
-              <p className="text-xs text-gray-500">
-                {total_points} pts totales
-              </p>
+              </div>
+              <div style={{ fontSize: 11, color: "#D4AF37", fontWeight: 700 }}>
+                {total_points} puntos totales
+              </div>
             </div>
           </div>
 
-          {/* WOD Results */}
-          <div className="mb-6 w-full">
-            <p className="mb-3 text-center text-xs font-bold uppercase tracking-widest text-gray-500">
+          {/* WOD Results table */}
+          <div style={{ width: "80%", marginBottom: 20 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.25em", color: "#555", textAlign: "center", marginBottom: 8, textTransform: "uppercase" }}>
               Resultados por WOD
-            </p>
-            <div className="flex flex-col gap-2">
-              {results.map((r) => (
+            </div>
+            <div style={{ borderRadius: 8, overflow: "hidden", border: "1px solid #222" }}>
+              {/* Table header */}
+              <div style={{ display: "flex", backgroundColor: "#161616", padding: "8px 16px", fontSize: 10, fontWeight: 700, color: "#666", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                <div style={{ flex: 1 }}>WOD</div>
+                <div style={{ width: 100, textAlign: "center" }}>Score</div>
+                <div style={{ width: 60, textAlign: "center" }}>Pos.</div>
+                <div style={{ width: 60, textAlign: "center" }}>Puntos</div>
+              </div>
+              {/* Table rows */}
+              {results.map((r, i) => (
                 <div
                   key={r.wod_id}
-                  className="flex items-center justify-between rounded-lg border border-gray-800 bg-[#0d0d0d] px-4 py-3"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "8px 16px",
+                    backgroundColor: i % 2 === 0 ? "#0d0d0d" : "#111",
+                    borderTop: "1px solid #1a1a1a",
+                  }}
                 >
-                  <div className="flex items-center gap-3">
-                    <span
-                      className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
-                      style={
-                        r.placement <= 3
-                          ? { backgroundColor: "rgba(212, 175, 55, 0.15)", color: "#D4AF37" }
-                          : { backgroundColor: "rgba(255,255,255,0.05)", color: "#888" }
-                      }
-                    >
-                      {r.placement}
-                    </span>
-                    <span className="text-sm font-medium text-gray-300">{r.wod_name}</span>
+                  <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: "#ccc" }}>
+                    {r.wod_name}
                   </div>
-                  <span className="font-mono text-sm font-bold text-primary">
+                  <div style={{ width: 100, textAlign: "center", fontSize: 13, fontFamily: "monospace", color: "#D4AF37", fontWeight: 700 }}>
                     {r.display_score}
-                  </span>
+                  </div>
+                  <div style={{ width: 60, textAlign: "center", fontSize: 12, color: "#888" }}>
+                    {r.placement}°
+                  </div>
+                  <div style={{ width: 60, textAlign: "center", fontSize: 14, fontWeight: 800, color: "#F5E6A3" }}>
+                    {r.points}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
+          {/* Spacer to push footer down */}
+          <div style={{ flex: 1 }} />
+
           {/* Event info */}
-          <p className="mb-1 text-center text-sm text-gray-400">
+          <div style={{ fontSize: 13, color: "#888", textAlign: "center", marginBottom: 4 }}>
             {event.name}
-          </p>
+          </div>
           {event.start_date && event.end_date && (
-            <p className="mb-4 text-center text-xs text-gray-600">
+            <div style={{ fontSize: 11, color: "#555", textAlign: "center", marginBottom: 12 }}>
               {event.start_date} — {event.end_date}
-            </p>
+            </div>
           )}
 
-          {/* Bottom divider */}
-          <div className="mb-4 flex w-full items-center gap-4">
-            <div className="h-px flex-1" style={{ background: "linear-gradient(90deg, transparent, #D4AF37, transparent)" }} />
-            <Star className="h-4 w-4" style={{ color: "#D4AF37" }} />
-            <div className="h-px flex-1" style={{ background: "linear-gradient(90deg, transparent, #D4AF37, transparent)" }} />
-          </div>
+          {/* Bottom gold divider */}
+          <div style={{ width: "60%", height: 1, background: "linear-gradient(90deg, transparent, #D4AF37, transparent)", marginBottom: 12 }} />
 
           {/* Footer */}
-          <p className="text-center text-[10px] text-gray-600">
-            Certificado generado digitalmente · crossfit.52-55-189-120.sslip.io
-          </p>
+          <div style={{ fontSize: 9, color: "#444", textAlign: "center", letterSpacing: "0.1em" }}>
+            Certificado generado digitalmente · GRIZZLYS CrossFit · crossfit.52-55-189-120.sslip.io
+          </div>
         </div>
-
-        {/* Bottom decorative bar */}
-        <div
-          className="h-2"
-          style={{
-            background: "linear-gradient(90deg, #D4AF37 0%, #F5E6A3 25%, #D4AF37 50%, #F5E6A3 75%, #D4AF37 100%)",
-          }}
-        />
       </div>
     </div>
   )
