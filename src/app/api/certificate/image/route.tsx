@@ -73,9 +73,9 @@ export async function POST(request: NextRequest) {
     }
 
     const WIDTH = 540
-    const baseHeight = 780
-    const rowHeight = 40
-    const photoExtraHeight = photoBase64 ? 120 : 0
+    const baseHeight = 850
+    const rowHeight = 42
+    const photoExtraHeight = photoBase64 ? 130 : 0
     const HEIGHT = baseHeight + (results.length * rowHeight) + photoExtraHeight
 
     return new ImageResponse(
