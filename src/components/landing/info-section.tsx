@@ -102,11 +102,24 @@ export function InfoSection({ wods, divisions }: InfoSectionProps) {
           <h2 className="mb-8 text-center font-display text-4xl tracking-wider text-white sm:text-5xl">
             Divisiones
           </h2>
-          <div className="flex flex-wrap justify-center gap-2">
+          <div
+            className="flex flex-wrap items-center justify-center gap-2"
+            style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "0.5rem" }}
+          >
             {divisions.map((div) => (
               <span
                 key={div}
-                className="rounded-lg border-2 border-primary bg-transparent px-4 py-2 font-display text-sm tracking-wider text-primary"
+                className="inline-block rounded-lg border-2 border-primary px-4 py-2 font-display text-sm tracking-wider text-primary"
+                style={{
+                  display: "inline-block",
+                  border: "2px solid hsl(24, 100%, 50%)",
+                  color: "hsl(24, 100%, 50%)",
+                  borderRadius: "0.5rem",
+                  padding: "0.5rem 1rem",
+                  margin: "0.25rem",
+                  fontSize: "0.875rem",
+                  letterSpacing: "0.05em",
+                }}
               >
                 {div.replace(/_/g, " ").replace(/(\d+)/, " $1+").toUpperCase()}
               </span>
