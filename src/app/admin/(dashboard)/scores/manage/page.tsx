@@ -204,7 +204,7 @@ export default function ScoresManagePage() {
           <option value="">Todas las divisiones</option>
           <option value="rx_male">RX Masculino</option>
           <option value="rx_female">RX Femenino</option>
-          <option value="foundation_male">Principiante Masculino</option>
+          <option value="foundation_male">Foundation Masculino</option>
           <option value="foundation_female">Foundation Femenino</option>
         </select>
         <span className="text-sm text-gray-500">

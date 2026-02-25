@@ -3,8 +3,8 @@ import type { DivisionInfo } from "@/types"
 export const DIVISIONS: Record<string, DivisionInfo> = {
   rx_male: { key: "rx_male", label: "RX Masculino", gender: "M", description: "Avanzado" },
   rx_female: { key: "rx_female", label: "RX Femenino", gender: "F", description: "Avanzado" },
-  foundation_male: { key: "foundation_male", label: "Principiante", gender: "M", description: "Principiante" },
-  foundation_female: { key: "foundation_female", label: "Foundation", gender: "F", description: "Principiante" },
+  foundation_male: { key: "foundation_male", label: "Foundation Masculino", gender: "M", description: "Principiante" },
+  foundation_female: { key: "foundation_female", label: "Foundation Femenino", gender: "F", description: "Principiante" },
 }
 
 export function getDivisionsByGender(gender: "M" | "F"): DivisionInfo[] {

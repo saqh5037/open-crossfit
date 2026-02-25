@@ -65,7 +65,7 @@ interface Wod {
 const DIV_LABEL: Record<string, string> = {
   rx_male: "RX M",
   rx_female: "RX F",
-  foundation_male: "Princ. M",
+  foundation_male: "Found. M",
   foundation_female: "Found. F",
 }
 
@@ -317,7 +317,7 @@ export default function ValidateScoresPage() {
           <option value="">Todas las divisiones</option>
           <option value="rx_male">RX Masculino</option>
           <option value="rx_female">RX Femenino</option>
-          <option value="foundation_male">Principiante Masculino</option>
+          <option value="foundation_male">Foundation Masculino</option>
           <option value="foundation_female">Foundation Femenino</option>
         </select>
         <select

@@ -27,7 +27,7 @@ const BIBS_PER_PAGE = 4
 const divisionLabel: Record<string, string> = {
   rx_male: "RX Masculino",
   rx_female: "RX Femenino",
-  foundation_male: "Principiante Masculino",
+  foundation_male: "Foundation Masculino",
   foundation_female: "Foundation Femenino",
 }
 

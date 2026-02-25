@@ -5,8 +5,8 @@ import { getDivisionLabel } from "@/lib/divisions"
 const SHORT_LABELS: Record<string, string> = {
   rx_male: "RX M",
   rx_female: "RX F",
-  foundation_male: "Princ.",
-  foundation_female: "Found.",
+  foundation_male: "Found. M",
+  foundation_female: "Found. F",
 }
 
 interface DivisionTabsProps {
