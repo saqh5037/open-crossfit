@@ -65,8 +65,6 @@ interface Wod {
 const DIV_LABEL: Record<string, string> = {
   rx_male: "RX M",
   rx_female: "RX F",
-  scaled_male: "Scaled M",
-  scaled_female: "Scaled F",
   foundation_male: "Found. M",
   foundation_female: "Found. F",
   masters45_male: "M45+ M",
@@ -323,8 +321,6 @@ export default function ValidateScoresPage() {
           <option value="">Todas las divisiones</option>
           <option value="rx_male">RX Masculino</option>
           <option value="rx_female">RX Femenino</option>
-          <option value="scaled_male">Scaled Masculino</option>
-          <option value="scaled_female">Scaled Femenino</option>
           <option value="foundation_male">Foundation Masculino</option>
           <option value="foundation_female">Foundation Femenino</option>
           <option value="masters45_male">Masters 45+ Masculino</option>

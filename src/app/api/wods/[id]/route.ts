@@ -47,6 +47,7 @@ export async function PUT(
         score_type: scoreType,
         time_cap_seconds: parsed.data.time_cap_seconds !== undefined ? (parsed.data.time_cap_seconds ?? null) : existing.time_cap_seconds,
         sort_order: getSortOrder(scoreType),
+        ...(typeof body.is_active === "boolean" ? { is_active: body.is_active } : {}),
       },
     })
 

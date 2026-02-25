@@ -23,8 +23,6 @@ import { Mail, Send, Loader2, CheckCircle, XCircle, AlertTriangle } from "lucide
 const DIVISIONS = [
   { key: "rx_male", label: "RX Masculino" },
   { key: "rx_female", label: "RX Femenino" },
-  { key: "scaled_male", label: "Scaled Masculino" },
-  { key: "scaled_female", label: "Scaled Femenino" },
   { key: "foundation_male", label: "Foundation Masculino" },
   { key: "foundation_female", label: "Foundation Femenino" },
   { key: "masters45_male", label: "Masters 45+ Masculino" },

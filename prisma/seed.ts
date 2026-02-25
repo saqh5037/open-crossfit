@@ -21,7 +21,7 @@ async function main() {
       registration_open: true,
       divisions: [
         "rx_male", "rx_female",
-        "scaled_male", "scaled_female",
+        "foundation_male", "foundation_female",
       ],
     },
   })
@@ -73,13 +73,13 @@ async function main() {
     { full_name: "Carlos Mendoza", email: "carlos@test.com", phone: "9991001001", gender: "M" as const, division: "rx_male" },
     { full_name: "Diego Ramírez", email: "diego@test.com", phone: "9991001002", gender: "M" as const, division: "rx_male" },
     { full_name: "Miguel Torres", email: "miguel@test.com", phone: "9991001003", gender: "M" as const, division: "rx_male" },
-    { full_name: "Andrés López", email: "andres@test.com", phone: "9991001004", gender: "M" as const, division: "scaled_male" },
-    { full_name: "Roberto García", email: "roberto@test.com", phone: "9991001005", gender: "M" as const, division: "scaled_male" },
+    { full_name: "Andrés López", email: "andres@test.com", phone: "9991001004", gender: "M" as const, division: "foundation_male" },
+    { full_name: "Roberto García", email: "roberto@test.com", phone: "9991001005", gender: "M" as const, division: "foundation_male" },
     { full_name: "Ana Martínez", email: "ana@test.com", phone: "9991001006", gender: "F" as const, division: "rx_female" },
     { full_name: "María Hernández", email: "maria@test.com", phone: "9991001007", gender: "F" as const, division: "rx_female" },
     { full_name: "Sofía Flores", email: "sofia@test.com", phone: "9991001008", gender: "F" as const, division: "rx_female" },
-    { full_name: "Laura Sánchez", email: "laura@test.com", phone: "9991001009", gender: "F" as const, division: "scaled_female" },
-    { full_name: "Patricia Díaz", email: "patricia@test.com", phone: "9991001010", gender: "F" as const, division: "scaled_female" },
+    { full_name: "Laura Sánchez", email: "laura@test.com", phone: "9991001009", gender: "F" as const, division: "foundation_female" },
+    { full_name: "Patricia Díaz", email: "patricia@test.com", phone: "9991001010", gender: "F" as const, division: "foundation_female" },
   ]
 
   const athletes = await Promise.all(

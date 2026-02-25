@@ -27,7 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react"
+import { Plus, Pencil, Trash2, Loader2, Eye, EyeOff } from "lucide-react"
 
 interface Wod {
   id: string
@@ -119,6 +119,16 @@ export default function WodsPage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  const toggleActive = async (wod: Wod) => {
+    const res = await fetch(`/api/wods/${wod.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_active: !wod.is_active }),
+    })
+    if (res.ok) fetchWods()
+    else alert("Error al cambiar estado")
   }
 
   const handleDelete = async (id: string) => {
@@ -213,7 +223,7 @@ export default function WodsPage() {
           </TableHeader>
           <TableBody>
             {wods.map((wod) => (
-              <TableRow key={wod.id}>
+              <TableRow key={wod.id} className={wod.is_active ? "" : "opacity-50"}>
                 <TableCell className="font-medium">{wod.name}</TableCell>
                 <TableCell>{wod.day_number}</TableCell>
                 <TableCell>
@@ -231,6 +241,17 @@ export default function WodsPage() {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      title={wod.is_active ? "Desactivar" : "Activar"}
+                      onClick={() => toggleActive(wod)}
+                    >
+                      {wod.is_active
+                        ? <Eye className="h-4 w-4 text-green-400" />
+                        : <EyeOff className="h-4 w-4 text-gray-500" />
+                      }
+                    </Button>
                     <Button size="sm" variant="ghost" onClick={() => openEdit(wod)}>
                       <Pencil className="h-4 w-4" />
                     </Button>

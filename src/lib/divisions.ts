@@ -3,8 +3,6 @@ import type { DivisionInfo } from "@/types"
 export const DIVISIONS: Record<string, DivisionInfo> = {
   rx_male: { key: "rx_male", label: "RX Masculino", gender: "M", description: "Avanzado" },
   rx_female: { key: "rx_female", label: "RX Femenino", gender: "F", description: "Avanzado" },
-  scaled_male: { key: "scaled_male", label: "Scaled Masculino", gender: "M", description: "Intermedio" },
-  scaled_female: { key: "scaled_female", label: "Scaled Femenino", gender: "F", description: "Intermedio" },
   foundation_male: { key: "foundation_male", label: "Foundation Masculino", gender: "M", description: "Principiante" },
   foundation_female: { key: "foundation_female", label: "Foundation Femenino", gender: "F", description: "Principiante" },
   masters45_male: { key: "masters45_male", label: "Masters 45+ Masculino", gender: "M", description: "45 años o más" },
@@ -31,7 +29,6 @@ export function isDivisionRx(divisionKey: string): boolean {
 
 export function getDivisionBadge(divisionKey: string): { text: string; bgColor: string } {
   if (divisionKey.startsWith("rx_")) return { text: "RX", bgColor: "#16a34a" }
-  if (divisionKey.startsWith("scaled_")) return { text: "Scaled", bgColor: "" }
   if (divisionKey.startsWith("foundation_")) return { text: "Foundation", bgColor: "#2563eb" }
   if (divisionKey.startsWith("masters45_")) return { text: "Masters 45+", bgColor: "#9333ea" }
   if (divisionKey.startsWith("teens_")) return { text: "Teens", bgColor: "#ea580c" }
