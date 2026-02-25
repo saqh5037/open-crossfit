@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { getDivisionsByGender } from "@/lib/divisions"
-import { Search, Trash2, Pencil, Loader2, Camera, X, Shield } from "lucide-react"
+import { Search, Trash2, Pencil, Loader2, Camera, X, Shield, Eye, EyeOff } from "lucide-react"
 
 interface Athlete {
   id: string
@@ -39,6 +39,7 @@ interface Athlete {
   division: string
   birth_date: string | null
   photo_url: string | null
+  is_active: boolean
   created_at: string
 }
 
@@ -69,8 +70,19 @@ export default function AthletesPage() {
   const [judgePassword, setJudgePassword] = useState("")
   const photoInputRef = useRef<HTMLInputElement>(null)
 
+  const toggleActive = async (athlete: Athlete) => {
+    const res = await fetch(`/api/athletes/${athlete.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_active: !athlete.is_active }),
+    })
+    if (res.ok) fetchAthletes()
+    else alert("Error al cambiar estado")
+  }
+
   const fetchAthletes = async () => {
     const params = new URLSearchParams()
+    params.set("include_inactive", "true")
     if (search) params.set("search", search)
     if (divisionFilter) params.set("division", divisionFilter)
 
@@ -241,6 +253,7 @@ export default function AthletesPage() {
               <TableHead>Género</TableHead>
               <TableHead>División</TableHead>
               <TableHead>Email</TableHead>
+              <TableHead>Estado</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
@@ -248,7 +261,7 @@ export default function AthletesPage() {
             {athletes.map((a) => (
               <TableRow
                 key={a.id}
-                className="cursor-pointer"
+                className={`cursor-pointer ${a.is_active ? "" : "opacity-50"}`}
                 onClick={() => openEdit(a)}
               >
                 <TableCell className="font-display text-primary">
@@ -273,8 +286,24 @@ export default function AthletesPage() {
                   {a.division.replace(/_/g, " ")}
                 </TableCell>
                 <TableCell className="text-gray-400">{a.email || "—"}</TableCell>
+                <TableCell>
+                  <Badge variant={a.is_active ? "default" : "secondary"}>
+                    {a.is_active ? "Activo" : "Retirado"}
+                  </Badge>
+                </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      title={a.is_active ? "Retirar" : "Activar"}
+                      onClick={(e) => { e.stopPropagation(); toggleActive(a) }}
+                    >
+                      {a.is_active
+                        ? <Eye className="h-4 w-4 text-green-400" />
+                        : <EyeOff className="h-4 w-4 text-gray-500" />
+                      }
+                    </Button>
                     <Button
                       size="sm"
                       variant="ghost"
@@ -296,7 +325,7 @@ export default function AthletesPage() {
             ))}
             {athletes.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="py-8 text-center text-gray-400">
+                <TableCell colSpan={7} className="py-8 text-center text-gray-400">
                   No se encontraron atletas
                 </TableCell>
               </TableRow>

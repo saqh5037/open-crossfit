@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
           JOIN wods w ON s.wod_id = w.id
           JOIN athletes a ON s.athlete_id = a.id
           WHERE a.division = ${div}
+            AND a.is_active = true
             AND w.is_active = true
             AND s.status = 'confirmed'
         ),
@@ -58,6 +59,7 @@ export async function POST(request: NextRequest) {
         FROM athletes a
         LEFT JOIN total_points tp ON a.id = tp.athlete_id
         WHERE a.division = ${div}
+          AND a.is_active = true
           AND tp.total_points IS NOT NULL
         ORDER BY COALESCE(tp.total_points, 999999) ASC
       `

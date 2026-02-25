@@ -29,7 +29,7 @@ export async function GET(
 
 const ALLOWED_FIELDS = [
   "full_name", "email", "phone", "birth_date",
-  "gender", "division", "photo_url",
+  "gender", "division", "photo_url", "is_active",
 ] as const
 
 export async function PUT(

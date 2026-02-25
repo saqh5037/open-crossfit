@@ -11,7 +11,10 @@ export async function GET(request: NextRequest) {
   const division = searchParams.get("division")
   const search = searchParams.get("search")
 
+  const includeInactive = searchParams.get("include_inactive") === "true"
+
   const where: Record<string, unknown> = {}
+  if (!includeInactive) where.is_active = true
   if (division) where.division = division
   if (search) where.full_name = { contains: search, mode: "insensitive" }
 

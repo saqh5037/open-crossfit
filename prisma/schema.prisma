@@ -78,6 +78,7 @@ model Athlete {
   gender     Gender
   division   String
   photo_url  String?
+  is_active  Boolean  @default(true)
   created_at DateTime @default(now())
   scores     Score[]
 

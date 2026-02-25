@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
           where: {
             wod_id: score.wod_id,
             status: "confirmed",
-            athlete: { division: score.athlete.division },
+            athlete: { division: score.athlete.division, is_active: true },
             raw_score: score.wod.sort_order === "asc"
               ? { lt: score.raw_score }
               : { gt: score.raw_score },
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
           where: {
             wod_id: score.wod_id,
             status: "confirmed",
-            athlete: { division: score.athlete.division },
+            athlete: { division: score.athlete.division, is_active: true },
           },
         })
 

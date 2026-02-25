@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
         JOIN wods w ON s.wod_id = w.id
         JOIN athletes a ON s.athlete_id = a.id
         WHERE a.division = ${division}
+          AND a.is_active = true
           AND w.is_active = true
           ${statusFilter}
       ),
@@ -67,6 +68,7 @@ export async function GET(request: NextRequest) {
       FROM athletes a
       LEFT JOIN total_points tp ON a.id = tp.athlete_id
       WHERE a.division = ${division}
+        AND a.is_active = true
       ORDER BY COALESCE(tp.total_points, 0) DESC, a.full_name ASC
     `
 
