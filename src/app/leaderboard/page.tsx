@@ -46,7 +46,7 @@ export default async function LeaderboardPage({
       <Header registrationOpen={config?.registration_open ?? false} userRole={(session?.user as { role?: string } | undefined)?.role ?? null} />
       <main className="min-h-screen bg-black px-4 py-8">
         <div className="container mx-auto max-w-5xl">
-          <h1 className="mb-6 text-3xl font-black uppercase tracking-tight text-white">
+          <h1 className="mb-4 text-2xl font-black uppercase tracking-tight text-white sm:mb-6 sm:text-3xl">
             Leaderboard
           </h1>
           <LeaderboardClient

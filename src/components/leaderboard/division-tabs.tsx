@@ -2,6 +2,13 @@
 
 import { getDivisionLabel } from "@/lib/divisions"
 
+const SHORT_LABELS: Record<string, string> = {
+  rx_male: "RX M",
+  rx_female: "RX F",
+  foundation_male: "Princ.",
+  foundation_female: "Found.",
+}
+
 interface DivisionTabsProps {
   divisions: string[]
   selected: string
@@ -21,7 +28,8 @@ export function DivisionTabs({ divisions, selected, onChange }: DivisionTabsProp
               : "bg-gray-800 text-gray-300 hover:bg-gray-700"
           }`}
         >
-          {getDivisionLabel(div)}
+          <span className="sm:hidden">{SHORT_LABELS[div] || getDivisionLabel(div)}</span>
+          <span className="hidden sm:inline">{getDivisionLabel(div)}</span>
         </button>
       ))}
     </div>

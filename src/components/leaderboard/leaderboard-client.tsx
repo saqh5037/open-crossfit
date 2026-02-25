@@ -121,13 +121,13 @@ export function LeaderboardClient({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3">
         <DivisionTabs
           divisions={availableDivisions}
           selected={division}
           onChange={handleDivisionChange}
         />
-        <div className="flex items-center gap-1">
+        <div className="flex items-center justify-end gap-1">
           <Button
             variant="ghost"
             size="sm"
