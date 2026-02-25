@@ -27,12 +27,8 @@ const BIBS_PER_PAGE = 4
 const divisionLabel: Record<string, string> = {
   rx_male: "RX Masculino",
   rx_female: "RX Femenino",
-  foundation_male: "Foundation Masculino",
+  foundation_male: "Principiante Masculino",
   foundation_female: "Foundation Femenino",
-  masters45_male: "Masters 45+ M",
-  masters45_female: "Masters 45+ F",
-  teens_male: "Teens Masculino",
-  teens_female: "Teens Femenino",
 }
 
 export default function BibsPage() {

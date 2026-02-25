@@ -65,12 +65,8 @@ interface Wod {
 const DIV_LABEL: Record<string, string> = {
   rx_male: "RX M",
   rx_female: "RX F",
-  foundation_male: "Found. M",
+  foundation_male: "Princ. M",
   foundation_female: "Found. F",
-  masters45_male: "M45+ M",
-  masters45_female: "M45+ F",
-  teens_male: "Teens M",
-  teens_female: "Teens F",
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -321,12 +317,8 @@ export default function ValidateScoresPage() {
           <option value="">Todas las divisiones</option>
           <option value="rx_male">RX Masculino</option>
           <option value="rx_female">RX Femenino</option>
-          <option value="foundation_male">Foundation Masculino</option>
+          <option value="foundation_male">Principiante Masculino</option>
           <option value="foundation_female">Foundation Femenino</option>
-          <option value="masters45_male">Masters 45+ Masculino</option>
-          <option value="masters45_female">Masters 45+ Femenino</option>
-          <option value="teens_male">Teens Masculino</option>
-          <option value="teens_female">Teens Femenino</option>
         </select>
         <select
           className="h-9 rounded-lg border border-gray-700 bg-[#111] px-3 text-xs text-white lg:w-36 lg:text-sm"

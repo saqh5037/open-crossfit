@@ -227,12 +227,8 @@ export default function AthletesPage() {
           <option value="">Todas las divisiones</option>
           <option value="rx_male">RX Masculino</option>
           <option value="rx_female">RX Femenino</option>
-          <option value="foundation_male">Foundation Masculino</option>
+          <option value="foundation_male">Principiante Masculino</option>
           <option value="foundation_female">Foundation Femenino</option>
-          <option value="masters45_male">Masters 45+ Masculino</option>
-          <option value="masters45_female">Masters 45+ Femenino</option>
-          <option value="teens_male">Teens Masculino</option>
-          <option value="teens_female">Teens Femenino</option>
         </select>
       </div>
 
