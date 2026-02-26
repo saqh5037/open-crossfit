@@ -18,6 +18,7 @@ import {
   Mail,
   Menu,
   X,
+  FileText,
 } from "lucide-react"
 import { SignOutButton } from "./sign-out-button"
 import { Button } from "@/components/ui/button"
@@ -34,6 +35,7 @@ const navItems = [
   { href: "/admin/scores/manage", label: "Ver Scores", shortLabel: "Scores", icon: ListChecks, roles: ["owner", "admin", "coach"], quickNav: false },
   { href: "/admin/scores/validate", label: "Validar Scores", shortLabel: "Validar", icon: ShieldCheck, roles: ["owner", "admin", "coach"], quickNav: true },
   { href: "/admin/scores/print", label: "Hojas de Score", shortLabel: "Imprimir", icon: Printer, roles: ["owner", "admin", "coach"], quickNav: false },
+  { href: "/admin/scores/scorecard", label: "Scorecards 26.1", shortLabel: "Scorecard", icon: FileText, roles: ["owner", "admin", "coach"], quickNav: false },
   { href: "/admin/bibs", label: "Credenciales", shortLabel: "Credenciales", icon: BadgeCheck, roles: ["owner", "admin", "coach"], quickNav: false },
   { href: "/admin/athletes", label: "Atletas", shortLabel: "Atletas", icon: Users, roles: ["owner", "admin", "coach"], quickNav: true },
   { href: "/admin/wods", label: "WODs", shortLabel: "WODs", icon: Dumbbell, roles: ["owner", "admin", "coach"], quickNav: false },
@@ -90,7 +92,7 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
       <Button
         variant="outline"
         size="sm"
-        className="fixed left-3 top-3 z-50 gap-2 border-gray-700 bg-gray-900 text-white md:hidden"
+        className="fixed left-3 top-3 z-50 gap-2 border-gray-700 bg-gray-900 text-white md:hidden print:hidden"
         onClick={() => setOpen(!open)}
       >
         {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -108,7 +110,7 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 bg-gray-950 p-4 transition-transform md:relative md:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 w-64 bg-gray-950 p-4 transition-transform md:relative md:translate-x-0 print:hidden",
           open ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -120,7 +122,7 @@ export function AdminSidebar({ role }: AdminSidebarProps) {
       </aside>
 
       {/* Bottom nav - mobile only */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 flex border-t border-gray-800 bg-gray-950 md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 flex border-t border-gray-800 bg-gray-950 md:hidden print:hidden">
         {quickNavItems.map((item) => {
           const isActive = pathname === item.href
           return (
