@@ -58,8 +58,12 @@ export function Footer() {
         {/* Bottom credits */}
         <div className="mt-8 border-t border-gray-800 pt-6 text-center">
           <p className="text-xs text-gray-600">
+            <Link href="/privacidad" className="transition-colors hover:text-gray-400">
+              Aviso de Privacidad
+            </Link>
+            {" · "}
             Desarrollado por{" "}
-            <span className="font-semibold text-gray-500">WBInnova México</span>{" "}
+            <span className="font-semibold text-gray-500">WBInnova Mexico</span>{" "}
             {new Date().getFullYear()}
           </p>
         </div>
