@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma"
 import { hash } from "bcryptjs"
 import { athleteSchema } from "@/lib/validations/athlete"
 import { getDivisionLabel } from "@/lib/divisions"
+import { toTitleCase } from "@/lib/utils"
 import { sendEmail } from "@/lib/email"
 import { WelcomeEmail } from "@/emails/welcome"
 
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     const athlete = await prisma.athlete.create({
       data: {
-        full_name: parsed.data.full_name,
+        full_name: toTitleCase(parsed.data.full_name),
         email: parsed.data.email,
         phone: parsed.data.phone,
         birth_date: parsed.data.birth_date ? new Date(parsed.data.birth_date) : null,
