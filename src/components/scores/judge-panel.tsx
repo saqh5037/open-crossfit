@@ -47,6 +47,7 @@ export function JudgePanel() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedAthlete, setSelectedAthlete] = useState<Athlete | null>(null)
   const [scoreInput, setScoreInput] = useState("")
+  const [didFinish, setDidFinish] = useState(true)
   const [isRx, setIsRx] = useState(true)
   const [judgeNotes, setJudgeNotes] = useState("")
   const [evidenceFile, setEvidenceFile] = useState<File | null>(null)
@@ -157,7 +158,9 @@ export function JudgePanel() {
     setSaving(true)
 
     try {
-      const { raw_score, display_score } = parseScore(scoreInput, selectedWod.score_type)
+      // If WOD is "time" but athlete didn't finish, treat score as reps
+      const effectiveScoreType = (selectedWod.score_type === "time" && !didFinish) ? "reps" as ScoreType : selectedWod.score_type
+      const { raw_score, display_score } = parseScore(scoreInput, effectiveScoreType)
 
       // Upload evidence photo first if present
       let evidence_url: string | undefined
@@ -213,6 +216,7 @@ export function JudgePanel() {
         setShowSuccess(false)
         setSelectedAthlete(null)
         setScoreInput("")
+        setDidFinish(true)
         setSearchQuery("")
         setAthletes([])
         setJudgeNotes("")
@@ -455,11 +459,42 @@ export function JudgePanel() {
             {/* Score Input */}
             {selectedAthlete && (
               <>
+                {/* Did finish toggle — only for "time" WODs */}
+                {selectedWod.score_type === "time" && (
+                  <div className="flex rounded-lg border border-gray-700 overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => { setDidFinish(true); setScoreInput("") }}
+                      className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+                        didFinish
+                          ? "bg-green-600 text-white"
+                          : "bg-transparent text-gray-400 hover:text-white"
+                      }`}
+                    >
+                      Completó el WOD
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setDidFinish(false); setScoreInput("") }}
+                      className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+                        !didFinish
+                          ? "bg-orange-600 text-white"
+                          : "bg-transparent text-gray-400 hover:text-white"
+                      }`}
+                    >
+                      No completó (Reps)
+                    </button>
+                  </div>
+                )}
+
                 <div>
                   <Label>
-                    Score ({selectedWod.score_type === "time" ? "mm:ss" : selectedWod.score_type === "reps" ? "repeticiones" : "libras"})
+                    {selectedWod.score_type === "time" && !didFinish
+                      ? "Reps completadas"
+                      : `Score (${selectedWod.score_type === "time" ? "mm:ss" : selectedWod.score_type === "reps" ? "repeticiones" : "libras"})`
+                    }
                   </Label>
-                  {selectedWod.score_type === "time" ? (
+                  {selectedWod.score_type === "time" && didFinish ? (
                     <TimeInput value={scoreInput} onChange={setScoreInput} />
                   ) : (
                     <Input
@@ -467,11 +502,16 @@ export function JudgePanel() {
                       inputMode={selectedWod.score_type === "weight" ? "decimal" : "numeric"}
                       step={selectedWod.score_type === "weight" ? "0.5" : "1"}
                       min="0"
-                      placeholder={selectedWod.score_type === "reps" ? "Ej: 150" : "Ej: 225"}
+                      placeholder={selectedWod.score_type === "time" && !didFinish ? "Ej: 210" : selectedWod.score_type === "reps" ? "Ej: 150" : "Ej: 225"}
                       value={scoreInput}
                       onChange={(e) => setScoreInput(e.target.value)}
                       className="text-center text-lg font-mono"
                     />
+                  )}
+                  {selectedWod.score_type === "time" && !didFinish && selectedWod.time_cap_seconds && (
+                    <p className="mt-1 text-xs text-gray-500">
+                      Total posible: 354 reps · Time cap: {Math.floor(selectedWod.time_cap_seconds / 60)} min
+                    </p>
                   )}
                 </div>
 
