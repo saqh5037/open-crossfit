@@ -25,7 +25,13 @@ export async function GET(request: NextRequest) {
           RANK() OVER (
             PARTITION BY s.wod_id
             ORDER BY
-              CASE WHEN w.sort_order = 'asc' THEN s.raw_score END ASC,
+              -- For "time" WODs: finished athletes (time) rank above unfinished (reps)
+              CASE WHEN w.sort_order = 'asc' AND s.display_score LIKE '%reps%' THEN 1 ELSE 0 END ASC,
+              -- Finished athletes: lower time = better (ASC)
+              CASE WHEN w.sort_order = 'asc' AND s.display_score NOT LIKE '%reps%' THEN s.raw_score END ASC,
+              -- Unfinished athletes: more reps = better (DESC)
+              CASE WHEN w.sort_order = 'asc' AND s.display_score LIKE '%reps%' THEN s.raw_score END DESC,
+              -- For "desc" WODs (reps/weight): higher = better
               CASE WHEN w.sort_order = 'desc' THEN s.raw_score END DESC
           ) as placement
         FROM scores s
