@@ -14,7 +14,7 @@ export default async function HomePage() {
     prisma.athlete.count(),
     prisma.wod.findMany({
       where: { is_active: true },
-      orderBy: { display_order: "asc" },
+      orderBy: { display_order: "desc" },
       select: { name: true, day_number: true, description: true, score_type: true },
     }),
     getServerSession(authOptions),

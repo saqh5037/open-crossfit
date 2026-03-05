@@ -1,4 +1,4 @@
-import { Timer, Repeat, Weight, Dumbbell, HelpCircle } from "lucide-react"
+import { Timer, Repeat, Weight, Dumbbell, HelpCircle, CheckCircle2, Flame } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface WodInfo {
@@ -66,29 +66,74 @@ export function InfoSection({ wods, divisions }: InfoSectionProps) {
             <h2 className="mb-8 text-center font-display text-4xl tracking-wider text-white sm:text-5xl">
               Los Workouts
             </h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2">
               {wods.map((wod) => {
                 const Icon = scoreTypeIcons[wod.score_type] || Timer
+                const maxDay = Math.max(...wods.map((w) => w.day_number))
+                const isActive = wod.day_number === maxDay
+                const isCompleted = wod.day_number < maxDay
+
                 return (
-                  <Card key={wod.name} className="border-2 border-gray-800 bg-[#111] transition-all hover:border-primary">
+                  <Card
+                    key={wod.name}
+                    className={`relative overflow-hidden transition-all duration-300 ${
+                      isActive
+                        ? "border-2 border-primary bg-[#111] shadow-[0_0_30px_rgba(255,102,0,0.15)] hover:shadow-[0_0_40px_rgba(255,102,0,0.25)]"
+                        : "border-2 border-green-800/50 bg-[#0d0d0d]"
+                    }`}
+                  >
+                    {/* Active glow bar */}
+                    {isActive && (
+                      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-orange-600 via-primary to-orange-600" />
+                    )}
+                    {/* Completed green bar */}
+                    {isCompleted && (
+                      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-green-700 via-green-500 to-green-700" />
+                    )}
+
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="font-display text-2xl tracking-wider text-primary">{wod.name}</CardTitle>
-                        <span className="rounded-md bg-gray-800 px-3 py-1 font-display text-xs tracking-wider text-gray-300">
-                          DÍA {wod.day_number}
+                        <div className="flex items-center gap-3">
+                          <CardTitle className={`font-display text-3xl tracking-wider ${isActive ? "text-primary" : "text-green-500"}`}>
+                            {wod.name}
+                          </CardTitle>
+                          {isActive && (
+                            <span className="flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">
+                              <Flame className="h-3 w-3 animate-pulse" />
+                              Esta semana
+                            </span>
+                          )}
+                          {isCompleted && (
+                            <span className="flex items-center gap-1.5 rounded-full bg-green-500/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-green-400">
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                              Completado
+                            </span>
+                          )}
+                        </div>
+                        <span className={`rounded-md px-3 py-1 font-display text-xs tracking-wider ${
+                          isActive ? "bg-primary/10 text-primary" : "bg-green-900/30 text-green-400"
+                        }`}>
+                          SEMANA {wod.day_number}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1 text-sm text-gray-500">
-                        <Icon className="h-3 w-3" />
+                      <div className={`flex items-center gap-1.5 text-sm ${isActive ? "text-gray-400" : "text-gray-500"}`}>
+                        <Icon className="h-3.5 w-3.5" />
                         {scoreTypeLabels[wod.score_type]}
                       </div>
                     </CardHeader>
                     {wod.description && (
                       <CardContent>
-                        <p className="whitespace-pre-line text-sm text-gray-400">
+                        <p className={`whitespace-pre-line text-sm leading-relaxed ${isActive ? "text-gray-300" : "text-gray-500"}`}>
                           {wod.description}
                         </p>
                       </CardContent>
+                    )}
+
+                    {/* Completed overlay checkmark */}
+                    {isCompleted && (
+                      <div className="pointer-events-none absolute right-4 bottom-4 opacity-10">
+                        <CheckCircle2 className="h-20 w-20 text-green-500" />
+                      </div>
                     )}
                   </Card>
                 )
