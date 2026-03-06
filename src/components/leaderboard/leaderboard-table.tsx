@@ -131,113 +131,160 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
 
   const stripOpen = (name: string) => name.replace(/^Open\s+/i, "")
 
-  // Sticky column widths for mobile: #=36px, Atleta=110px, Pts=52px
-  const COL_RANK = 36
-  const COL_NAME = 110
-  const COL_PTS = 52
-
+  // Mobile: card layout with full name visible. Desktop: full table.
   return (
-    <div className="leaderboard-sticky-shadow -mx-4 overflow-x-auto sm:mx-0 sm:rounded-lg sm:border sm:border-gray-800">
-      <Table>
-        <TableHeader>
-          <TableRow className="border-gray-800 bg-gray-900 hover:bg-gray-900">
-            <TableHead
-              className="sticky left-0 z-20 bg-gray-900 text-center text-gray-300 sm:static sm:w-16"
-              style={{ width: COL_RANK, minWidth: COL_RANK }}
-            >#</TableHead>
-            <TableHead
-              className="sticky z-20 bg-gray-900 text-gray-300 sm:static"
-              style={{ left: COL_RANK, width: COL_NAME, minWidth: COL_NAME }}
-            >Atleta</TableHead>
-            <TableHead
-              className="sticky z-20 bg-gray-900 text-center font-bold text-gray-300 sm:static"
-              style={{ left: COL_RANK + COL_NAME, width: COL_PTS, minWidth: COL_PTS }}
-            >
-              <span className="sm:hidden">Pts</span>
-              <span className="hidden sm:inline">Puntos</span>
-            </TableHead>
-            {wods.map((wod) => (
-              <TableHead key={wod.id} className="text-center text-gray-300 whitespace-nowrap">
-                <span className="sm:hidden">{stripOpen(wod.name)}</span>
-                <span className="hidden sm:inline">{wod.name}</span>
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {entries.map((entry, index) => {
-            const rank = Number(entry.overall_rank)
-            const isTop3 = rank <= 3
-            const rowBg = rowStyles[rank] || "hover:bg-gray-900/50"
-            const borderClass = rank === 4 ? "border-t-2 border-t-gray-700" : "border-gray-800"
+    <>
+      {/* Mobile layout: cards */}
+      <div className="flex flex-col gap-2 sm:hidden">
+        {entries.map((entry, index) => {
+          const rank = Number(entry.overall_rank)
+          const rowBg = rowStyles[rank] || ""
 
-            return (
-              <TableRow
-                key={entry.id}
-                className={`animate-fade-up ${borderClass} ${rowBg} ${isTop3 ? "transition-transform duration-200 hover:scale-[1.01]" : ""}`}
-                style={{ animationDelay: `${index * 60}ms` }}
-              >
-                <TableCell
-                  className="sticky left-0 z-10 bg-gray-950 text-center sm:static sm:bg-transparent"
-                  style={{ width: COL_RANK, minWidth: COL_RANK }}
-                >
+          return (
+            <div
+              key={entry.id}
+              className={`animate-fade-up rounded-lg border border-gray-800 p-3 ${rowBg || "bg-gray-950"}`}
+              style={{ animationDelay: `${index * 60}ms` }}
+            >
+              {/* Top row: rank + name + points */}
+              <div className="flex items-center gap-2">
+                <div className="flex-shrink-0">
                   <MedalBadge rank={rank} />
-                </TableCell>
-                <TableCell
-                  className="sticky z-10 bg-gray-950 font-medium sm:static sm:bg-transparent"
-                  style={{ left: COL_RANK, width: COL_NAME, minWidth: COL_NAME, maxWidth: COL_NAME }}
-                >
-                  <Link
-                    href={`/atleta/${entry.id}`}
-                    className="block truncate transition-colors hover:text-primary hover:underline"
-                  >
-                    {rank === 1 ? (
-                      <span className="bg-gradient-to-r from-yellow-400 via-orange-400 to-primary bg-clip-text font-bold text-transparent">
-                        {entry.full_name}
-                      </span>
-                    ) : (
-                      <span className="text-white">{entry.full_name}</span>
-                    )}
-                  </Link>
-                </TableCell>
-                <TableCell
-                  className="sticky z-10 bg-gray-950 text-center sm:static sm:bg-transparent"
-                  style={{ left: COL_RANK + COL_NAME, width: COL_PTS, minWidth: COL_PTS }}
+                </div>
+                <Link
+                  href={`/atleta/${entry.id}`}
+                  className="min-w-0 flex-1 transition-colors hover:text-primary"
                 >
                   {rank === 1 ? (
-                    <span className="text-xl font-black text-primary animate-count-up inline-block sm:text-2xl" style={{ animationDelay: "800ms" }}>
+                    <span className="bg-gradient-to-r from-yellow-400 via-orange-400 to-primary bg-clip-text text-sm font-bold text-transparent">
+                      {entry.full_name}
+                    </span>
+                  ) : (
+                    <span className="text-sm font-medium text-white">{entry.full_name}</span>
+                  )}
+                </Link>
+                <div className="flex-shrink-0 text-right">
+                  {rank === 1 ? (
+                    <span className="text-xl font-black text-primary animate-count-up inline-block" style={{ animationDelay: "800ms" }}>
                       <AnimatedPoints value={Number(entry.total_points)} />
                     </span>
                   ) : (
-                    <span className="text-base font-black text-primary sm:text-lg">
+                    <span className="text-lg font-black text-primary">
                       {Number(entry.total_points) || "—"}
                     </span>
                   )}
-                </TableCell>
-                {wods.map((wod) => {
-                  const result = entry.wod_results?.find(
-                    (r) => r.wod_id === wod.id
-                  )
-                  return (
-                    <TableCell key={wod.id} className="text-center">
-                      {result ? (
-                        <div>
-                          {formatScore(result.display_score ?? "", wod.score_type)}
-                          <br />
-                          <span className="text-sm font-bold text-primary">{result.points ?? 0}</span>
-                          <span className="ml-1 text-[10px] text-gray-600">({result.placement}°)</span>
-                        </div>
+                  <span className="ml-1 text-[10px] text-gray-500">pts</span>
+                </div>
+              </div>
+              {/* WOD scores row */}
+              {wods.length > 0 && (
+                <div className="mt-2 flex gap-3 overflow-x-auto border-t border-gray-800/50 pt-2">
+                  {wods.map((wod) => {
+                    const result = entry.wod_results?.find((r) => r.wod_id === wod.id)
+                    return (
+                      <div key={wod.id} className="flex-shrink-0 text-center">
+                        <p className="text-[10px] text-gray-500">{stripOpen(wod.name)}</p>
+                        {result ? (
+                          <>
+                            <span className="text-xs text-gray-400">{result.display_score}</span>
+                            <br />
+                            <span className="text-xs font-bold text-primary">{result.points ?? 0}</span>
+                            <span className="ml-0.5 text-[9px] text-gray-600">({result.placement}°)</span>
+                          </>
+                        ) : (
+                          <span className="text-xs text-gray-700">—</span>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Desktop layout: table */}
+      <div className="hidden sm:block sm:rounded-lg sm:border sm:border-gray-800">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-gray-800 bg-gray-900 hover:bg-gray-900">
+              <TableHead className="w-16 text-center text-gray-300">#</TableHead>
+              <TableHead className="text-gray-300">Atleta</TableHead>
+              <TableHead className="text-center font-bold text-gray-300">Puntos</TableHead>
+              {wods.map((wod) => (
+                <TableHead key={wod.id} className="text-center text-gray-300 whitespace-nowrap">
+                  {wod.name}
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {entries.map((entry, index) => {
+              const rank = Number(entry.overall_rank)
+              const isTop3 = rank <= 3
+              const rowBg = rowStyles[rank] || "hover:bg-gray-900/50"
+              const borderClass = rank === 4 ? "border-t-2 border-t-gray-700" : "border-gray-800"
+
+              return (
+                <TableRow
+                  key={entry.id}
+                  className={`animate-fade-up ${borderClass} ${rowBg} ${isTop3 ? "transition-transform duration-200 hover:scale-[1.01]" : ""}`}
+                  style={{ animationDelay: `${index * 60}ms` }}
+                >
+                  <TableCell className="text-center">
+                    <MedalBadge rank={rank} />
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    <Link
+                      href={`/atleta/${entry.id}`}
+                      className="transition-colors hover:text-primary hover:underline"
+                    >
+                      {rank === 1 ? (
+                        <span className="bg-gradient-to-r from-yellow-400 via-orange-400 to-primary bg-clip-text font-bold text-transparent">
+                          {entry.full_name}
+                        </span>
                       ) : (
-                        <span className="text-gray-500">—</span>
+                        <span className="text-white">{entry.full_name}</span>
                       )}
-                    </TableCell>
-                  )
-                })}
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
-    </div>
+                    </Link>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {rank === 1 ? (
+                      <span className="text-2xl font-black text-primary animate-count-up inline-block" style={{ animationDelay: "800ms" }}>
+                        <AnimatedPoints value={Number(entry.total_points)} />
+                      </span>
+                    ) : (
+                      <span className="text-lg font-black text-primary">
+                        {Number(entry.total_points) || "—"}
+                      </span>
+                    )}
+                  </TableCell>
+                  {wods.map((wod) => {
+                    const result = entry.wod_results?.find(
+                      (r) => r.wod_id === wod.id
+                    )
+                    return (
+                      <TableCell key={wod.id} className="text-center">
+                        {result ? (
+                          <div>
+                            {formatScore(result.display_score ?? "", wod.score_type)}
+                            <br />
+                            <span className="text-sm font-bold text-primary">{result.points ?? 0}</span>
+                            <span className="ml-1 text-[10px] text-gray-600">({result.placement}°)</span>
+                          </div>
+                        ) : (
+                          <span className="text-gray-500">—</span>
+                        )}
+                      </TableCell>
+                    )
+                  })}
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </div>
+    </>
   )
 }
