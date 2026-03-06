@@ -129,19 +129,39 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
     )
   }
 
+  const stripOpen = (name: string) => name.replace(/^Open\s+/i, "")
+
+  // Sticky column widths for mobile: #=36px, Atleta=110px, Pts=52px
+  const COL_RANK = 36
+  const COL_NAME = 110
+  const COL_PTS = 52
+
   return (
-    <div className="-mx-4 overflow-x-auto sm:mx-0 sm:rounded-lg sm:border sm:border-gray-800">
-      <Table className="min-w-[600px]">
+    <div className="leaderboard-sticky-shadow -mx-4 overflow-x-auto sm:mx-0 sm:rounded-lg sm:border sm:border-gray-800">
+      <Table>
         <TableHeader>
           <TableRow className="border-gray-800 bg-gray-900 hover:bg-gray-900">
-            <TableHead className="w-16 text-center text-gray-300">#</TableHead>
-            <TableHead className="text-gray-300">Atleta</TableHead>
+            <TableHead
+              className="sticky left-0 z-20 bg-gray-900 text-center text-gray-300 sm:static sm:w-16"
+              style={{ width: COL_RANK, minWidth: COL_RANK }}
+            >#</TableHead>
+            <TableHead
+              className="sticky z-20 bg-gray-900 text-gray-300 sm:static"
+              style={{ left: COL_RANK, width: COL_NAME, minWidth: COL_NAME }}
+            >Atleta</TableHead>
+            <TableHead
+              className="sticky z-20 bg-gray-900 text-center font-bold text-gray-300 sm:static"
+              style={{ left: COL_RANK + COL_NAME, width: COL_PTS, minWidth: COL_PTS }}
+            >
+              <span className="sm:hidden">Pts</span>
+              <span className="hidden sm:inline">Puntos</span>
+            </TableHead>
             {wods.map((wod) => (
-              <TableHead key={wod.id} className="text-center text-gray-300">
-                {wod.name}
+              <TableHead key={wod.id} className="text-center text-gray-300 whitespace-nowrap">
+                <span className="sm:hidden">{stripOpen(wod.name)}</span>
+                <span className="hidden sm:inline">{wod.name}</span>
               </TableHead>
             ))}
-            <TableHead className="text-center font-bold text-gray-300">Puntos</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -157,13 +177,19 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
                 className={`animate-fade-up ${borderClass} ${rowBg} ${isTop3 ? "transition-transform duration-200 hover:scale-[1.01]" : ""}`}
                 style={{ animationDelay: `${index * 60}ms` }}
               >
-                <TableCell className="text-center">
+                <TableCell
+                  className="sticky left-0 z-10 bg-gray-950 text-center sm:static sm:bg-transparent"
+                  style={{ width: COL_RANK, minWidth: COL_RANK }}
+                >
                   <MedalBadge rank={rank} />
                 </TableCell>
-                <TableCell className="font-medium">
+                <TableCell
+                  className="sticky z-10 bg-gray-950 font-medium sm:static sm:bg-transparent"
+                  style={{ left: COL_RANK, width: COL_NAME, minWidth: COL_NAME, maxWidth: COL_NAME }}
+                >
                   <Link
                     href={`/atleta/${entry.id}`}
-                    className="transition-colors hover:text-primary hover:underline"
+                    className="block truncate transition-colors hover:text-primary hover:underline"
                   >
                     {rank === 1 ? (
                       <span className="bg-gradient-to-r from-yellow-400 via-orange-400 to-primary bg-clip-text font-bold text-transparent">
@@ -173,6 +199,20 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
                       <span className="text-white">{entry.full_name}</span>
                     )}
                   </Link>
+                </TableCell>
+                <TableCell
+                  className="sticky z-10 bg-gray-950 text-center sm:static sm:bg-transparent"
+                  style={{ left: COL_RANK + COL_NAME, width: COL_PTS, minWidth: COL_PTS }}
+                >
+                  {rank === 1 ? (
+                    <span className="text-xl font-black text-primary animate-count-up inline-block sm:text-2xl" style={{ animationDelay: "800ms" }}>
+                      <AnimatedPoints value={Number(entry.total_points)} />
+                    </span>
+                  ) : (
+                    <span className="text-base font-black text-primary sm:text-lg">
+                      {Number(entry.total_points) || "—"}
+                    </span>
+                  )}
                 </TableCell>
                 {wods.map((wod) => {
                   const result = entry.wod_results?.find(
@@ -193,17 +233,6 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
                     </TableCell>
                   )
                 })}
-                <TableCell className="text-center">
-                  {rank === 1 ? (
-                    <span className="text-2xl font-black text-primary animate-count-up inline-block" style={{ animationDelay: "800ms" }}>
-                      <AnimatedPoints value={Number(entry.total_points)} />
-                    </span>
-                  ) : (
-                    <span className="text-lg font-black text-primary">
-                      {Number(entry.total_points) || "—"}
-                    </span>
-                  )}
-                </TableCell>
               </TableRow>
             )
           })}
