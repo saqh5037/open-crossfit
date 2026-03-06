@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
+import confetti from "canvas-confetti"
 import type { LeaderboardEntry } from "@/types"
 import { getDivisionLabel } from "@/lib/divisions"
 
@@ -16,6 +17,30 @@ interface LeaderboardTVProps {
   eventName: string
 }
 
+const medalConfig: Record<number, { emoji: string; bg: string; glow: string }> = {
+  1: {
+    emoji: "🥇",
+    bg: "bg-gradient-to-br from-yellow-400/25 via-yellow-500/35 to-amber-600/25",
+    glow: "shadow-[0_0_16px_rgba(234,179,8,0.5)]",
+  },
+  2: {
+    emoji: "🥈",
+    bg: "bg-gradient-to-br from-gray-300/25 via-gray-400/30 to-gray-500/20",
+    glow: "shadow-[0_0_12px_rgba(156,163,175,0.4)]",
+  },
+  3: {
+    emoji: "🥉",
+    bg: "bg-gradient-to-br from-amber-600/25 via-amber-700/30 to-orange-800/20",
+    glow: "shadow-[0_0_12px_rgba(180,83,9,0.4)]",
+  },
+}
+
+const rowStyles: Record<number, string> = {
+  1: "bg-gradient-to-r from-yellow-500/15 via-yellow-400/8 to-transparent border-l-4 border-l-yellow-500",
+  2: "bg-gradient-to-r from-gray-400/15 via-gray-300/8 to-transparent border-l-4 border-l-gray-400",
+  3: "bg-gradient-to-r from-amber-700/15 via-amber-600/8 to-transparent border-l-4 border-l-amber-700",
+}
+
 export function LeaderboardTV({
   initialData,
   initialWods,
@@ -24,6 +49,7 @@ export function LeaderboardTV({
 }: LeaderboardTVProps) {
   const [data, setData] = useState<LeaderboardEntry[]>(initialData)
   const [wods, setWods] = useState<WodHeader[]>(initialWods)
+  const hasConfettied = useRef(false)
 
   const fetchData = useCallback(async () => {
     try {
@@ -40,6 +66,24 @@ export function LeaderboardTV({
     const interval = setInterval(fetchData, 30000)
     return () => clearInterval(interval)
   }, [fetchData])
+
+  useEffect(() => {
+    if (hasConfettied.current || initialData.length === 0) return
+    hasConfettied.current = true
+
+    const timer = setTimeout(() => {
+      confetti({
+        particleCount: 120,
+        spread: 100,
+        origin: { x: 0.5, y: 0.25 },
+        colors: ["#FF6600", "#FFB800", "#FFFFFF", "#FF3D00"],
+        gravity: 1,
+        ticks: 200,
+      })
+    }, 800)
+
+    return () => clearTimeout(timer)
+  }, [initialData.length])
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-950 p-8 text-white">
@@ -73,24 +117,36 @@ export function LeaderboardTV({
             </tr>
           </thead>
           <tbody>
-            {data.map((entry) => {
+            {data.map((entry, index) => {
               const rank = Number(entry.overall_rank)
-              const isTop3 = rank <= 3
-              const rankColors: Record<number, string> = {
-                1: "text-yellow-400",
-                2: "text-gray-300",
-                3: "text-amber-600",
-              }
+              const medal = medalConfig[rank]
+              const rowBg = rowStyles[rank] || ""
+              const borderClass = rank === 4 ? "border-b-2 border-b-gray-700" : "border-b border-gray-900"
 
               return (
                 <tr
                   key={entry.id}
-                  className={`border-b border-gray-900 ${isTop3 ? "bg-gray-900/50" : ""}`}
+                  className={`animate-fade-up ${borderClass} ${rowBg}`}
+                  style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <td className={`py-5 text-center text-2xl font-black ${rankColors[rank] || "text-gray-500"}`}>
-                    {rank}
+                  <td className="py-5 text-center">
+                    {medal ? (
+                      <span className={`inline-flex h-14 w-14 items-center justify-center rounded-full text-3xl ${medal.bg} ${medal.glow}`}>
+                        {medal.emoji}
+                      </span>
+                    ) : (
+                      <span className="text-2xl font-black text-gray-500">{rank}</span>
+                    )}
                   </td>
-                  <td className="py-5 text-2xl font-bold">{entry.full_name}</td>
+                  <td className="py-5">
+                    {rank === 1 ? (
+                      <span className="bg-gradient-to-r from-yellow-400 via-orange-400 to-primary bg-clip-text text-3xl font-black text-transparent">
+                        {entry.full_name}
+                      </span>
+                    ) : (
+                      <span className="text-2xl font-bold">{entry.full_name}</span>
+                    )}
+                  </td>
                   {wods.map((wod) => {
                     const result = entry.wod_results?.find((r) => r.wod_id === wod.id)
                     return (

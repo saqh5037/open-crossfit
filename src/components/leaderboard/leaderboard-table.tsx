@@ -1,4 +1,8 @@
+"use client"
+
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
+import confetti from "canvas-confetti"
 import {
   Table,
   TableBody,
@@ -7,7 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { Trophy } from "lucide-react"
 import type { LeaderboardEntry } from "@/types"
 
@@ -22,11 +25,59 @@ interface LeaderboardTableProps {
   wods: WodHeader[]
 }
 
+const medalConfig: Record<number, { emoji: string; bg: string; glow: string }> = {
+  1: {
+    emoji: "🥇",
+    bg: "bg-gradient-to-br from-yellow-400/20 via-yellow-500/30 to-amber-600/20",
+    glow: "shadow-[0_0_12px_rgba(234,179,8,0.4)]",
+  },
+  2: {
+    emoji: "🥈",
+    bg: "bg-gradient-to-br from-gray-300/20 via-gray-400/25 to-gray-500/15",
+    glow: "shadow-[0_0_10px_rgba(156,163,175,0.3)]",
+  },
+  3: {
+    emoji: "🥉",
+    bg: "bg-gradient-to-br from-amber-600/20 via-amber-700/25 to-orange-800/15",
+    glow: "shadow-[0_0_10px_rgba(180,83,9,0.3)]",
+  },
+}
+
 function MedalBadge({ rank }: { rank: number }) {
-  if (rank === 1) return <Badge className="bg-yellow-500 text-white">🥇</Badge>
-  if (rank === 2) return <Badge className="bg-gray-400 text-white">🥈</Badge>
-  if (rank === 3) return <Badge className="bg-amber-700 text-white">🥉</Badge>
-  return <span className="text-gray-400">{rank}</span>
+  const config = medalConfig[rank]
+  if (config) {
+    return (
+      <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-lg ${config.bg} ${config.glow}`}>
+        {config.emoji}
+      </span>
+    )
+  }
+  return <span className="font-mono text-gray-500">{rank}</span>
+}
+
+function AnimatedPoints({ value }: { value: number }) {
+  const [display, setDisplay] = useState(0)
+
+  useEffect(() => {
+    if (!value) return
+    const duration = 1200
+    const start = performance.now()
+    const step = (now: number) => {
+      const progress = Math.min((now - start) / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setDisplay(Math.round(eased * value))
+      if (progress < 1) requestAnimationFrame(step)
+    }
+    requestAnimationFrame(step)
+  }, [value])
+
+  return <>{display || "—"}</>
+}
+
+const rowStyles: Record<number, string> = {
+  1: "bg-gradient-to-r from-yellow-500/10 via-yellow-400/5 to-transparent border-l-2 border-l-yellow-500",
+  2: "bg-gradient-to-r from-gray-400/10 via-gray-300/5 to-transparent border-l-2 border-l-gray-400",
+  3: "bg-gradient-to-r from-amber-700/10 via-amber-600/5 to-transparent border-l-2 border-l-amber-700",
 }
 
 const lbsToKg = (lbs: number) => Math.round(lbs / 2.20462 * 10) / 10
@@ -48,6 +99,26 @@ function formatScore(displayScore: string, scoreType: string) {
 }
 
 export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
+  const hasConfettied = useRef(false)
+
+  useEffect(() => {
+    if (hasConfettied.current || entries.length === 0) return
+    hasConfettied.current = true
+
+    const timer = setTimeout(() => {
+      confetti({
+        particleCount: 80,
+        spread: 90,
+        origin: { x: 0.5, y: 0.3 },
+        colors: ["#FF6600", "#FFB800", "#FFFFFF", "#FF3D00"],
+        gravity: 1.2,
+        ticks: 150,
+      })
+    }, 600)
+
+    return () => clearTimeout(timer)
+  }, [entries.length])
+
   if (entries.length === 0) {
     return (
       <div className="flex flex-col items-center gap-3 py-12 text-center text-gray-400">
@@ -74,13 +145,17 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {entries.map((entry) => {
+          {entries.map((entry, index) => {
             const rank = Number(entry.overall_rank)
             const isTop3 = rank <= 3
+            const rowBg = rowStyles[rank] || "hover:bg-gray-900/50"
+            const borderClass = rank === 4 ? "border-t-2 border-t-gray-700" : "border-gray-800"
+
             return (
               <TableRow
                 key={entry.id}
-                className={`border-gray-800 ${isTop3 ? "bg-primary/10" : "hover:bg-gray-900/50"}`}
+                className={`animate-fade-up ${borderClass} ${rowBg} ${isTop3 ? "transition-transform duration-200 hover:scale-[1.01]" : ""}`}
+                style={{ animationDelay: `${index * 60}ms` }}
               >
                 <TableCell className="text-center">
                   <MedalBadge rank={rank} />
@@ -88,9 +163,15 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
                 <TableCell className="font-medium">
                   <Link
                     href={`/atleta/${entry.id}`}
-                    className="text-white hover:text-primary hover:underline transition-colors"
+                    className="transition-colors hover:text-primary hover:underline"
                   >
-                    {entry.full_name}
+                    {rank === 1 ? (
+                      <span className="bg-gradient-to-r from-yellow-400 via-orange-400 to-primary bg-clip-text font-bold text-transparent">
+                        {entry.full_name}
+                      </span>
+                    ) : (
+                      <span className="text-white">{entry.full_name}</span>
+                    )}
                   </Link>
                 </TableCell>
                 {wods.map((wod) => {
@@ -113,9 +194,15 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
                   )
                 })}
                 <TableCell className="text-center">
-                  <span className="text-lg font-black text-primary">
-                    {Number(entry.total_points) || "—"}
-                  </span>
+                  {rank === 1 ? (
+                    <span className="text-2xl font-black text-primary animate-count-up inline-block" style={{ animationDelay: "800ms" }}>
+                      <AnimatedPoints value={Number(entry.total_points)} />
+                    </span>
+                  ) : (
+                    <span className="text-lg font-black text-primary">
+                      {Number(entry.total_points) || "—"}
+                    </span>
+                  )}
                 </TableCell>
               </TableRow>
             )
