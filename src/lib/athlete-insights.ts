@@ -59,7 +59,6 @@ export interface AthleteInsight {
 
 // Crew de las 6pm — nombres cortos para mencionar en mensajes
 const CREW_6PM_NAMES: Record<string, string> = {
-  "martha sofia lares": "Sofi",
   "mirna aracelly perez ceballos": "Mirna",
   "ricardo espinosa suarez": "Ricardo",
   "mariel avila perez": "Mariel",
