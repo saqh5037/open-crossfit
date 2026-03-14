@@ -279,6 +279,59 @@ export default async function RecapPage({ params }: PageProps) {
           background: rgba(234,88,12,0.6);
           animation: particleFloat 6s linear infinite;
         }
+        @keyframes rocketShake {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          10% { transform: translateY(-2px) rotate(-5deg); }
+          20% { transform: translateY(1px) rotate(5deg); }
+          30% { transform: translateY(-3px) rotate(-3deg); }
+          40% { transform: translateY(0px) rotate(4deg); }
+          50% { transform: translateY(-1px) rotate(-2deg); }
+          60% { transform: translateY(2px) rotate(3deg); }
+          70% { transform: translateY(-2px) rotate(-4deg); }
+          80% { transform: translateY(1px) rotate(2deg); }
+          90% { transform: translateY(-1px) rotate(-1deg); }
+        }
+        @keyframes heartbeat {
+          0%, 100% { transform: scale(1); }
+          15% { transform: scale(1.3); }
+          30% { transform: scale(1); }
+          45% { transform: scale(1.2); }
+          60% { transform: scale(1); }
+        }
+        @keyframes earthSpin {
+          0% { transform: rotateZ(0deg); }
+          100% { transform: rotateZ(360deg); }
+        }
+        @keyframes flexPump {
+          0%, 100% { transform: scale(1) rotate(0deg); }
+          25% { transform: scale(1.2) rotate(-10deg); }
+          50% { transform: scale(1.3) rotate(0deg); }
+          75% { transform: scale(1.2) rotate(10deg); }
+        }
+        @keyframes chartPop {
+          0%, 100% { transform: scale(1); }
+          20% { transform: scale(1.15) rotate(5deg); }
+          40% { transform: scale(0.95) rotate(-3deg); }
+          60% { transform: scale(1.1) rotate(2deg); }
+          80% { transform: scale(1); }
+        }
+        @keyframes sparkle {
+          0%, 100% { transform: scale(1) rotate(0deg); filter: brightness(1); }
+          25% { transform: scale(1.2) rotate(15deg); filter: brightness(1.5); }
+          50% { transform: scale(0.9) rotate(-10deg); filter: brightness(1.2); }
+          75% { transform: scale(1.15) rotate(5deg); filter: brightness(1.4); }
+        }
+        @keyframes goldenPulse {
+          0%, 100% { transform: scale(1); filter: brightness(1) drop-shadow(0 0 3px rgba(255,215,0,0.3)); }
+          50% { transform: scale(1.15); filter: brightness(1.3) drop-shadow(0 0 10px rgba(255,215,0,0.6)); }
+        }
+        .animate-rocket { animation: rocketShake 2s ease-in-out infinite; }
+        .animate-heartbeat { animation: heartbeat 2s ease-in-out infinite; }
+        .animate-earth-spin { animation: earthSpin 8s linear infinite; }
+        .animate-flex { animation: flexPump 2.5s ease-in-out infinite; }
+        .animate-chart { animation: chartPop 3s ease-in-out infinite; }
+        .animate-sparkle { animation: sparkle 2s ease-in-out infinite; }
+        .animate-golden { animation: goldenPulse 2s ease-in-out infinite; }
       `}} />
 
       {/* ===== HERO ===== */}
@@ -355,7 +408,7 @@ export default async function RecapPage({ params }: PageProps) {
                     className="rounded-lg border border-yellow-600/30 bg-gradient-to-br from-yellow-950/20 to-neutral-950 p-4 -mx-1"
                   >
                     <p className="text-[10px] font-bold tracking-[0.2em] text-yellow-500/70 mb-2">
-                      💛 PARA TI
+                      <span className="inline-block animate-golden">💛</span> PARA TI
                     </p>
                     <p
                       className="text-sm leading-relaxed text-neutral-200"
@@ -380,7 +433,7 @@ export default async function RecapPage({ params }: PageProps) {
       <section className="px-5 pb-4 animate-fade-in-3">
         <div className="rounded-lg border border-neutral-700 bg-gradient-to-r from-neutral-900 via-neutral-900/80 to-neutral-900 px-5 py-5 text-center">
           <p className="text-xs font-bold tracking-[0.2em] text-neutral-400 mb-3">
-            🌎 DATO MUNDIAL
+            <span className="inline-block animate-earth-spin">🌎</span> DATO MUNDIAL
           </p>
           <p className="text-sm leading-relaxed text-neutral-300 font-medium">
             {insight.globalFact}
@@ -391,7 +444,7 @@ export default async function RecapPage({ params }: PageProps) {
       {/* ===== TUS NUMEROS — WOD Cards ===== */}
       <section className="px-5 pt-4 pb-4 animate-fade-in-3">
         <h2 className="mb-4 text-xs font-bold tracking-[0.25em] text-neutral-400">
-          📊 TUS NÚMEROS
+          <span className="inline-block animate-chart">📊</span> TUS NÚMEROS
         </h2>
         <div className="space-y-3">
           {wodResults.map((wod) => {
@@ -427,7 +480,7 @@ export default async function RecapPage({ params }: PageProps) {
       <section className="px-5 pt-4 pb-4 animate-fade-in-4">
         <div className="rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-900 to-neutral-950 p-6">
           <h2 className="mb-5 text-xs font-bold tracking-[0.25em] text-neutral-400">
-            💪 TU VOLUMEN TOTAL
+            <span className="inline-block animate-flex">💪</span> TU VOLUMEN TOTAL
           </h2>
           <div className="grid grid-cols-2 gap-4">
             <StatBox
@@ -482,7 +535,7 @@ export default async function RecapPage({ params }: PageProps) {
             <div className="absolute inset-0 bg-gradient-to-br from-orange-950/10 via-transparent to-orange-950/10" />
             <div className="relative z-10">
             <p className="text-xs font-bold tracking-[0.3em] text-orange-500 mb-2">
-              POSICIÓN FINAL
+              <span className="inline-block animate-rocket">🏆</span> POSICIÓN FINAL
             </p>
             <p
               className="text-8xl font-black text-gradient-fire animate-count-up"
@@ -557,9 +610,9 @@ export default async function RecapPage({ params }: PageProps) {
       <section className="px-5 pb-8 flex flex-col items-center gap-3">
         <Link
           href="/leaderboard"
-          className="inline-block rounded-lg bg-orange-600 px-8 py-4 text-xs font-bold tracking-[0.2em] text-white hover:bg-orange-500 transition-colors"
+          className="inline-block rounded-lg bg-gradient-to-r from-orange-600 to-red-600 px-8 py-4 text-xs font-bold tracking-[0.2em] text-white hover:from-orange-500 hover:to-red-500 transition-all shadow-[0_0_20px_rgba(234,88,12,0.3)] hover:shadow-[0_0_30px_rgba(234,88,12,0.5)] hover:scale-105"
         >
-          VER LEADERBOARD COMPLETO
+          <span className="inline-block animate-rocket mr-2">🚀</span> VER LEADERBOARD COMPLETO
         </Link>
         <Link
           href={`/atleta/${athlete.id}`}
@@ -748,9 +801,9 @@ function AndreaSpecialView({ name, id }: { name: string; id: string }) {
       <section className="px-5 pb-8 flex flex-col items-center gap-3">
         <Link
           href="/leaderboard"
-          className="inline-block rounded-lg bg-orange-600 px-8 py-4 text-xs font-bold tracking-[0.2em] text-white hover:bg-orange-500 transition-colors"
+          className="inline-block rounded-lg bg-gradient-to-r from-orange-600 to-red-600 px-8 py-4 text-xs font-bold tracking-[0.2em] text-white hover:from-orange-500 hover:to-red-500 transition-all shadow-[0_0_20px_rgba(234,88,12,0.3)] hover:shadow-[0_0_30px_rgba(234,88,12,0.5)] hover:scale-105"
         >
-          VER LEADERBOARD COMPLETO
+          <span className="inline-block animate-rocket mr-2">🚀</span> VER LEADERBOARD COMPLETO
         </Link>
         <Link
           href={`/atleta/${id}`}
