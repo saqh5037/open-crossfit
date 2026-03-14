@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 
 interface ShareRecapButtonProps {
   athleteId: string
@@ -18,6 +18,7 @@ export default function ShareRecapButton({ athleteId, athleteName }: ShareRecapB
   const [showImages, setShowImages] = useState(false)
   const [loading, setLoading] = useState<string | null>(null)
   const [previews, setPreviews] = useState<Record<number, string>>({})
+  const [activeIdx, setActiveIdx] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const firstName = athleteName.split(" ")[0]
@@ -29,6 +30,23 @@ export default function ShareRecapButton({ athleteId, athleteName }: ShareRecapB
     return `/api/recap/share-image?id=${athleteId}&v=${v}`
   }
 
+  // Track which card is visible
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const scrollLeft = el.scrollLeft
+    const cardWidth = 200 + 12 // card width + gap
+    const idx = Math.round(scrollLeft / cardWidth)
+    setActiveIdx(Math.min(idx, VARIANTS.length - 1))
+  }, [])
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el || !showImages) return
+    el.addEventListener("scroll", handleScroll, { passive: true })
+    return () => el.removeEventListener("scroll", handleScroll)
+  }, [showImages, handleScroll])
+
   // ---- Share the recap LINK ----
   async function handleShareLink() {
     setLoading("link")
@@ -38,11 +56,9 @@ export default function ShareRecapButton({ athleteId, athleteName }: ShareRecapB
         text: `Mira el recap de ${firstName} en el GRIZZLYS CrossFit Open 2026 🔥`,
         url: recapUrl,
       }
-
       if (navigator.share) {
         await navigator.share(shareData)
       } else {
-        // Fallback: copy link
         await navigator.clipboard.writeText(recapUrl)
         alert("Link copiado al portapapeles")
       }
@@ -56,6 +72,7 @@ export default function ShareRecapButton({ athleteId, athleteName }: ShareRecapB
   // ---- Open images carousel ----
   function handleOpenImages() {
     setShowImages(true)
+    setActiveIdx(0)
     for (const v of VARIANTS) {
       if (!previews[v.id]) {
         const img = new Image()
@@ -93,14 +110,9 @@ export default function ShareRecapButton({ athleteId, athleteName }: ShareRecapB
       if (!res.ok) throw new Error("img")
       const blob = await res.blob()
       const file = new File([blob], `recap-${firstName.toLowerCase()}-grizzlys-${variant}.png`, { type: "image/png" })
-
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: `${firstName} — GRIZZLYS Open 2026`,
-        })
+        await navigator.share({ files: [file], title: `${firstName} — GRIZZLYS Open 2026` })
       } else {
-        // Fallback: just download
         handleDownload(variant)
         return
       }
@@ -109,6 +121,14 @@ export default function ShareRecapButton({ athleteId, athleteName }: ShareRecapB
     } finally {
       setLoading(null)
     }
+  }
+
+  // Scroll to a specific dot
+  function scrollToCard(idx: number) {
+    const el = scrollRef.current
+    if (!el) return
+    const cardWidth = 200 + 12
+    el.scrollTo({ left: idx * cardWidth, behavior: "smooth" })
   }
 
   return (
@@ -147,10 +167,23 @@ export default function ShareRecapButton({ athleteId, athleteName }: ShareRecapB
         <div className="w-full -mx-5">
           {/* Header */}
           <div className="flex items-center justify-between px-5 mb-3">
-            <p className="text-[10px] font-bold tracking-[0.25em] text-neutral-500">ELIGE TU ESTILO</p>
+            <p className="text-[10px] font-bold tracking-[0.25em] text-neutral-500">
+              ELIGE TU ESTILO <span className="text-neutral-600">({VARIANTS.length} diseños)</span>
+            </p>
             <button onClick={() => setShowImages(false)} className="text-neutral-600 hover:text-white transition-colors text-[10px] tracking-[0.2em] font-bold">
               CERRAR
             </button>
+          </div>
+
+          {/* Swipe hint on first view */}
+          <div className="flex items-center justify-center gap-1.5 mb-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-600">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            <span className="text-[10px] text-neutral-600 tracking-wider">DESLIZA PARA VER MÁS</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-600">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
           </div>
 
           {/* Horizontal carousel */}
@@ -188,7 +221,6 @@ export default function ShareRecapButton({ athleteId, athleteName }: ShareRecapB
                 <div className="px-3 py-2.5 bg-neutral-900/80">
                   <p className="text-xs font-bold text-white mb-2">{v.label}</p>
                   <div className="flex gap-2">
-                    {/* Download button */}
                     <button
                       onClick={() => handleDownload(v.id)}
                       disabled={loading !== null}
@@ -201,16 +233,11 @@ export default function ShareRecapButton({ athleteId, athleteName }: ShareRecapB
                       </svg>
                       Guardar
                     </button>
-                    {/* Share button */}
                     <button
                       onClick={() => handleShareImage(v.id)}
                       disabled={loading !== null}
                       className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg border py-2 text-[10px] font-bold tracking-wider transition-all active:scale-95 disabled:opacity-40"
-                      style={{
-                        backgroundColor: `${v.color}20`,
-                        borderColor: `${v.color}40`,
-                        color: v.color,
-                      }}
+                      style={{ backgroundColor: `${v.color}20`, borderColor: `${v.color}40`, color: v.color }}
                     >
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
@@ -222,6 +249,23 @@ export default function ShareRecapButton({ athleteId, athleteName }: ShareRecapB
                   </div>
                 </div>
               </div>
+            ))}
+          </div>
+
+          {/* Pagination dots */}
+          <div className="flex justify-center gap-2 mt-1 pb-1">
+            {VARIANTS.map((v, i) => (
+              <button
+                key={v.id}
+                onClick={() => scrollToCard(i)}
+                className="transition-all duration-300"
+                style={{
+                  width: activeIdx === i ? 20 : 8,
+                  height: 8,
+                  borderRadius: 4,
+                  backgroundColor: activeIdx === i ? v.color : "#333",
+                }}
+              />
             ))}
           </div>
 

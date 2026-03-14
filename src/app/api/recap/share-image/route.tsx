@@ -29,7 +29,7 @@ function V1(d: D) {
   return (
     <div style={{ width: W, height: H, display: "flex", flexDirection: "column", backgroundColor: "#050505", position: "relative", overflow: "hidden" }}>
       {/* Geometric radiating lines */}
-      <div style={{ position: "absolute", top: "42%", left: "50%", transform: "translate(-50%,-50%)", width: 900, height: 900, display: "flex" }}>
+      <div style={{ position: "absolute", top: "38%", left: "50%", transform: "translate(-50%,-50%)", width: 900, height: 900, display: "flex" }}>
         {[0, 30, 60, 90, 120, 150].map((deg) => (
           <div key={deg} style={{ position: "absolute", top: "50%", left: "50%", width: 900, height: 1, background: `linear-gradient(90deg, transparent 0%, ${OG}08 30%, ${OG}15 50%, ${OG}08 70%, transparent 100%)`, transform: `translate(-50%,-50%) rotate(${deg}deg)`, display: "flex" }} />
         ))}
@@ -39,32 +39,31 @@ function V1(d: D) {
       {/* Top fire bar */}
       <div style={{ width: "100%", height: 8, background: `linear-gradient(90deg, #ff3d00, ${OG}, #ffab00, ${OG}, #ff3d00)`, display: "flex", flexShrink: 0 }} />
 
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 64px", flex: 1, position: "relative" }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "36px 64px", flex: 1, position: "relative" }}>
         {/* Header row */}
         <div style={{ display: "flex", alignItems: "center", width: "100%", gap: 16 }}>
-          <img src={d.logoB64} alt="" width={52} height={52} style={{ borderRadius: 10 }} />
+          <img src={d.logoB64} alt="" width={48} height={48} style={{ borderRadius: 10 }} />
           <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
             <div style={{ fontFamily: "Bebas Neue", fontSize: 18, letterSpacing: "0.25em", color: "#555", display: "flex" }}>GRIZZLYS OPEN 2026</div>
           </div>
-          {d.photo ? (
-            <div style={{ width: 64, height: 64, borderRadius: "50%", border: `2px solid ${OG}50`, overflow: "hidden", display: "flex", flexShrink: 0 }}>
-              <img src={d.photo} alt="" width={64} height={64} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
-            </div>
-          ) : null}
         </div>
 
-        {/* Name + division */}
-        <div style={{ display: "flex", alignItems: "center", width: "100%", marginTop: 24, gap: 16 }}>
-          <div style={{ width: 5, height: 56, backgroundColor: OG, borderRadius: 4, display: "flex", flexShrink: 0 }} />
+        {/* Photo + Name row */}
+        <div style={{ display: "flex", alignItems: "center", width: "100%", marginTop: 24, gap: 20 }}>
+          {d.photo ? (
+            <div style={{ width: 100, height: 100, borderRadius: "50%", border: `3px solid ${OG}60`, overflow: "hidden", display: "flex", flexShrink: 0, boxShadow: `0 0 30px ${OG}30` }}>
+              <img src={d.photo} alt="" width={100} height={100} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
+            </div>
+          ) : null}
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ fontFamily: "Bebas Neue", fontSize: 52, color: "#fff", lineHeight: 1, display: "flex" }}>{d.name.toUpperCase()}</div>
-            <div style={{ fontSize: 16, color: "#666", marginTop: 4, display: "flex" }}>{d.divLabel} • {d.totalPts} puntos</div>
+            <div style={{ fontFamily: "Bebas Neue", fontSize: 48, color: "#fff", lineHeight: 1, display: "flex" }}>{d.name.toUpperCase()}</div>
+            <div style={{ fontSize: 15, color: "#666", marginTop: 6, display: "flex" }}>{d.divLabel} • {d.totalPts} puntos</div>
           </div>
         </div>
 
         {/* ═══ THE GIANT NUMBER ═══ */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, justifyContent: "center" }}>
-          <div style={{ fontFamily: "Bebas Neue", fontSize: 420, color: "#fff", lineHeight: 0.75, display: "flex", letterSpacing: "-0.04em" }}>#{d.rank}</div>
+          <div style={{ fontFamily: "Bebas Neue", fontSize: 400, color: "#fff", lineHeight: 0.75, display: "flex", letterSpacing: "-0.04em" }}>#{d.rank}</div>
           {/* Underline accent */}
           <div style={{ width: 180, height: 6, backgroundColor: OG, borderRadius: 4, marginTop: 12, display: "flex" }} />
           <div style={{ fontFamily: "Bebas Neue", fontSize: 32, letterSpacing: "0.4em", color: OG, display: "flex", marginTop: 16 }}>POSICIÓN</div>
@@ -105,15 +104,15 @@ function V2(d: D) {
         <img src={d.logoB64} alt="" width={48} height={48} style={{ borderRadius: 10, opacity: 0.7 }} />
 
         {/* Photo + name */}
-        <div style={{ display: "flex", alignItems: "center", gap: 20, marginTop: 28 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 24, marginTop: 28 }}>
           {d.photo ? (
-            <div style={{ width: 100, height: 100, borderRadius: "50%", border: "3px solid rgba(251,191,36,0.3)", overflow: "hidden", display: "flex", flexShrink: 0 }}>
-              <img src={d.photo} alt="" width={100} height={100} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
+            <div style={{ width: 120, height: 120, borderRadius: "50%", border: "3px solid rgba(251,191,36,0.35)", overflow: "hidden", display: "flex", flexShrink: 0, boxShadow: "0 0 40px rgba(251,191,36,0.15)" }}>
+              <img src={d.photo} alt="" width={120} height={120} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
             </div>
           ) : null}
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ fontFamily: "Bebas Neue", fontSize: 40, color: "#fff", lineHeight: 1, display: "flex" }}>{d.name.toUpperCase()}</div>
-            <div style={{ fontSize: 14, color: "#665533", marginTop: 4, display: "flex" }}>#{d.rank} de {d.totalAthletes} • {d.divLabel}</div>
+            <div style={{ fontFamily: "Bebas Neue", fontSize: 42, color: "#fff", lineHeight: 1, display: "flex" }}>{d.name.toUpperCase()}</div>
+            <div style={{ fontSize: 14, color: "#665533", marginTop: 6, display: "flex" }}>#{d.rank} de {d.totalAthletes} • {d.divLabel}</div>
           </div>
         </div>
 
@@ -171,6 +170,11 @@ function V3(d: D) {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", padding: "24px 48px", gap: 14 }}>
         <img src={d.logoB64} alt="" width={44} height={44} style={{ borderRadius: 8 }} />
+        {d.photo ? (
+          <div style={{ width: 56, height: 56, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.15)", overflow: "hidden", display: "flex", flexShrink: 0 }}>
+            <img src={d.photo} alt="" width={56} height={56} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
+          </div>
+        ) : null}
         <div style={{ fontFamily: "Bebas Neue", fontSize: 30, color: "#fff", lineHeight: 1, display: "flex", flex: 1 }}>{d.name.toUpperCase()}</div>
         {d.rank > 0 && (
           <div style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 18px", borderRadius: 8, backgroundColor: `${OG}18`, border: `1px solid ${OG}30` }}>
