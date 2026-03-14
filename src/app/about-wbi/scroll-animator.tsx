@@ -16,7 +16,7 @@ export default function ScrollAnimator() {
       { threshold: 0.12 }
     )
 
-    document.querySelectorAll(".wbi .fu").forEach((el) => observer.observe(el))
+    document.querySelectorAll(".W .fu").forEach((el) => observer.observe(el))
 
     return () => observer.disconnect()
   }, [])
