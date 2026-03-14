@@ -186,47 +186,135 @@ export default async function RecapPage({ params }: PageProps) {
     <main className="min-h-screen bg-black text-white">
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(24px); }
+          from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }
         }
         @keyframes glowPulse {
-          0%, 100% { box-shadow: 0 0 20px rgba(234,88,12,0.3); }
-          50% { box-shadow: 0 0 40px rgba(234,88,12,0.5); }
+          0%, 100% { box-shadow: 0 0 20px rgba(234,88,12,0.3), 0 0 60px rgba(234,88,12,0.1); }
+          50% { box-shadow: 0 0 40px rgba(234,88,12,0.5), 0 0 80px rgba(234,88,12,0.2); }
+        }
+        @keyframes spin3d {
+          0% { transform: perspective(600px) rotateY(0deg); }
+          100% { transform: perspective(600px) rotateY(360deg); }
+        }
+        @keyframes floatBounce {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.5); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes shimmer {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        @keyframes borderGlow {
+          0%, 100% { border-color: rgba(234,88,12,0.3); }
+          50% { border-color: rgba(234,88,12,0.8); }
+        }
+        @keyframes slideInLeft {
+          from { opacity: 0; transform: translateX(-40px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+          from { opacity: 0; transform: translateX(40px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fireFlicker {
+          0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+          25% { transform: scale(1.1) rotate(-3deg); opacity: 0.9; }
+          50% { transform: scale(1.2) rotate(2deg); opacity: 1; }
+          75% { transform: scale(1.05) rotate(-1deg); opacity: 0.95; }
+        }
+        @keyframes countUp {
+          from { opacity: 0; transform: translateY(20px) scale(0.8); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes particleFloat {
+          0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
         }
         .animate-fade-in { animation: fadeInUp 0.8s ease-out both; }
-        .animate-fade-in-1 { animation: fadeInUp 0.8s ease-out 0.1s both; }
-        .animate-fade-in-2 { animation: fadeInUp 0.8s ease-out 0.2s both; }
-        .animate-fade-in-3 { animation: fadeInUp 0.8s ease-out 0.35s both; }
-        .animate-fade-in-4 { animation: fadeInUp 0.8s ease-out 0.5s both; }
-        .animate-fade-in-5 { animation: fadeInUp 0.8s ease-out 0.65s both; }
-        .animate-fade-in-6 { animation: fadeInUp 0.8s ease-out 0.8s both; }
+        .animate-fade-in-1 { animation: fadeInUp 0.8s ease-out 0.15s both; }
+        .animate-fade-in-2 { animation: fadeInUp 0.8s ease-out 0.3s both; }
+        .animate-fade-in-3 { animation: fadeInUp 0.8s ease-out 0.45s both; }
+        .animate-fade-in-4 { animation: fadeInUp 0.8s ease-out 0.6s both; }
+        .animate-fade-in-5 { animation: fadeInUp 0.8s ease-out 0.75s both; }
+        .animate-fade-in-6 { animation: fadeInUp 0.8s ease-out 0.9s both; }
         .animate-glow { animation: glowPulse 3s ease-in-out infinite; }
+        .animate-spin3d { animation: spin3d 2s ease-in-out 0.5s both; }
+        .animate-float { animation: floatBounce 3s ease-in-out infinite; }
+        .animate-scale-in { animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+        .animate-fire { animation: fireFlicker 1.5s ease-in-out infinite; }
+        .animate-shimmer {
+          background: linear-gradient(90deg, transparent 0%, rgba(234,88,12,0.3) 50%, transparent 100%);
+          background-size: 200% 100%;
+          animation: shimmer 3s linear infinite;
+        }
+        .animate-border-glow { animation: borderGlow 2s ease-in-out infinite; }
+        .animate-slide-left { animation: slideInLeft 0.8s ease-out both; }
+        .animate-slide-right { animation: slideInRight 0.8s ease-out both; }
+        .animate-count-up { animation: countUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+        .text-gradient-fire {
+          background: linear-gradient(135deg, #ff6b00, #ff3d00, #ff8c00, #ff4500);
+          background-size: 300% 300%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: gradientShift 4s ease infinite;
+        }
+        .particle {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: rgba(234,88,12,0.6);
+          animation: particleFloat 6s linear infinite;
+        }
       `}} />
 
       {/* ===== HERO ===== */}
       <section className="relative overflow-hidden px-6 pt-14 pb-10 text-center">
         <div className="absolute inset-0 bg-gradient-to-b from-orange-950/40 via-orange-950/10 to-black" />
-        <div className="relative z-10 animate-fade-in">
-          <img
-            src="/logo-200.png"
-            alt="GRIZZLYS"
-            className="mx-auto h-20 w-20 rounded-xl border-2 border-orange-600/60 shadow-[0_0_30px_rgba(234,88,12,0.3)]"
-          />
-          <p className="mt-5 text-xs font-bold tracking-[0.4em] text-orange-400">
+        {/* Floating particles */}
+        <div className="particle" style={{ left: '10%', bottom: '0', animationDelay: '0s' }} />
+        <div className="particle" style={{ left: '25%', bottom: '0', animationDelay: '1s', width: '6px', height: '6px' }} />
+        <div className="particle" style={{ left: '50%', bottom: '0', animationDelay: '2s' }} />
+        <div className="particle" style={{ left: '70%', bottom: '0', animationDelay: '0.5s', width: '5px', height: '5px' }} />
+        <div className="particle" style={{ left: '85%', bottom: '0', animationDelay: '3s' }} />
+        <div className="particle" style={{ left: '40%', bottom: '0', animationDelay: '4s', width: '3px', height: '3px' }} />
+        <div className="relative z-10">
+          <div className="animate-spin3d mx-auto w-fit">
+            <img
+              src="/logo-200.png"
+              alt="GRIZZLYS"
+              className="mx-auto h-24 w-24 rounded-xl border-2 border-orange-600/60 shadow-[0_0_40px_rgba(234,88,12,0.4)]"
+            />
+          </div>
+          <p className="mt-5 text-xs font-bold tracking-[0.5em] text-orange-400 animate-fade-in">
             TU RECAP
           </p>
           <h1
-            className="mt-1 text-5xl font-black tracking-wider text-white drop-shadow-[0_0_20px_rgba(234,88,12,0.3)]"
-            style={{ fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif' }}
+            className="mt-1 text-6xl font-black tracking-wider text-gradient-fire animate-scale-in"
+            style={{ fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif', animationDelay: '0.3s' }}
           >
             OPEN 2026
           </h1>
-          <p className="mt-5 text-3xl font-bold text-white animate-fade-in-1">
+          <div className="mt-2 mx-auto h-1 w-32 rounded-full animate-shimmer" />
+          <p className="mt-5 text-3xl font-bold text-white animate-fade-in-1 animate-float">
             {athlete.full_name}
           </p>
           <div className="mt-3 flex items-center justify-center gap-3 animate-fade-in-2">
             <span
-              className="rounded-md px-3 py-1 text-xs font-bold tracking-wider text-white"
+              className="rounded-md px-3 py-1 text-xs font-bold tracking-wider text-white animate-border-glow border-2"
               style={{ backgroundColor: badge.bgColor }}
             >
               {badge.text}
@@ -239,7 +327,7 @@ export default async function RecapPage({ params }: PageProps) {
       </section>
 
       {/* ===== ORANGE GRADIENT BAR ===== */}
-      <div className="flex h-1.5">
+      <div className="flex h-2 animate-shimmer rounded-full mx-4 overflow-hidden">
         <div className="flex-1 bg-gradient-to-r from-orange-700 to-orange-500" />
         <div className="flex-1 bg-gradient-to-r from-orange-500 to-red-500" />
         <div className="flex-1 bg-gradient-to-r from-red-500 to-orange-700" />
@@ -249,7 +337,7 @@ export default async function RecapPage({ params }: PageProps) {
       <section className="px-5 pt-8 pb-4 animate-fade-in-2">
         <div className="rounded-xl border-2 border-orange-600/50 bg-neutral-950 p-6 animate-glow">
           <div className="mb-4 flex items-center gap-2">
-            <span className="text-2xl">🔥</span>
+            <span className="text-3xl animate-fire">🔥</span>
             <h2 className="text-xs font-bold tracking-[0.25em] text-orange-500">
               TU HISTORIA
             </h2>
@@ -390,16 +478,18 @@ export default async function RecapPage({ params }: PageProps) {
       {/* ===== POSICION FINAL ===== */}
       {overall.overall_rank > 0 && (
         <section className="px-5 pt-4 pb-4 animate-fade-in-5">
-          <div className="rounded-xl border-2 border-orange-600 bg-neutral-950 p-8 text-center">
+          <div className="rounded-xl border-2 animate-border-glow bg-neutral-950 p-8 text-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-950/10 via-transparent to-orange-950/10" />
+            <div className="relative z-10">
             <p className="text-xs font-bold tracking-[0.3em] text-orange-500 mb-2">
               POSICIÓN FINAL
             </p>
             <p
-              className="text-7xl font-black text-white"
-              style={{ fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif' }}
+              className="text-8xl font-black text-gradient-fire animate-count-up"
+              style={{ fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif', animationDelay: '0.3s' }}
             >
               {overall.overall_rank <= 3 && (
-                <span className="mr-2">
+                <span className="mr-2 inline-block animate-float">
                   {overall.overall_rank === 1
                     ? "🥇"
                     : overall.overall_rank === 2
@@ -424,6 +514,7 @@ export default async function RecapPage({ params }: PageProps) {
                 PUNTOS TOTALES
               </p>
             </div>
+            </div>
           </div>
         </section>
       )}
@@ -431,19 +522,22 @@ export default async function RecapPage({ params }: PageProps) {
       {/* ===== TU MEJOR MOMENTO ===== */}
       {insight.bestWod && (
         <section className="px-5 pt-4 pb-4 animate-fade-in-5">
-          <div className="rounded-xl border border-yellow-600/40 bg-gradient-to-br from-yellow-950/20 to-neutral-950 p-6 text-center">
+          <div className="rounded-xl border-2 border-yellow-600/40 bg-gradient-to-br from-yellow-950/20 to-neutral-950 p-6 text-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-900/5 via-transparent to-yellow-900/5" />
+            <div className="relative z-10">
             <p className="text-xs font-bold tracking-[0.25em] text-yellow-500 mb-3">
-              ⭐ TU MEJOR MOMENTO
+              <span className="inline-block animate-spin3d" style={{ animationDuration: '3s', animationIterationCount: 'infinite' }}>⭐</span> TU MEJOR MOMENTO
             </p>
             <p className="text-lg font-bold text-white leading-relaxed">
               {insight.bestWodMessage}
             </p>
             <p
-              className="mt-3 text-4xl font-black text-yellow-500"
+              className="mt-3 text-5xl font-black text-gradient-fire animate-count-up"
               style={{ fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif' }}
             >
               {insight.bestWod.displayScore}
             </p>
+            </div>
           </div>
         </section>
       )}
@@ -495,7 +589,9 @@ export default async function RecapPage({ params }: PageProps) {
 function WodCard({ wod, phrase }: { wod: WodResult; phrase: string }) {
   const points = wod.points
   return (
-    <div className="rounded-xl border border-neutral-800 bg-neutral-900/80 p-5 hover:border-orange-600/30 hover:shadow-[0_0_15px_rgba(234,88,12,0.1)] transition-all duration-300">
+    <div className="rounded-xl border border-neutral-800 bg-neutral-900/80 p-5 hover:border-orange-600/40 hover:shadow-[0_0_25px_rgba(234,88,12,0.15)] transition-all duration-500 relative overflow-hidden group">
+      <div className="absolute inset-0 bg-gradient-to-r from-orange-600/0 via-orange-600/5 to-orange-600/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="relative z-10">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs font-bold tracking-[0.2em] text-orange-500">
@@ -507,7 +603,7 @@ function WodCard({ wod, phrase }: { wod: WodResult; phrase: string }) {
       {/* Score + Rank */}
       <div className="flex items-end justify-between mb-3">
         <p
-          className="text-4xl font-black bg-gradient-to-r from-white to-orange-200 bg-clip-text text-transparent"
+          className="text-5xl font-black text-gradient-fire"
           style={{ fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif' }}
         >
           {wod.displayScore}
@@ -515,7 +611,7 @@ function WodCard({ wod, phrase }: { wod: WodResult; phrase: string }) {
         <div className="text-right">
           <p className="text-xl font-bold text-neutral-300">
             {wod.rank <= 3 && (
-              <span className="mr-1">
+              <span className="mr-1 inline-block animate-float">
                 {wod.rank === 1 ? "🥇" : wod.rank === 2 ? "🥈" : "🥉"}
               </span>
             )}
@@ -531,6 +627,7 @@ function WodCard({ wod, phrase }: { wod: WodResult; phrase: string }) {
           {phrase}
         </p>
       )}
+      </div>
     </div>
   )
 }
@@ -545,9 +642,9 @@ function StatBox({
   accent?: boolean
 }) {
   return (
-    <div className="rounded-lg border border-neutral-800 bg-neutral-900/50 p-4 text-center">
+    <div className="rounded-lg border border-neutral-800 bg-neutral-900/50 p-4 text-center hover:border-orange-600/30 transition-all duration-300 hover:scale-105">
       <p
-        className={`text-3xl font-black ${accent ? "bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent" : "text-white"}`}
+        className={`text-3xl font-black ${accent ? "text-gradient-fire" : "text-white"}`}
         style={{ fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif' }}
       >
         {value}
