@@ -18,14 +18,18 @@ const wC = ["#ea580c", "#16a34a", "#2563eb"]
 function img2b64(url: string): string | null {
   try {
     if (url.startsWith("/")) {
-      // Local file — read from public directory
       const filePath = join(process.cwd(), "public", url)
       const ext = url.split(".").pop()?.toLowerCase() || "jpeg"
       const mime = ext === "png" ? "image/png" : "image/jpeg"
-      return `data:${mime};base64,${readFileSync(filePath).toString("base64")}`
+      const b64 = `data:${mime};base64,${readFileSync(filePath).toString("base64")}`
+      console.log(`[share-image] Photo loaded: ${url} (${b64.length} chars)`)
+      return b64
     }
     return null
-  } catch { return null }
+  } catch (err) {
+    console.error(`[share-image] Photo error for ${url}:`, err)
+    return null
+  }
 }
 
 interface D {
@@ -364,6 +368,7 @@ export async function GET(request: NextRequest) {
     const bebasData = readFileSync(join(process.cwd(), "public", "fonts", "BebasNeue-Regular.ttf"))
     const logoB64 = `data:image/png;base64,${readFileSync(join(process.cwd(), "public", "logo-200.png")).toString("base64")}`
     const photoB64 = athlete.photo_url ? img2b64(athlete.photo_url) : null
+    console.log(`[share-image] athlete=${athlete.full_name}, photo_url=${athlete.photo_url}, photoB64=${photoB64 ? 'loaded' : 'NULL'}, variant=${variant}`)
 
     const d: D = {
       name: athlete.full_name, photo: photoB64, divLabel: getDivisionLabel(division),
