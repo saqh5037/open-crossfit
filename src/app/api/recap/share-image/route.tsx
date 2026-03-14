@@ -15,8 +15,17 @@ const W = 1080, H = 1350
 const OG = "#FF6600"
 const wC = ["#ea580c", "#16a34a", "#2563eb"]
 
-async function img2b64(url: string): Promise<string | null> {
-  try { const r = await fetch(url); if (!r.ok) return null; return `data:${r.headers.get("content-type")||"image/png"};base64,${Buffer.from(await r.arrayBuffer()).toString("base64")}` } catch { return null }
+function img2b64(url: string): string | null {
+  try {
+    if (url.startsWith("/")) {
+      // Local file — read from public directory
+      const filePath = join(process.cwd(), "public", url)
+      const ext = url.split(".").pop()?.toLowerCase() || "jpeg"
+      const mime = ext === "png" ? "image/png" : "image/jpeg"
+      return `data:${mime};base64,${readFileSync(filePath).toString("base64")}`
+    }
+    return null
+  } catch { return null }
 }
 
 interface D {
@@ -354,7 +363,7 @@ export async function GET(request: NextRequest) {
 
     const bebasData = readFileSync(join(process.cwd(), "public", "fonts", "BebasNeue-Regular.ttf"))
     const logoB64 = `data:image/png;base64,${readFileSync(join(process.cwd(), "public", "logo-200.png")).toString("base64")}`
-    const photoB64 = athlete.photo_url ? await img2b64(athlete.photo_url) : null
+    const photoB64 = athlete.photo_url ? img2b64(athlete.photo_url) : null
 
     const d: D = {
       name: athlete.full_name, photo: photoB64, divLabel: getDivisionLabel(division),
