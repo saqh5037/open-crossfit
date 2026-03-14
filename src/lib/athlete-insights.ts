@@ -55,6 +55,79 @@ export interface AthleteInsight {
   wodInsights: { wodName: string; phrase: string }[]
 }
 
+// ==================== PERSONALIZED MESSAGES ====================
+
+// Crew de las 6pm — nombres cortos para mencionar en mensajes
+const CREW_6PM_NAMES: Record<string, string> = {
+  "martha sofia lares": "Sofi",
+  "mirna aracelly perez ceballos": "Mirna",
+  "ricardo espinosa suarez": "Ricardo",
+  "mariel avila perez": "Mariel",
+  "cesar alexis ruiz chigo": "César",
+  "cesar manuel bastarrachea alcocer": "César B.",
+  "felix fierro mandujano": "Félix",
+  "gerardo emilio torres lara": "Gerardo",
+  "rogelio lopez": "Rogelio",
+  "maria aguilar": "María",
+  "andrea fernandez": "Andrea",
+}
+
+function getCrewBullet(fullName: string): string {
+  const key = fullName.toLowerCase()
+  const others = Object.entries(CREW_6PM_NAMES)
+    .filter(([k]) => k !== key)
+    .map(([, name]) => name)
+  return `Eres parte del crew de las 6pm: ${others.join(", ")}. Los que se levantan cuando el cuerpo dice no. Los que gritan tu nombre cuando ya no puedes. Los que se quedan a recoger la barra contigo. Eso no es un gym — es familia.`
+}
+
+function getCrewClosing(): string {
+  return "Hay días que no quieres ir. Días que el cuerpo pesa, que la cabeza dice 'hoy no'. Pero llegas. Y ahí están ellos. Mirna echándote porras, Félix sudando a tu lado, Ricardo empujando, Mariel sin parar. El crew de las 6 no te deja caer. Y tú tampoco los dejas caer a ellos. Somos compañeros, somos equipo, somos familia. Eso es lo que nos hace GRIZZLYS. 🐻🔥"
+}
+
+interface PersonalOverride {
+  greeting: string
+  closingMessage: string
+  extraBullet: string
+}
+
+function getPersonalOverride(fullName: string): PersonalOverride | null {
+  const key = fullName.toLowerCase()
+
+  // Martha Sofia Lares — esposa de Samuel
+  if (key === "martha sofia lares") {
+    return {
+      greeting: "Sofi, este Open fue por Bernardo, por Samuel, y por ti.",
+      extraBullet: "Cada hora que invertiste haciendo ejercicio, la invertiste en tu familia. En tener más energía para Bernardo, en estar más fuerte para Samuel, en ser la mejor versión de ti para los que más te importan.",
+      closingMessage: "Sofi, cada rep fue por ellos. Cada gota de sudor fue salud para tu familia. Bernardo un día va a saber que su mamá es una guerrera. Samuel ya lo sabe. Sigue así. 🐻❤️",
+    }
+  }
+
+  // Crew de las 6pm
+  if (key in CREW_6PM_NAMES) {
+    const nickname = CREW_6PM_NAMES[key]
+    return {
+      greeting: `${nickname}, este Open lo hicimos juntos.`,
+      extraBullet: getCrewBullet(fullName),
+      closingMessage: getCrewClosing(),
+    }
+  }
+
+  return null
+}
+
+// Andrea Fernandez — special case (no scores, was judge)
+export function getAndreaSpecialMessage(): {
+  greeting: string
+  message: string
+  closing: string
+} {
+  return {
+    greeting: "Andrea, tú también eres parte de este Open.",
+    message: "No pudiste competir por lesión, pero no te perdiste ni un solo Open. Estuviste ahí como juez, contando reps, validando scores, echándole porras a Félix y al crew de las 6. Ser juez es ser parte del Open tanto como ser atleta. Sin ti, esto no funciona.",
+    closing: "La lesión te frenó, pero no te detuvo. Estuviste ahí para los demás cuando no podías estar para ti. Eso es más fuerte que cualquier WOD. Cuando regreses, el crew va a estar ahí para ti. 🐻❤️",
+  }
+}
+
 // ==================== CONSTANTS ====================
 
 // 26.1 rep map (cumulative thresholds)
@@ -587,10 +660,18 @@ export function analyzeAthlete(
     phrase: getWodInsight(wod, movementsByWod[wod.wodName], gender, isRx),
   }))
 
+  // Apply personal overrides if this athlete has one
+  const personalOverride = getPersonalOverride(fullName)
+  const finalGreeting = personalOverride?.greeting ?? greeting
+  const finalClosing = personalOverride?.closingMessage ?? closingMessage
+  const finalBullets = personalOverride?.extraBullet
+    ? [personalOverride.extraBullet, ...storyBullets]
+    : storyBullets
+
   return {
     pattern,
-    greeting,
-    storyBullets,
+    greeting: finalGreeting,
+    storyBullets: finalBullets,
     globalFact,
     movementsByWod,
     totalMovements,
@@ -599,7 +680,7 @@ export function analyzeAthlete(
     totalLungeMeters,
     bestWod,
     bestWodMessage,
-    closingMessage,
+    closingMessage: finalClosing,
     wodInsights,
   }
 }

@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { Prisma } from "@prisma/client"
 import { getDivisionLabel, getDivisionBadge } from "@/lib/divisions"
-import { analyzeAthlete, type WodResult } from "@/lib/athlete-insights"
+import { analyzeAthlete, getAndreaSpecialMessage, type WodResult } from "@/lib/athlete-insights"
 import Link from "next/link"
 import type { Metadata } from "next"
 
@@ -51,6 +51,10 @@ export default async function RecapPage({ params }: PageProps) {
 
   // Check if athlete has any scores
   if (athlete.scores.length === 0) {
+    // Special case: Andrea Fernandez — was judge, not competitor
+    if (athlete.full_name.toLowerCase() === "andrea fernandez") {
+      return <AndreaSpecialView name={athlete.full_name} id={athlete.id} />
+    }
     return <NoScoresView name={athlete.full_name} id={athlete.id} />
   }
 
@@ -172,30 +176,55 @@ export default async function RecapPage({ params }: PageProps) {
   const badge = getDivisionBadge(division)
   const divLabel = getDivisionLabel(division)
 
+  // Check if athlete has personal crew/family bullet (for special card styling)
+  const hasPersonalBullet = insight.storyBullets.length > 0 && (
+    insight.storyBullets[0].includes("crew de las 6pm") ||
+    insight.storyBullets[0].includes("invertiste en tu familia")
+  )
+
   return (
     <main className="min-h-screen bg-black text-white">
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes glowPulse {
+          0%, 100% { box-shadow: 0 0 20px rgba(234,88,12,0.3); }
+          50% { box-shadow: 0 0 40px rgba(234,88,12,0.5); }
+        }
+        .animate-fade-in { animation: fadeInUp 0.8s ease-out both; }
+        .animate-fade-in-1 { animation: fadeInUp 0.8s ease-out 0.1s both; }
+        .animate-fade-in-2 { animation: fadeInUp 0.8s ease-out 0.2s both; }
+        .animate-fade-in-3 { animation: fadeInUp 0.8s ease-out 0.35s both; }
+        .animate-fade-in-4 { animation: fadeInUp 0.8s ease-out 0.5s both; }
+        .animate-fade-in-5 { animation: fadeInUp 0.8s ease-out 0.65s both; }
+        .animate-fade-in-6 { animation: fadeInUp 0.8s ease-out 0.8s both; }
+        .animate-glow { animation: glowPulse 3s ease-in-out infinite; }
+      `}} />
+
       {/* ===== HERO ===== */}
-      <section className="relative overflow-hidden px-6 pt-12 pb-8 text-center">
-        <div className="absolute inset-0 bg-gradient-to-b from-orange-950/30 via-black to-black" />
-        <div className="relative z-10">
+      <section className="relative overflow-hidden px-6 pt-14 pb-10 text-center">
+        <div className="absolute inset-0 bg-gradient-to-b from-orange-950/40 via-orange-950/10 to-black" />
+        <div className="relative z-10 animate-fade-in">
           <img
             src="/logo-200.png"
             alt="GRIZZLYS"
-            className="mx-auto h-16 w-16 rounded-xl border border-orange-600/50"
+            className="mx-auto h-20 w-20 rounded-xl border-2 border-orange-600/60 shadow-[0_0_30px_rgba(234,88,12,0.3)]"
           />
-          <p className="mt-4 text-xs font-bold tracking-[0.3em] text-orange-500">
+          <p className="mt-5 text-xs font-bold tracking-[0.4em] text-orange-400">
             TU RECAP
           </p>
           <h1
-            className="mt-1 text-4xl font-black tracking-wider text-white"
+            className="mt-1 text-5xl font-black tracking-wider text-white drop-shadow-[0_0_20px_rgba(234,88,12,0.3)]"
             style={{ fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif' }}
           >
             OPEN 2026
           </h1>
-          <p className="mt-4 text-2xl font-bold text-white">
+          <p className="mt-5 text-3xl font-bold text-white animate-fade-in-1">
             {athlete.full_name}
           </p>
-          <div className="mt-3 flex items-center justify-center gap-3">
+          <div className="mt-3 flex items-center justify-center gap-3 animate-fade-in-2">
             <span
               className="rounded-md px-3 py-1 text-xs font-bold tracking-wider text-white"
               style={{ backgroundColor: badge.bgColor }}
@@ -210,51 +239,70 @@ export default async function RecapPage({ params }: PageProps) {
       </section>
 
       {/* ===== ORANGE GRADIENT BAR ===== */}
-      <div className="flex h-1">
-        <div className="flex-1 bg-orange-600" />
-        <div className="flex-1 bg-orange-500" />
-        <div className="flex-1 bg-orange-600" />
+      <div className="flex h-1.5">
+        <div className="flex-1 bg-gradient-to-r from-orange-700 to-orange-500" />
+        <div className="flex-1 bg-gradient-to-r from-orange-500 to-red-500" />
+        <div className="flex-1 bg-gradient-to-r from-red-500 to-orange-700" />
       </div>
 
       {/* ===== YOUR STORY ===== */}
-      <section className="px-5 pt-8 pb-4">
-        <div className="rounded-xl border border-orange-600/40 bg-neutral-950 p-6">
+      <section className="px-5 pt-8 pb-4 animate-fade-in-2">
+        <div className="rounded-xl border-2 border-orange-600/50 bg-neutral-950 p-6 animate-glow">
           <div className="mb-4 flex items-center gap-2">
-            <span className="text-xl">🔥</span>
+            <span className="text-2xl">🔥</span>
             <h2 className="text-xs font-bold tracking-[0.25em] text-orange-500">
               TU HISTORIA
             </h2>
           </div>
-          <p className="mb-5 text-xl font-bold leading-tight text-white">
+          <p className="mb-5 text-2xl font-bold leading-tight text-white">
             {insight.greeting}
           </p>
           <div className="space-y-4">
-            {insight.storyBullets.map((bullet, i) => (
-              <p
-                key={i}
-                className="text-sm leading-relaxed text-neutral-300"
-                dangerouslySetInnerHTML={{ __html: `• ${bullet}` }}
-              />
-            ))}
+            {insight.storyBullets.map((bullet, i) => {
+              // First bullet gets special treatment if it's a personal/crew bullet
+              if (i === 0 && hasPersonalBullet) {
+                return (
+                  <div
+                    key={i}
+                    className="rounded-lg border border-yellow-600/30 bg-gradient-to-br from-yellow-950/20 to-neutral-950 p-4 -mx-1"
+                  >
+                    <p className="text-[10px] font-bold tracking-[0.2em] text-yellow-500/70 mb-2">
+                      💛 PARA TI
+                    </p>
+                    <p
+                      className="text-sm leading-relaxed text-neutral-200"
+                      dangerouslySetInnerHTML={{ __html: bullet }}
+                    />
+                  </div>
+                )
+              }
+              return (
+                <p
+                  key={i}
+                  className="text-sm leading-relaxed text-neutral-300"
+                  dangerouslySetInnerHTML={{ __html: `• ${bullet}` }}
+                />
+              )
+            })}
           </div>
         </div>
       </section>
 
       {/* ===== DATO MUNDIAL ===== */}
-      <section className="px-5 pb-4">
-        <div className="rounded-lg border border-neutral-800 bg-neutral-900/50 px-5 py-4 text-center">
-          <p className="text-xs font-bold tracking-[0.2em] text-neutral-500 mb-2">
+      <section className="px-5 pb-4 animate-fade-in-3">
+        <div className="rounded-lg border border-neutral-700 bg-gradient-to-r from-neutral-900 via-neutral-900/80 to-neutral-900 px-5 py-5 text-center">
+          <p className="text-xs font-bold tracking-[0.2em] text-neutral-400 mb-3">
             🌎 DATO MUNDIAL
           </p>
-          <p className="text-sm leading-relaxed text-neutral-400">
+          <p className="text-sm leading-relaxed text-neutral-300 font-medium">
             {insight.globalFact}
           </p>
         </div>
       </section>
 
       {/* ===== TUS NUMEROS — WOD Cards ===== */}
-      <section className="px-5 pt-4 pb-4">
-        <h2 className="mb-4 text-xs font-bold tracking-[0.25em] text-neutral-500">
+      <section className="px-5 pt-4 pb-4 animate-fade-in-3">
+        <h2 className="mb-4 text-xs font-bold tracking-[0.25em] text-neutral-400">
           📊 TUS NÚMEROS
         </h2>
         <div className="space-y-3">
@@ -288,7 +336,7 @@ export default async function RecapPage({ params }: PageProps) {
       </section>
 
       {/* ===== VOLUMEN TOTAL ===== */}
-      <section className="px-5 pt-4 pb-4">
+      <section className="px-5 pt-4 pb-4 animate-fade-in-4">
         <div className="rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-900 to-neutral-950 p-6">
           <h2 className="mb-5 text-xs font-bold tracking-[0.25em] text-neutral-400">
             💪 TU VOLUMEN TOTAL
@@ -341,7 +389,7 @@ export default async function RecapPage({ params }: PageProps) {
 
       {/* ===== POSICION FINAL ===== */}
       {overall.overall_rank > 0 && (
-        <section className="px-5 pt-4 pb-4">
+        <section className="px-5 pt-4 pb-4 animate-fade-in-5">
           <div className="rounded-xl border-2 border-orange-600 bg-neutral-950 p-8 text-center">
             <p className="text-xs font-bold tracking-[0.3em] text-orange-500 mb-2">
               POSICIÓN FINAL
@@ -382,7 +430,7 @@ export default async function RecapPage({ params }: PageProps) {
 
       {/* ===== TU MEJOR MOMENTO ===== */}
       {insight.bestWod && (
-        <section className="px-5 pt-4 pb-4">
+        <section className="px-5 pt-4 pb-4 animate-fade-in-5">
           <div className="rounded-xl border border-yellow-600/40 bg-gradient-to-br from-yellow-950/20 to-neutral-950 p-6 text-center">
             <p className="text-xs font-bold tracking-[0.25em] text-yellow-500 mb-3">
               ⭐ TU MEJOR MOMENTO
@@ -401,13 +449,13 @@ export default async function RecapPage({ params }: PageProps) {
       )}
 
       {/* ===== MENSAJE FINAL ===== */}
-      <section className="px-5 pt-6 pb-6">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-px w-16 bg-orange-600/50" />
-          <p className="text-base leading-relaxed text-neutral-300 italic px-2">
+      <section className="px-5 pt-8 pb-8 animate-fade-in-6">
+        <div className="rounded-xl bg-gradient-to-br from-orange-950/20 via-neutral-950 to-orange-950/10 p-8 text-center border border-orange-900/20">
+          <div className="mx-auto mb-5 h-px w-20 bg-gradient-to-r from-transparent via-orange-600/60 to-transparent" />
+          <p className="text-lg leading-relaxed text-neutral-200 italic px-2 font-medium">
             &ldquo;{insight.closingMessage}&rdquo;
           </p>
-          <div className="mx-auto mt-4 h-px w-16 bg-orange-600/50" />
+          <div className="mx-auto mt-5 h-px w-20 bg-gradient-to-r from-transparent via-orange-600/60 to-transparent" />
         </div>
       </section>
 
@@ -447,7 +495,7 @@ export default async function RecapPage({ params }: PageProps) {
 function WodCard({ wod, phrase }: { wod: WodResult; phrase: string }) {
   const points = wod.points
   return (
-    <div className="rounded-xl border border-neutral-800 bg-neutral-900/80 p-5">
+    <div className="rounded-xl border border-neutral-800 bg-neutral-900/80 p-5 hover:border-orange-600/30 hover:shadow-[0_0_15px_rgba(234,88,12,0.1)] transition-all duration-300">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs font-bold tracking-[0.2em] text-orange-500">
@@ -459,13 +507,13 @@ function WodCard({ wod, phrase }: { wod: WodResult; phrase: string }) {
       {/* Score + Rank */}
       <div className="flex items-end justify-between mb-3">
         <p
-          className="text-3xl font-black text-white"
+          className="text-4xl font-black bg-gradient-to-r from-white to-orange-200 bg-clip-text text-transparent"
           style={{ fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif' }}
         >
           {wod.displayScore}
         </p>
         <div className="text-right">
-          <p className="text-lg font-bold text-neutral-300">
+          <p className="text-xl font-bold text-neutral-300">
             {wod.rank <= 3 && (
               <span className="mr-1">
                 {wod.rank === 1 ? "🥇" : wod.rank === 2 ? "🥈" : "🥉"}
@@ -479,7 +527,7 @@ function WodCard({ wod, phrase }: { wod: WodResult; phrase: string }) {
 
       {/* Visceral phrase */}
       {phrase && (
-        <p className="text-xs leading-relaxed text-neutral-400 italic border-t border-neutral-800 pt-3">
+        <p className="text-xs leading-relaxed text-neutral-400 italic border-t border-neutral-800 pt-3 mt-1">
           {phrase}
         </p>
       )}
@@ -499,7 +547,7 @@ function StatBox({
   return (
     <div className="rounded-lg border border-neutral-800 bg-neutral-900/50 p-4 text-center">
       <p
-        className={`text-2xl font-black ${accent ? "text-orange-500" : "text-white"}`}
+        className={`text-3xl font-black ${accent ? "bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent" : "text-white"}`}
         style={{ fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif' }}
       >
         {value}
@@ -532,6 +580,94 @@ function NoScoresView({ name, id }: { name: string; id: string }) {
           ← Volver a mi perfil
         </Link>
       </div>
+    </main>
+  )
+}
+
+function AndreaSpecialView({ name, id }: { name: string; id: string }) {
+  const msg = getAndreaSpecialMessage()
+  return (
+    <main className="min-h-screen bg-black text-white">
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeInUp 0.8s ease-out both; }
+        .animate-fade-in-2 { animation: fadeInUp 0.8s ease-out 0.2s both; }
+        .animate-fade-in-3 { animation: fadeInUp 0.8s ease-out 0.4s both; }
+      `}} />
+
+      {/* Hero */}
+      <section className="relative overflow-hidden px-6 pt-14 pb-10 text-center">
+        <div className="absolute inset-0 bg-gradient-to-b from-orange-950/40 via-orange-950/10 to-black" />
+        <div className="relative z-10 animate-fade-in">
+          <img
+            src="/logo-200.png"
+            alt="GRIZZLYS"
+            className="mx-auto h-20 w-20 rounded-xl border-2 border-orange-600/60 shadow-[0_0_30px_rgba(234,88,12,0.3)]"
+          />
+          <p className="mt-5 text-xs font-bold tracking-[0.4em] text-orange-400">TU RECAP</p>
+          <h1
+            className="mt-1 text-5xl font-black tracking-wider text-white"
+            style={{ fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif' }}
+          >
+            OPEN 2026
+          </h1>
+          <p className="mt-5 text-3xl font-bold text-white">{name}</p>
+        </div>
+      </section>
+
+      <div className="flex h-1.5">
+        <div className="flex-1 bg-gradient-to-r from-orange-700 to-orange-500" />
+        <div className="flex-1 bg-gradient-to-r from-orange-500 to-red-500" />
+        <div className="flex-1 bg-gradient-to-r from-red-500 to-orange-700" />
+      </div>
+
+      {/* Message */}
+      <section className="px-5 pt-8 pb-4 animate-fade-in-2">
+        <div className="rounded-xl border-2 border-orange-600/50 bg-neutral-950 p-6">
+          <div className="mb-4 flex items-center gap-2">
+            <span className="text-2xl">🔥</span>
+            <h2 className="text-xs font-bold tracking-[0.25em] text-orange-500">TU HISTORIA</h2>
+          </div>
+          <p className="mb-5 text-2xl font-bold leading-tight text-white">{msg.greeting}</p>
+          <p className="text-sm leading-relaxed text-neutral-300">{msg.message}</p>
+        </div>
+      </section>
+
+      {/* Closing */}
+      <section className="px-5 pt-6 pb-8 animate-fade-in-3">
+        <div className="rounded-xl bg-gradient-to-br from-orange-950/20 via-neutral-950 to-orange-950/10 p-8 text-center border border-orange-900/20">
+          <div className="mx-auto mb-5 h-px w-20 bg-gradient-to-r from-transparent via-orange-600/60 to-transparent" />
+          <p className="text-lg leading-relaxed text-neutral-200 italic px-2 font-medium">
+            &ldquo;{msg.closing}&rdquo;
+          </p>
+          <div className="mx-auto mt-5 h-px w-20 bg-gradient-to-r from-transparent via-orange-600/60 to-transparent" />
+        </div>
+      </section>
+
+      {/* CTAs */}
+      <section className="px-5 pb-8 flex flex-col items-center gap-3">
+        <Link
+          href="/leaderboard"
+          className="inline-block rounded-lg bg-orange-600 px-8 py-4 text-xs font-bold tracking-[0.2em] text-white hover:bg-orange-500 transition-colors"
+        >
+          VER LEADERBOARD COMPLETO
+        </Link>
+        <Link
+          href={`/atleta/${id}`}
+          className="text-xs font-bold tracking-wider text-neutral-500 hover:text-neutral-300 transition-colors"
+        >
+          ← VOLVER A MI PERFIL
+        </Link>
+      </section>
+
+      <footer className="border-t border-neutral-900 px-5 py-8 text-center">
+        <p className="text-[10px] font-bold tracking-[0.2em] text-neutral-600">
+          GRIZZLYS — ENTRENAMIENTO FUNCIONAL — MÉRIDA
+        </p>
+      </footer>
     </main>
   )
 }
