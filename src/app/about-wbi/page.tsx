@@ -10,770 +10,400 @@ export default function AboutWbiPage() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: `
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
         :root {
-          --wbi-blue:    #0098DA;
-          --wbi-blue2:   #47B6E6;
-          --wbi-green:   #0C7347;
-          --wbi-green2:  #17D986;
-          --wbi-orange:  #F58634;
-          --wbi-orange2: #BC5000;
-          --wbi-yellow:  #FBCE26;
-          --wbi-cyan:    #00AAFF;
-          --white:       #FFFFFF;
-          --off-white:   #F7FAFD;
-          --gray-50:     #F0F5FA;
-          --gray-100:    #E1E8F0;
-          --gray-600:    #4A5568;
-          --gray-800:    #1A202C;
+          --wbi-blue:#0098DA; --wbi-blue2:#47B6E6; --wbi-green:#0C7347;
+          --wbi-green2:#17D986; --wbi-orange:#F58634; --wbi-orange2:#BC5000;
+          --wbi-yellow:#FBCE26; --wbi-cyan:#00AAFF;
+          --g800:#1a202c; --g700:#2d3748; --g600:#4a5568; --g500:#718096;
+          --g300:#cbd5e0; --g100:#edf2f7; --g50:#f7fafc;
         }
+        .wbi *{margin:0;padding:0;box-sizing:border-box}
+        .wbi{background:#fff;color:var(--g800);font-family:'Plus Jakarta Sans',system-ui,sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
-        .wbi-page * { margin:0; padding:0; box-sizing:border-box; }
-        .wbi-page {
-          background:var(--white); color:var(--gray-800);
-          font-family:'Poppins',sans-serif; overflow-x:hidden;
-        }
+        /* ══ NAV ══ */
+        .wbi .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(1.5rem,4vw,3rem);height:72px;background:rgba(255,255,255,.92);backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid rgba(0,0,0,.04)}
+        .wbi .nav-logo img{height:38px;width:auto}
+        .wbi .nav-r{display:flex;gap:2rem;align-items:center}
+        .wbi .nav-a{color:var(--g600);font-size:.875rem;font-weight:500;text-decoration:none;transition:color .2s}
+        .wbi .nav-a:hover{color:var(--wbi-blue)}
+        .wbi .nav-cta{padding:10px 26px;background:var(--wbi-blue);color:#fff;border-radius:8px;font-weight:600;font-size:.85rem;text-decoration:none;transition:all .25s;box-shadow:0 2px 12px rgba(0,152,218,.25)}
+        .wbi .nav-cta:hover{background:#0086c2;transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,152,218,.35)}
 
-        /* ═══════════ NAVBAR ═══════════ */
-        .wbi-page .wbi-nav {
-          position:fixed; top:0; left:0; right:0; z-index:100;
-          display:flex; align-items:center; justify-content:space-between;
-          padding:0 3rem; height:72px;
-          background:rgba(255,255,255,0.92); backdrop-filter:blur(20px) saturate(180%);
-          border-bottom:1px solid rgba(0,152,218,0.08);
-          box-shadow:0 1px 20px rgba(0,152,218,0.06);
-        }
-        .wbi-page .nav-logo img { height:40px; width:auto; }
-        .wbi-page .nav-links { display:flex; gap:2rem; align-items:center; }
-        .wbi-page .nav-link {
-          color:var(--gray-600); font-size:0.88rem; font-weight:500;
-          text-decoration:none; transition:all .25s; position:relative;
-        }
-        .wbi-page .nav-link:hover { color:var(--wbi-blue); }
-        .wbi-page .nav-link::after {
-          content:''; position:absolute; bottom:-4px; left:0; width:0; height:2px;
-          background:linear-gradient(90deg, var(--wbi-blue), var(--wbi-green2));
-          transition:width .3s; border-radius:2px;
-        }
-        .wbi-page .nav-link:hover::after { width:100%; }
-        .wbi-page .nav-cta {
-          padding:10px 28px;
-          background:linear-gradient(135deg, var(--wbi-blue) 0%, var(--wbi-blue2) 100%);
-          color:#fff; border-radius:50px; font-weight:600; font-size:0.85rem;
-          text-decoration:none; transition:all .3s; letter-spacing:0.3px;
-          box-shadow:0 4px 15px rgba(0,152,218,0.3);
-        }
-        .wbi-page .nav-cta:hover {
-          transform:translateY(-2px);
-          box-shadow:0 6px 25px rgba(0,152,218,0.4);
-        }
+        /* ══ HERO ══ */
+        .wbi .hero{min-height:100vh;display:flex;align-items:center;padding:100px 2rem 60px;position:relative;overflow:hidden;background:#fff}
+        .wbi .hero-bg{position:absolute;inset:0;pointer-events:none}
+        .wbi .hero-bg::before{content:'';position:absolute;top:-200px;right:-200px;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(0,152,218,.07) 0%,transparent 70%)}
+        .wbi .hero-bg::after{content:'';position:absolute;bottom:-150px;left:-100px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(23,217,134,.05) 0%,transparent 70%)}
+        .wbi .hero-inner{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;position:relative}
+        .wbi .hero-text{}
+        .wbi .hero-label{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(0,152,218,.06);border:1px solid rgba(0,152,218,.12);border-radius:6px;font-size:.7rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--wbi-blue);margin-bottom:1.5rem}
+        .wbi .hero-label span{width:6px;height:6px;border-radius:50%;background:var(--wbi-blue);animation:pulse 2s infinite}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+        .wbi .hero h1{font-size:clamp(2.2rem,5vw,3.6rem);font-weight:800;line-height:1.12;color:var(--g800);letter-spacing:-.5px;margin-bottom:1.25rem}
+        .wbi .hero h1 .hl{background:linear-gradient(135deg,var(--wbi-blue),var(--wbi-green2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .wbi .hero-p{font-size:1.05rem;color:var(--g600);line-height:1.8;margin-bottom:2rem;font-weight:400;max-width:480px}
+        .wbi .hero-btns{display:flex;gap:.75rem;flex-wrap:wrap}
+        .wbi .btn-fill{padding:14px 32px;background:var(--wbi-blue);color:#fff;border-radius:8px;font-weight:600;font-size:.9rem;text-decoration:none;transition:all .25s;display:inline-flex;align-items:center;gap:8px;box-shadow:0 2px 12px rgba(0,152,218,.2)}
+        .wbi .btn-fill:hover{background:#0086c2;transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,152,218,.3)}
+        .wbi .btn-ghost{padding:14px 32px;border:1.5px solid var(--g300);color:var(--g700);border-radius:8px;font-weight:600;font-size:.9rem;text-decoration:none;transition:all .25s}
+        .wbi .btn-ghost:hover{border-color:var(--wbi-blue);color:var(--wbi-blue)}
 
-        /* ═══════════ HERO ═══════════ */
-        .wbi-page .hero {
-          min-height:100vh; display:flex; align-items:center; justify-content:center;
-          position:relative; overflow:hidden; padding:120px 2rem 80px;
-          background:linear-gradient(160deg, #F0F9FF 0%, #FFFFFF 30%, #F0FFF4 60%, #FFFBEB 100%);
-        }
-        /* Orbs decorativas */
-        .wbi-page .hero-orb {
-          position:absolute; border-radius:50%; pointer-events:none; filter:blur(80px);
-        }
-        .wbi-page .orb-blue {
-          width:500px; height:500px; top:-10%; left:-10%;
-          background:radial-gradient(circle, rgba(0,152,218,0.15) 0%, transparent 70%);
-        }
-        .wbi-page .orb-green {
-          width:400px; height:400px; bottom:5%; right:-5%;
-          background:radial-gradient(circle, rgba(23,217,134,0.12) 0%, transparent 70%);
-        }
-        .wbi-page .orb-orange {
-          width:350px; height:350px; top:20%; right:10%;
-          background:radial-gradient(circle, rgba(245,134,52,0.1) 0%, transparent 70%);
-        }
-        /* Geometric shapes */
-        .wbi-page .hero-shapes { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
-        .wbi-page .shape {
-          position:absolute; border-radius:20px; opacity:0.06;
-          animation:wbi-drift 20s ease-in-out infinite;
-        }
-        .wbi-page .shape-1 {
-          width:120px; height:120px; top:15%; left:8%;
-          background:var(--wbi-blue); transform:rotate(30deg);
-        }
-        .wbi-page .shape-2 {
-          width:80px; height:80px; top:60%; left:15%;
-          background:var(--wbi-green2); transform:rotate(-20deg);
-          animation-delay:-5s;
-        }
-        .wbi-page .shape-3 {
-          width:100px; height:100px; top:25%; right:12%;
-          background:var(--wbi-orange); transform:rotate(45deg);
-          animation-delay:-10s;
-        }
-        .wbi-page .shape-4 {
-          width:60px; height:60px; bottom:20%; right:20%;
-          background:var(--wbi-yellow); transform:rotate(15deg);
-          animation-delay:-15s;
-        }
-        .wbi-page .shape-5 {
-          width:90px; height:90px; bottom:30%; left:5%;
-          background:var(--wbi-cyan); transform:rotate(-35deg);
-          animation-delay:-8s;
-        }
-        @keyframes wbi-drift {
-          0%,100%{ transform:rotate(var(--r,30deg)) translateY(0); }
-          50%{ transform:rotate(var(--r,30deg)) translateY(-20px); }
-        }
+        /* Hero right — stats grid */
+        .wbi .hero-visual{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+        .wbi .hero-card{padding:1.75rem;border-radius:16px;text-align:center;transition:transform .3s}
+        .wbi .hero-card:hover{transform:translateY(-4px)}
+        .wbi .hc-1{background:linear-gradient(135deg,rgba(0,152,218,.06),rgba(71,182,230,.04));border:1px solid rgba(0,152,218,.1)}
+        .wbi .hc-2{background:linear-gradient(135deg,rgba(12,115,71,.06),rgba(23,217,134,.04));border:1px solid rgba(23,217,134,.1)}
+        .wbi .hc-3{background:linear-gradient(135deg,rgba(245,134,52,.06),rgba(251,206,38,.04));border:1px solid rgba(245,134,52,.1)}
+        .wbi .hc-4{background:linear-gradient(135deg,rgba(0,170,255,.06),rgba(0,152,218,.04));border:1px solid rgba(0,170,255,.1)}
+        .wbi .hc-num{font-size:2.4rem;font-weight:800;line-height:1}
+        .wbi .hc-1 .hc-num{color:var(--wbi-blue)}
+        .wbi .hc-2 .hc-num{color:var(--wbi-green)}
+        .wbi .hc-3 .hc-num{color:var(--wbi-orange)}
+        .wbi .hc-4 .hc-num{color:var(--wbi-cyan)}
+        .wbi .hc-lbl{font-size:.7rem;color:var(--g500);text-transform:uppercase;letter-spacing:1.5px;margin-top:6px;font-weight:600}
 
-        .wbi-page .hero-content { position:relative; text-align:center; max-width:880px; }
-        .wbi-page .hero-logo { height:56px; width:auto; margin-bottom:1.5rem; }
-        .wbi-page .hero-badge {
-          display:inline-flex; align-items:center; gap:10px;
-          padding:8px 24px;
-          background:linear-gradient(135deg, rgba(0,152,218,0.08) 0%, rgba(23,217,134,0.08) 100%);
-          border:1px solid rgba(0,152,218,0.15);
-          border-radius:999px; font-size:0.72rem; letter-spacing:3px;
-          font-weight:600; text-transform:uppercase; margin-bottom:2rem;
-          background-clip:padding-box;
-        }
-        .wbi-page .hero-badge .badge-text {
-          background:linear-gradient(135deg, var(--wbi-blue) 0%, var(--wbi-green2) 100%);
-          -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-          background-clip:text;
-        }
-        .wbi-page .hero-badge-dot {
-          width:7px; height:7px; border-radius:50%;
-          background:linear-gradient(135deg, var(--wbi-blue), var(--wbi-green2));
-          animation:wbi-pulse 2s infinite;
-        }
-        @keyframes wbi-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(0.8)} }
-
-        .wbi-page .hero h1 {
-          font-size:clamp(2.4rem,6vw,4.2rem); font-weight:800;
-          line-height:1.12; margin-bottom:1.5rem; color:var(--gray-800);
-          letter-spacing:-0.5px;
-        }
-        .wbi-page .hero h1 .gradient-text {
-          background:linear-gradient(135deg, var(--wbi-blue) 0%, var(--wbi-green2) 50%, var(--wbi-orange) 100%);
-          -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-          background-clip:text;
-        }
-        .wbi-page .hero-sub {
-          font-size:1.1rem; color:var(--gray-600); line-height:1.85;
-          max-width:600px; margin:0 auto 2.5rem; font-weight:300;
-        }
-        .wbi-page .hero-actions { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
-        .wbi-page .btn-gradient {
-          padding:16px 40px;
-          background:linear-gradient(135deg, var(--wbi-blue) 0%, var(--wbi-green) 100%);
-          color:#fff; border-radius:50px; font-weight:600; font-size:0.92rem;
-          text-decoration:none; transition:all .3s; display:inline-flex;
-          align-items:center; gap:10px; letter-spacing:0.3px;
-          box-shadow:0 6px 25px rgba(0,152,218,0.3);
-        }
-        .wbi-page .btn-gradient:hover {
-          transform:translateY(-3px);
-          box-shadow:0 10px 40px rgba(0,152,218,0.4);
-        }
-        .wbi-page .btn-soft {
-          padding:16px 40px;
-          background:rgba(0,152,218,0.06); color:var(--wbi-blue);
-          border:2px solid rgba(0,152,218,0.15);
-          border-radius:50px; font-weight:600; font-size:0.92rem;
-          text-decoration:none; transition:all .3s;
-        }
-        .wbi-page .btn-soft:hover {
-          background:rgba(0,152,218,0.12); border-color:var(--wbi-blue);
-          transform:translateY(-2px);
-        }
-
-        .wbi-page .hero-stats {
-          display:flex; gap:2rem; justify-content:center; margin-top:4rem;
-          padding-top:2.5rem; border-top:2px solid var(--gray-100);
-          flex-wrap:wrap;
-        }
-        .wbi-page .hero-stat {
-          padding:0 1.5rem; text-align:center;
-        }
-        .wbi-page .hero-stat-num {
-          font-size:2.4rem; font-weight:800; line-height:1;
-          background:linear-gradient(135deg, var(--wbi-blue), var(--wbi-green2));
-          -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-          background-clip:text;
-        }
-        .wbi-page .hero-stat-lbl {
-          font-size:0.72rem; color:var(--gray-600); letter-spacing:1.5px;
-          text-transform:uppercase; margin-top:6px; font-weight:500;
-        }
-
-        /* ═══════════ SECTIONS COMMON ═══════════ */
-        .wbi-page section { padding:100px 2rem; }
-        .wbi-page .container { max-width:1140px; margin:0 auto; }
-        .wbi-page .section-tag {
-          font-size:0.75rem; letter-spacing:4px; font-weight:700;
-          text-transform:uppercase; margin-bottom:0.75rem;
-          background:linear-gradient(135deg, var(--wbi-blue), var(--wbi-green2));
-          -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-          background-clip:text; display:inline-block;
-        }
-        .wbi-page .section-title {
-          font-size:clamp(1.8rem,4vw,2.8rem);
-          font-weight:800; line-height:1.15; color:var(--gray-800);
-        }
-        .wbi-page .section-title .gradient-text {
-          background:linear-gradient(135deg, var(--wbi-blue) 0%, var(--wbi-green2) 100%);
-          -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-          background-clip:text;
-        }
-        .wbi-page .section-sub {
-          color:var(--gray-600); font-size:1rem; line-height:1.85;
-          max-width:560px; margin-top:1rem; font-weight:300;
-        }
-
-        /* ═══════════ SERVICIOS ═══════════ */
-        .wbi-page .services-section {
-          background:linear-gradient(180deg, var(--white) 0%, var(--off-white) 50%, var(--white) 100%);
-          position:relative;
-        }
-        .wbi-page .services-grid {
-          display:grid; grid-template-columns:repeat(3, 1fr); gap:1.5rem; margin-top:3rem;
-        }
-        @media(max-width:960px){ .wbi-page .services-grid { grid-template-columns:repeat(2,1fr); } }
-        @media(max-width:600px){ .wbi-page .services-grid { grid-template-columns:1fr; } }
-
-        .wbi-page .service-card {
-          padding:2.25rem 2rem; background:var(--white);
-          border-radius:20px; transition:all .4s; cursor:default;
-          position:relative; overflow:hidden;
-          border:1px solid transparent;
-          box-shadow:0 2px 20px rgba(0,0,0,0.04);
-        }
-        .wbi-page .service-card::before {
-          content:''; position:absolute; top:0; left:0; right:0; height:4px;
-        }
-        .wbi-page .service-card:hover {
-          transform:translateY(-8px);
-          box-shadow:0 20px 60px rgba(0,0,0,0.08);
-        }
-        /* Color variants */
-        .wbi-page .svc-card-cyan::before { background:linear-gradient(90deg, var(--wbi-blue), var(--wbi-cyan)); }
-        .wbi-page .svc-card-cyan:hover { border-color:rgba(0,170,255,0.2); box-shadow:0 20px 60px rgba(0,152,218,0.12); }
-        .wbi-page .svc-card-blue::before { background:linear-gradient(90deg, #1a365d, var(--wbi-blue)); }
-        .wbi-page .svc-card-blue:hover { border-color:rgba(0,152,218,0.2); box-shadow:0 20px 60px rgba(0,152,218,0.1); }
-        .wbi-page .svc-card-orange::before { background:linear-gradient(90deg, var(--wbi-orange), var(--wbi-yellow)); }
-        .wbi-page .svc-card-orange:hover { border-color:rgba(245,134,52,0.2); box-shadow:0 20px 60px rgba(245,134,52,0.1); }
-        .wbi-page .svc-card-green::before { background:linear-gradient(90deg, var(--wbi-green), var(--wbi-green2)); }
-        .wbi-page .svc-card-green:hover { border-color:rgba(23,217,134,0.2); box-shadow:0 20px 60px rgba(23,217,134,0.1); }
-
-        /* Astronaut helmet icons */
-        .wbi-page .astro-icon {
-          width:56px; height:56px; border-radius:16px; display:flex;
-          align-items:center; justify-content:center; margin-bottom:1.5rem;
-        }
-        .wbi-page .astro-icon .helmet {
-          width:28px; height:26px; background:#fff; border-radius:50%;
-          position:relative; border:2.5px solid rgba(255,255,255,0.8);
-          box-shadow:0 2px 8px rgba(0,0,0,0.1);
-        }
-        .wbi-page .astro-icon .visor {
-          position:absolute; top:6px; left:5px; right:5px; bottom:7px;
-          border-radius:50%;
-          border:1px solid rgba(255,255,255,0.4);
-        }
-        .wbi-page .astro-icon .visor::after {
-          content:''; position:absolute; top:2px; left:3px;
-          width:5px; height:3px; background:rgba(255,255,255,0.7);
-          border-radius:50%; transform:rotate(-20deg);
-        }
-        .wbi-page .astro-cyan {
-          background:linear-gradient(135deg, var(--wbi-blue), var(--wbi-cyan));
-        }
-        .wbi-page .astro-cyan .visor { background:linear-gradient(135deg, rgba(0,60,100,0.7), rgba(0,120,180,0.4)); }
-        .wbi-page .astro-blue {
-          background:linear-gradient(135deg, #1a365d, var(--wbi-blue));
-        }
-        .wbi-page .astro-blue .visor { background:linear-gradient(135deg, rgba(0,40,80,0.7), rgba(0,80,140,0.4)); }
-        .wbi-page .astro-orange {
-          background:linear-gradient(135deg, var(--wbi-orange), var(--wbi-yellow));
-        }
-        .wbi-page .astro-orange .visor { background:linear-gradient(135deg, rgba(120,50,0,0.6), rgba(180,80,0,0.3)); }
-        .wbi-page .astro-green {
-          background:linear-gradient(135deg, var(--wbi-green), var(--wbi-green2));
-        }
-        .wbi-page .astro-green .visor { background:linear-gradient(135deg, rgba(0,60,30,0.7), rgba(0,100,50,0.4)); }
-
-        .wbi-page .svc-title {
-          font-size:1.05rem; font-weight:700;
-          margin-bottom:0.75rem; color:var(--gray-800);
-        }
-        .wbi-page .svc-title .accent { font-weight:800; }
-        .wbi-page .accent-cyan { color:var(--wbi-blue); }
-        .wbi-page .accent-blue { color:#1a365d; }
-        .wbi-page .accent-orange { color:var(--wbi-orange); }
-        .wbi-page .accent-green { color:var(--wbi-green); }
-        .wbi-page .svc-desc { font-size:0.88rem; color:var(--gray-600); line-height:1.75; font-weight:300; }
-
-        /* ═══════════ PROPUESTA DE VALOR ═══════════ */
-        .wbi-page .value-section {
-          background:linear-gradient(135deg,
-            rgba(0,152,218,0.03) 0%,
-            rgba(23,217,134,0.03) 50%,
-            rgba(245,134,52,0.03) 100%
-          );
-        }
-        .wbi-page .value-grid {
-          display:grid; grid-template-columns:repeat(3, 1fr); gap:1.5rem; margin-top:3rem;
-        }
-        @media(max-width:768px){ .wbi-page .value-grid { grid-template-columns:1fr; } }
-        .wbi-page .value-card {
-          padding:2.5rem 2rem; border-radius:24px; text-align:center;
-          color:#fff; position:relative; overflow:hidden;
-          transition:all .35s;
-        }
-        .wbi-page .value-card:hover { transform:translateY(-6px) scale(1.02); }
-        .wbi-page .value-card::before {
-          content:''; position:absolute; inset:0;
-          background:linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
-          pointer-events:none;
-        }
-        .wbi-page .val-blue {
-          background:linear-gradient(135deg, var(--wbi-blue) 0%, var(--wbi-blue2) 100%);
-          box-shadow:0 8px 30px rgba(0,152,218,0.3);
-        }
-        .wbi-page .val-green {
-          background:linear-gradient(135deg, var(--wbi-green) 0%, var(--wbi-green2) 100%);
-          box-shadow:0 8px 30px rgba(12,115,71,0.3);
-        }
-        .wbi-page .val-orange {
-          background:linear-gradient(135deg, var(--wbi-orange2) 0%, var(--wbi-orange) 50%, var(--wbi-yellow) 100%);
-          box-shadow:0 8px 30px rgba(245,134,52,0.3);
-        }
-        .wbi-page .value-card .val-icon {
-          width:56px; height:56px; border-radius:50%; background:rgba(255,255,255,0.2);
-          display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem;
-          font-size:1.5rem; backdrop-filter:blur(10px);
-        }
-        .wbi-page .value-card h3 {
-          font-size:1.15rem; font-weight:700;
-          margin-bottom:0.75rem; position:relative;
-        }
-        .wbi-page .value-card p {
-          font-size:0.88rem; line-height:1.75; font-weight:300;
-          color:rgba(255,255,255,0.92); position:relative;
-        }
-
-        /* ═══════════ SOBRE NOSOTROS ═══════════ */
-        .wbi-page .about-section { background:var(--white); }
-        .wbi-page .about-logo { height:44px; width:auto; margin-bottom:1.5rem; }
-        .wbi-page .about-grid {
-          display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; margin-top:3rem;
-        }
-        @media(max-width:768px){ .wbi-page .about-grid { grid-template-columns:1fr; gap:2.5rem; } }
-        .wbi-page .about-text p {
-          color:var(--gray-600); font-size:0.95rem; line-height:1.85;
-          margin-bottom:1rem; font-weight:300;
-        }
-        .wbi-page .about-text p strong { color:var(--gray-800); font-weight:600; }
-        .wbi-page .about-text .manager-tag {
-          display:inline-flex; align-items:center; gap:10px;
-          padding:12px 18px;
-          background:linear-gradient(135deg, rgba(0,152,218,0.06), rgba(23,217,134,0.06));
-          border:1px solid rgba(0,152,218,0.1);
-          border-radius:14px; margin-top:0.75rem;
-        }
-        .wbi-page .manager-dot {
-          width:10px; height:10px; border-radius:50%;
-          background:linear-gradient(135deg, var(--wbi-green), var(--wbi-green2));
-          box-shadow:0 0 8px rgba(23,217,134,0.4);
-        }
-        .wbi-page .manager-name { font-size:0.88rem; font-weight:600; color:var(--gray-800); }
-        .wbi-page .manager-role { font-size:0.75rem; color:var(--gray-600); }
-        .wbi-page .stat-cards { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-        .wbi-page .stat-card {
-          padding:1.75rem; background:var(--white);
-          border:1px solid var(--gray-100); border-radius:18px;
-          text-align:center; transition:all .35s;
-          box-shadow:0 2px 15px rgba(0,0,0,0.03);
-        }
-        .wbi-page .stat-card:hover {
-          transform:translateY(-4px);
-          box-shadow:0 10px 30px rgba(0,152,218,0.1);
-          border-color:rgba(0,152,218,0.2);
-        }
-        .wbi-page .stat-card-num {
-          font-size:2.6rem; font-weight:800; line-height:1;
-          background:linear-gradient(135deg, var(--wbi-blue), var(--wbi-green2));
-          -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-          background-clip:text;
-        }
-        .wbi-page .stat-card-lbl {
-          font-size:0.72rem; color:var(--gray-600); text-transform:uppercase;
-          letter-spacing:1.5px; margin-top:6px; font-weight:500;
-        }
-        .wbi-page .presence { display:flex; flex-wrap:wrap; gap:0.6rem; margin-top:1.5rem; }
-        .wbi-page .presence-pill {
-          padding:7px 16px; border:1px solid var(--gray-100); border-radius:999px;
-          font-size:0.8rem; color:var(--gray-600); background:var(--white);
-          transition:all .25s; box-shadow:0 1px 5px rgba(0,0,0,0.03);
-        }
-        .wbi-page .presence-pill:hover {
-          border-color:var(--wbi-blue); color:var(--wbi-blue);
-          box-shadow:0 3px 12px rgba(0,152,218,0.1);
-        }
-
-        /* ═══════════ CTA ═══════════ */
-        .wbi-page .cta-section {
-          text-align:center; padding:120px 2rem;
-          background:linear-gradient(180deg, var(--off-white) 0%, var(--white) 100%);
-          position:relative; overflow:hidden;
-        }
-        .wbi-page .cta-section::before {
-          content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-          width:800px; height:800px; border-radius:50%;
-          background:radial-gradient(ellipse,
-            rgba(0,152,218,0.04) 0%,
-            rgba(23,217,134,0.03) 30%,
-            transparent 60%
-          );
-          pointer-events:none;
-        }
-        .wbi-page .cta-section h2 {
-          font-size:clamp(1.8rem,4vw,3rem);
-          font-weight:800; position:relative; color:var(--gray-800);
-        }
-        .wbi-page .cta-section h2 .gradient-text {
-          background:linear-gradient(135deg, var(--wbi-blue), var(--wbi-green2));
-          -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-          background-clip:text;
-        }
-        .wbi-page .cta-body {
-          color:var(--gray-600); max-width:520px; margin:1.2rem auto 2.5rem;
-          font-size:1rem; line-height:1.85; font-weight:300; position:relative;
-        }
-        .wbi-page .cta-actions { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; position:relative; }
-
-        /* ═══════════ FOOTER ═══════════ */
-        .wbi-page .wbi-footer {
-          padding:3.5rem 3rem 2.5rem;
-          background:linear-gradient(135deg, #F0F9FF 0%, #F0FFF4 50%, #FFFBEB 100%);
-          border-top:2px solid;
-          border-image:linear-gradient(90deg, var(--wbi-blue), var(--wbi-green2), var(--wbi-orange)) 1;
-          position:relative;
-        }
-        .wbi-page .footer-inner {
-          max-width:1140px; margin:0 auto;
-          display:grid; grid-template-columns:1.2fr 1fr 0.8fr; gap:2rem; align-items:start;
-        }
         @media(max-width:768px){
-          .wbi-page .footer-inner { grid-template-columns:1fr; text-align:center; }
-        }
-        .wbi-page .footer-logo { margin-bottom:0.75rem; }
-        .wbi-page .footer-logo img { height:36px; width:auto; }
-        .wbi-page .footer-tagline {
-          font-size:0.85rem; color:var(--gray-600); font-style:italic;
-          line-height:1.6; max-width:300px;
-        }
-        @media(max-width:768px){ .wbi-page .footer-tagline { max-width:100%; } }
-        .wbi-page .footer-flags {
-          display:flex; gap:0.5rem; margin-top:1rem; flex-wrap:wrap; font-size:1.3rem;
-        }
-        @media(max-width:768px){ .wbi-page .footer-flags { justify-content:center; } }
-        .wbi-page .footer-flag {
-          width:36px; height:36px; display:flex; align-items:center; justify-content:center;
-          background:var(--white); border-radius:10px; font-size:1.15rem;
-          box-shadow:0 1px 5px rgba(0,0,0,0.06); transition:transform .2s;
-        }
-        .wbi-page .footer-flag:hover { transform:scale(1.15); }
-        .wbi-page .footer-contact-title {
-          font-size:0.78rem; font-weight:700;
-          letter-spacing:2px; text-transform:uppercase; margin-bottom:0.75rem;
-          background:linear-gradient(135deg, var(--wbi-blue), var(--wbi-green2));
-          -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-          background-clip:text; display:inline-block;
-        }
-        .wbi-page .footer-contact a {
-          display:block; color:var(--gray-600); text-decoration:none;
-          font-size:0.88rem; margin-bottom:0.5rem; transition:color .2s; font-weight:400;
-        }
-        .wbi-page .footer-contact a:hover { color:var(--wbi-blue); }
-        .wbi-page .footer-legal {
-          text-align:right; font-size:0.75rem; color:var(--gray-600);
-          line-height:1.7; opacity:0.7;
-        }
-        @media(max-width:768px){ .wbi-page .footer-legal { text-align:center; } }
-        .wbi-page .footer-bottom {
-          max-width:1140px; margin:2rem auto 0; padding-top:1.5rem;
-          border-top:1px solid rgba(0,152,218,0.1);
-          text-align:center; font-size:0.78rem; color:var(--gray-600);
-          font-weight:300;
+          .wbi .hero-inner{grid-template-columns:1fr;text-align:center}
+          .wbi .hero-p{max-width:100%;margin-left:auto;margin-right:auto}
+          .wbi .hero-btns{justify-content:center}
         }
 
-        /* ═══════════ DIVIDER ═══════════ */
-        .wbi-page .divider-gradient {
-          height:2px; margin:0;
-          background:linear-gradient(90deg, transparent, var(--wbi-blue), var(--wbi-green2), var(--wbi-orange), transparent);
-          opacity:0.3;
-        }
+        /* ══ SERVICES ══ */
+        .wbi .svc-sec{padding:100px 2rem;background:var(--g50)}
+        .wbi .con{max-width:1140px;margin:0 auto}
+        .wbi .tag{font-size:.7rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--wbi-blue);margin-bottom:.5rem}
+        .wbi .ttl{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:800;line-height:1.2;color:var(--g800);margin-bottom:.5rem}
+        .wbi .ttl .hl{background:linear-gradient(135deg,var(--wbi-blue),var(--wbi-green2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .wbi .sub{color:var(--g500);font-size:.95rem;line-height:1.7;max-width:520px;font-weight:400}
+        .wbi .svc-head{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem;margin-bottom:3rem;flex-wrap:wrap}
 
-        /* ═══════════ SCROLL ANIMATION ═══════════ */
-        .wbi-page .fade-up { opacity:0; transform:translateY(30px); transition:opacity .8s ease, transform .8s ease; }
-        .wbi-page .fade-up.visible { opacity:1; transform:none; }
+        .wbi .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+        @media(max-width:960px){.wbi .svc-grid{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:600px){.wbi .svc-grid{grid-template-columns:1fr}}
 
-        /* ═══════════ RESPONSIVE ═══════════ */
-        @media(max-width:768px){
-          .wbi-page .wbi-nav { padding:0 1.5rem; height:64px; }
-          .wbi-page .nav-logo img { height:32px; }
-          .wbi-page .nav-links { display:none; }
-          .wbi-page .hero-stats { gap:1rem; }
-          .wbi-page .hero-stat { padding:0 1rem; }
-          .wbi-page .wbi-footer { padding:2.5rem 1.5rem 2rem; }
-          .wbi-page section { padding:80px 1.5rem; }
-        }
+        .wbi .svc{padding:2rem;background:#fff;border-radius:16px;border:1px solid var(--g100);transition:all .35s;position:relative;overflow:hidden}
+        .wbi .svc:hover{transform:translateY(-6px);box-shadow:0 16px 48px rgba(0,0,0,.06);border-color:transparent}
+        .wbi .svc-bar{position:absolute;top:0;left:0;right:0;height:3px}
+        .wbi .svc .svc-ico{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem}
+        .wbi .svc .svc-ico svg{width:24px;height:24px}
+        .wbi .svc h3{font-size:1rem;font-weight:700;margin-bottom:.6rem;color:var(--g800)}
+        .wbi .svc p{font-size:.875rem;color:var(--g500);line-height:1.7;font-weight:400}
+
+        /* Icon colors */
+        .wbi .ico-cyan{background:linear-gradient(135deg,#e6f7ff,#ccefff)} .wbi .ico-cyan svg{color:var(--wbi-blue)}
+        .wbi .ico-blue{background:linear-gradient(135deg,#e6f0ff,#cce0ff)} .wbi .ico-blue svg{color:#1a56a8}
+        .wbi .ico-orange{background:linear-gradient(135deg,#fff3e6,#ffe8cc)} .wbi .ico-orange svg{color:var(--wbi-orange)}
+        .wbi .ico-green{background:linear-gradient(135deg,#e6fff2,#ccffe6)} .wbi .ico-green svg{color:var(--wbi-green)}
+        .wbi .bar-cyan{background:linear-gradient(90deg,var(--wbi-blue),var(--wbi-cyan))}
+        .wbi .bar-blue{background:linear-gradient(90deg,#1a56a8,var(--wbi-blue))}
+        .wbi .bar-orange{background:linear-gradient(90deg,var(--wbi-orange),var(--wbi-yellow))}
+        .wbi .bar-green{background:linear-gradient(90deg,var(--wbi-green),var(--wbi-green2))}
+
+        /* ══ PROCESS ══ */
+        .wbi .proc-sec{padding:100px 2rem;background:#fff}
+        .wbi .proc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem}
+        @media(max-width:768px){.wbi .proc-grid{grid-template-columns:1fr}}
+        .wbi .proc{padding:2.5rem 2rem;border-radius:16px;position:relative;color:#fff;overflow:hidden}
+        .wbi .proc::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12),transparent 60%);pointer-events:none}
+        .wbi .proc-blue{background:linear-gradient(135deg,var(--wbi-blue),var(--wbi-blue2));box-shadow:0 8px 32px rgba(0,152,218,.25)}
+        .wbi .proc-green{background:linear-gradient(135deg,var(--wbi-green),var(--wbi-green2));box-shadow:0 8px 32px rgba(12,115,71,.25)}
+        .wbi .proc-orange{background:linear-gradient(135deg,var(--wbi-orange2),var(--wbi-orange));box-shadow:0 8px 32px rgba(245,134,52,.25)}
+        .wbi .proc:hover{transform:translateY(-4px)}
+        .wbi .proc{transition:transform .3s}
+        .wbi .proc-num{font-size:3.5rem;font-weight:800;opacity:.15;position:absolute;top:1rem;right:1.5rem;line-height:1}
+        .wbi .proc-ico{width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;backdrop-filter:blur(4px)}
+        .wbi .proc-ico svg{width:22px;height:22px;color:#fff}
+        .wbi .proc h3{font-size:1.1rem;font-weight:700;margin-bottom:.6rem;position:relative}
+        .wbi .proc p{font-size:.875rem;line-height:1.7;color:rgba(255,255,255,.88);font-weight:400;position:relative}
+
+        /* ══ ABOUT ══ */
+        .wbi .about-sec{padding:100px 2rem;background:var(--g50)}
+        .wbi .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;margin-top:2.5rem}
+        @media(max-width:768px){.wbi .about-grid{grid-template-columns:1fr;gap:2.5rem}}
+        .wbi .about-text p{color:var(--g600);font-size:.95rem;line-height:1.8;margin-bottom:1rem;font-weight:400}
+        .wbi .about-text p strong{color:var(--g800);font-weight:700}
+        .wbi .mgr{display:inline-flex;align-items:center;gap:12px;padding:12px 18px;background:#fff;border:1px solid var(--g100);border-radius:12px;margin-top:.5rem;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+        .wbi .mgr-dot{width:10px;height:10px;border-radius:50%;background:var(--wbi-green2);box-shadow:0 0 0 3px rgba(23,217,134,.2)}
+        .wbi .mgr-name{font-size:.88rem;font-weight:700;color:var(--g800)}
+        .wbi .mgr-role{font-size:.75rem;color:var(--g500);font-weight:500}
+        .wbi .flags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.5rem}
+        .wbi .flag{display:flex;align-items:center;gap:6px;padding:6px 14px;background:#fff;border:1px solid var(--g100);border-radius:8px;font-size:.8rem;color:var(--g600);font-weight:500;transition:all .2s;box-shadow:0 1px 4px rgba(0,0,0,.02)}
+        .wbi .flag:hover{border-color:var(--wbi-blue);color:var(--wbi-blue);transform:translateY(-1px)}
+
+        /* About right — big stats */
+        .wbi .about-right{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+        .wbi .a-stat{padding:2rem;background:#fff;border-radius:16px;text-align:center;border:1px solid var(--g100);transition:all .3s;box-shadow:0 2px 8px rgba(0,0,0,.02)}
+        .wbi .a-stat:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.05);border-color:var(--wbi-blue)}
+        .wbi .a-stat-num{font-size:2.6rem;font-weight:800;color:var(--wbi-blue);line-height:1}
+        .wbi .a-stat:nth-child(2) .a-stat-num{color:var(--wbi-green)}
+        .wbi .a-stat:nth-child(3) .a-stat-num{color:var(--wbi-orange)}
+        .wbi .a-stat:nth-child(4) .a-stat-num{color:var(--wbi-cyan)}
+        .wbi .a-stat-lbl{font-size:.7rem;color:var(--g500);text-transform:uppercase;letter-spacing:1.5px;margin-top:6px;font-weight:600}
+
+        /* ══ CTA ══ */
+        .wbi .cta-sec{padding:100px 2rem;background:#fff;text-align:center;position:relative;overflow:hidden}
+        .wbi .cta-sec::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,152,218,.03),rgba(23,217,134,.02),rgba(245,134,52,.02));pointer-events:none}
+        .wbi .cta-inner{position:relative;max-width:640px;margin:0 auto}
+        .wbi .cta-inner .ttl{margin-bottom:.75rem}
+        .wbi .cta-p{color:var(--g500);font-size:1rem;line-height:1.8;margin-bottom:2rem;font-weight:400}
+        .wbi .cta-btns{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+
+        /* ══ FOOTER ══ */
+        .wbi .foot{padding:3rem clamp(1.5rem,4vw,3rem) 2rem;background:var(--g50);border-top:1px solid var(--g100)}
+        .wbi .foot-inner{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:1.3fr 1fr .8fr;gap:2rem;align-items:start}
+        @media(max-width:768px){.wbi .foot-inner{grid-template-columns:1fr;text-align:center}}
+        .wbi .foot-logo img{height:32px;width:auto;margin-bottom:.75rem}
+        .wbi .foot-tag{font-size:.82rem;color:var(--g500);font-style:italic;line-height:1.6;max-width:280px}
+        @media(max-width:768px){.wbi .foot-tag{max-width:100%}}
+        .wbi .foot-flags{display:flex;gap:6px;margin-top:1rem;flex-wrap:wrap;font-size:1.1rem}
+        @media(max-width:768px){.wbi .foot-flags{justify-content:center}}
+        .wbi .foot-ct-title{font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--wbi-blue);margin-bottom:.75rem}
+        .wbi .foot-ct a{display:block;color:var(--g600);text-decoration:none;font-size:.875rem;margin-bottom:.4rem;transition:color .2s;font-weight:400}
+        .wbi .foot-ct a:hover{color:var(--wbi-blue)}
+        .wbi .foot-legal{text-align:right;font-size:.75rem;color:var(--g500);line-height:1.7}
+        @media(max-width:768px){.wbi .foot-legal{text-align:center}}
+        .wbi .foot-bar{max-width:1140px;margin:2rem auto 0;padding-top:1.25rem;border-top:1px solid var(--g100);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+        .wbi .foot-bar-text{font-size:.75rem;color:var(--g500);font-weight:400}
+        .wbi .foot-bar-line{height:2px;flex:1;max-width:200px;margin:0 1rem;background:linear-gradient(90deg,var(--wbi-blue),var(--wbi-green2),var(--wbi-orange));border-radius:2px;opacity:.3}
+        @media(max-width:768px){.wbi .foot-bar{justify-content:center;text-align:center}.wbi .foot-bar-line{display:none}}
+
+        /* ══ ANIM ══ */
+        .wbi .fu{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+        .wbi .fu.visible{opacity:1;transform:none}
+        @media(max-width:768px){.wbi .nav-r{display:none}}
       `}} />
 
-      <div className="wbi-page">
-        {/* NAVBAR */}
-        <nav className="wbi-nav">
-          <div className="nav-logo">
-            <img src="/wbi-logo-black.png" alt="WE BUILD IT" />
-          </div>
-          <div className="nav-links">
-            <a href="#servicios" className="nav-link">Servicios</a>
-            <a href="#nosotros" className="nav-link">Nosotros</a>
+      <div className="wbi">
+        {/* NAV */}
+        <nav className="nav">
+          <div className="nav-logo"><img src="/wbi-logo-black.png" alt="WE BUILD IT" /></div>
+          <div className="nav-r">
+            <a href="#servicios" className="nav-a">Servicios</a>
+            <a href="#proceso" className="nav-a">Proceso</a>
+            <a href="#nosotros" className="nav-a">Nosotros</a>
             <a href="mailto:squiroz@wbinnova.com" className="nav-cta">Contáctanos</a>
           </div>
         </nav>
 
         {/* HERO */}
         <section className="hero">
-          <div className="hero-orb orb-blue"></div>
-          <div className="hero-orb orb-green"></div>
-          <div className="hero-orb orb-orange"></div>
-          <div className="hero-shapes">
-            <div className="shape shape-1"></div>
-            <div className="shape shape-2"></div>
-            <div className="shape shape-3"></div>
-            <div className="shape shape-4"></div>
-            <div className="shape shape-5"></div>
-          </div>
-          <div className="hero-content fade-up">
-            <img src="/wbi-logo-black.png" alt="WE BUILD IT" className="hero-logo" />
-            <div className="hero-badge">
-              <span className="hero-badge-dot"></span>
-              <span className="badge-text">MARKETING SERVICES</span>
+          <div className="hero-bg"></div>
+          <div className="hero-inner">
+            <div className="hero-text fu">
+              <div className="hero-label"><span></span> MARKETING SERVICES</div>
+              <h1>The life of a brand must be found in <span className="hl">all spaces.</span></h1>
+              <p className="hero-p">{"Conectamos marcas con su audiencia ideal a través de estrategia digital, diseño de experiencia y tecnología de automatización."}</p>
+              <div className="hero-btns">
+                <a href="mailto:squiroz@wbinnova.com" className="btn-fill">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  Escríbenos
+                </a>
+                <a href="https://webuildit.tech" target="_blank" rel="noopener noreferrer" className="btn-ghost">webuildit.tech →</a>
+              </div>
             </div>
-            <h1>The life of a brand<br />must be found in<br /><span className="gradient-text">all spaces.</span></h1>
-            <p className="hero-sub">
-              {"Conectamos marcas con su audiencia ideal a través de estrategia digital, diseño de experiencia y tecnología de automatización. Si lo puedes imaginar, WE can BUILD IT."}
-            </p>
-            <div className="hero-actions">
-              <a href="mailto:squiroz@wbinnova.com" className="btn-gradient">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                Escríbenos
-              </a>
-              <a href="https://webuildit.tech" target="_blank" rel="noopener noreferrer" className="btn-soft">webuildit.tech →</a>
-            </div>
-            <div className="hero-stats">
-              <div className="hero-stat">
-                <div className="hero-stat-num">7+</div>
-                <div className="hero-stat-lbl">Países</div>
-              </div>
-              <div className="hero-stat">
-                <div className="hero-stat-num">6+</div>
-                <div className="hero-stat-lbl">Años</div>
-              </div>
-              <div className="hero-stat">
-                <div className="hero-stat-num">20+</div>
-                <div className="hero-stat-lbl">Proyectos</div>
-              </div>
-              <div className="hero-stat">
-                <div className="hero-stat-num">100%</div>
-                <div className="hero-stat-lbl">Código entregado</div>
-              </div>
+            <div className="hero-visual fu">
+              <div className="hero-card hc-1"><div className="hc-num">7+</div><div className="hc-lbl">Países</div></div>
+              <div className="hero-card hc-2"><div className="hc-num">6+</div><div className="hc-lbl">Años</div></div>
+              <div className="hero-card hc-3"><div className="hc-num">20+</div><div className="hc-lbl">Proyectos</div></div>
+              <div className="hero-card hc-4"><div className="hc-num">100%</div><div className="hc-lbl">Código entregado</div></div>
             </div>
           </div>
         </section>
-
-        <div className="divider-gradient"></div>
 
         {/* SERVICIOS */}
-        <section className="services-section" id="servicios">
-          <div className="container">
-            <div className="fade-up">
-              <div className="section-tag">Marketing Services</div>
-              <h2 className="section-title">Soluciones que <span className="gradient-text">posicionan</span><br />y hacen crecer tu marca.</h2>
-              <p className="section-sub">{"Cada servicio está diseñado para impulsar tu presencia digital de forma estratégica, medible y con resultados reales."}</p>
+        <section className="svc-sec" id="servicios">
+          <div className="con">
+            <div className="svc-head fu">
+              <div>
+                <div className="tag">Marketing Services</div>
+                <h2 className="ttl">Soluciones que <span className="hl">posicionan</span> tu marca.</h2>
+              </div>
+              <p className="sub">{"Cada servicio impulsa tu presencia digital de forma estratégica, medible y con resultados reales."}</p>
             </div>
-            <div className="services-grid">
+            <div className="svc-grid">
 
-              <div className="service-card svc-card-cyan fade-up">
-                <div className="astro-icon astro-cyan">
-                  <div className="helmet"><div className="visor"></div></div>
+              <div className="svc fu">
+                <div className="svc-bar bar-cyan"></div>
+                <div className="svc-ico ico-cyan">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M2 20h20"/><path d="M5 20V8l7-5 7 5v12"/><rect x="9" y="12" width="6" height="8"/></svg>
                 </div>
-                <div className="svc-title"><span className="accent accent-cyan">BRAND</span> Solutions</div>
-                <p className="svc-desc">{"Conecta, Destaca y Perdura. Identidad digital, voz de marca, impacto visual. Construimos marcas que resuenan con su audiencia y generan confianza desde el primer contacto."}</p>
+                <h3>BRAND Solutions</h3>
+                <p>{"Conecta, Destaca y Perdura. Identidad digital, voz de marca e impacto visual que genera confianza desde el primer contacto."}</p>
               </div>
 
-              <div className="service-card svc-card-blue fade-up">
-                <div className="astro-icon astro-blue">
-                  <div className="helmet"><div className="visor"></div></div>
+              <div className="svc fu">
+                <div className="svc-bar bar-blue"></div>
+                <div className="svc-ico ico-blue">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                 </div>
-                <div className="svc-title"><span className="accent accent-blue">UX/UI</span> Design Solutions</div>
-                <p className="svc-desc">{"Reunión inicial, research, prototipos, entrega de diseños finales. Tratamos el diseño como estrategia core para maximizar el ROI de tu inversión digital."}</p>
+                <h3>UX/UI Design Solutions</h3>
+                <p>{"Research, prototipos y diseños finales. Tratamos el diseño como estrategia core para maximizar el ROI de tu inversión digital."}</p>
               </div>
 
-              <div className="service-card svc-card-orange fade-up">
-                <div className="astro-icon astro-orange">
-                  <div className="helmet"><div className="visor"></div></div>
+              <div className="svc fu">
+                <div className="svc-bar bar-orange"></div>
+                <div className="svc-ico ico-orange">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                 </div>
-                <div className="svc-title"><span className="accent accent-orange">WEB</span> Solutions</div>
-                <p className="svc-desc">{"Genera confianza e impulsa el crecimiento. Sitios web optimizados para rendimiento, experiencia de usuario y conversión que trabajan 24/7 para tu negocio."}</p>
+                <h3>WEB Solutions</h3>
+                <p>{"Sitios web optimizados para rendimiento, experiencia de usuario y conversión que trabajan 24/7 para tu negocio."}</p>
               </div>
 
-              <div className="service-card svc-card-cyan fade-up">
-                <div className="astro-icon astro-cyan">
-                  <div className="helmet"><div className="visor"></div></div>
+              <div className="svc fu">
+                <div className="svc-bar bar-cyan"></div>
+                <div className="svc-ico ico-cyan">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                 </div>
-                <div className="svc-title"><span className="accent accent-cyan">CONTENT</span> Solutions</div>
-                <p className="svc-desc">{"Comunica tu valor. Blogs, páginas web, contenido publicitario. Creamos narrativas que conectan con tu audiencia y fortalecen tu posicionamiento de marca."}</p>
+                <h3>CONTENT Solutions</h3>
+                <p>{"Comunica tu valor. Blogs, contenido publicitario y narrativas que conectan con tu audiencia y fortalecen tu posicionamiento."}</p>
               </div>
 
-              <div className="service-card svc-card-green fade-up">
-                <div className="astro-icon astro-green">
-                  <div className="helmet"><div className="visor"></div></div>
+              <div className="svc fu">
+                <div className="svc-bar bar-green"></div>
+                <div className="svc-ico ico-green">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                 </div>
-                <div className="svc-title"><span className="accent accent-green">SEO/SEM</span> Solutions</div>
-                <p className="svc-desc">{"Posiciónate de forma orgánica, sostenible y estratégica. Auditoría técnica, keyword research, campañas SEM y optimización continua para dominar los resultados de búsqueda."}</p>
+                <h3>SEO/SEM Solutions</h3>
+                <p>{"Posiciónate de forma orgánica y estratégica. Auditoría técnica, keyword research y campañas SEM de alto rendimiento."}</p>
               </div>
 
-              <div className="service-card svc-card-orange fade-up">
-                <div className="astro-icon astro-orange">
-                  <div className="helmet"><div className="visor"></div></div>
+              <div className="svc fu">
+                <div className="svc-bar bar-orange"></div>
+                <div className="svc-ico ico-orange">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
                 </div>
-                <div className="svc-title"><span className="accent accent-orange">MKT</span> Automation</div>
-                <p className="svc-desc">{"Eficiencia, innovación y crecimiento con IA. Automatizamos flujos de marketing, email nurturing, lead scoring y reportería para escalar sin multiplicar esfuerzo."}</p>
+                <h3>MKT Automation</h3>
+                <p>{"Eficiencia e innovación con IA. Email nurturing, lead scoring y reportería automatizada para escalar sin multiplicar esfuerzo."}</p>
               </div>
 
             </div>
           </div>
         </section>
 
-        {/* PROPUESTA DE VALOR */}
-        <section className="value-section">
-          <div className="container">
-            <div className="fade-up" style={{ textAlign: 'center', marginBottom: '1rem' }}>
-              <div className="section-tag">Nuestro proceso</div>
-              <h2 className="section-title">Así <span className="gradient-text">trabajamos</span> contigo.</h2>
-              <p className="section-sub" style={{ margin: '1rem auto 0' }}>{"Un flujo ágil, transparente y orientado a resultados. Sin sorpresas, con entregas constantes."}</p>
+        {/* PROCESO */}
+        <section className="proc-sec" id="proceso">
+          <div className="con">
+            <div className="fu" style={{ textAlign: 'center', marginBottom: '1rem' }}>
+              <div className="tag">Nuestro proceso</div>
+              <h2 className="ttl">Así <span className="hl">trabajamos</span> contigo.</h2>
+              <p className="sub" style={{ margin: '.75rem auto 0' }}>{"Flujo ágil, transparente y orientado a resultados."}</p>
             </div>
-            <div className="value-grid fade-up">
-              <div className="value-card val-blue">
-                <div className="val-icon">{"📋"}</div>
+            <div className="proc-grid fu">
+
+              <div className="proc proc-blue">
+                <div className="proc-num">01</div>
+                <div className="proc-ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
                 <h3>Reuniones Semanales</h3>
-                <p>{"Status meetings, revisión de mockups, retroalimentación ágil. Comunicación constante para mantener el proyecto en la dirección correcta."}</p>
+                <p>{"Status meetings, revisión de mockups y retroalimentación ágil. Comunicación constante para mantener el proyecto en la dirección correcta."}</p>
               </div>
-              <div className="value-card val-green">
-                <div className="val-icon">{"✅"}</div>
-                <h3>Propuestas</h3>
-                <p>{"Vistas aprobadas, flujo semanal de avances. Cada propuesta pasa por tu revisión antes de continuar — sin sorpresas, sin retrabajos."}</p>
+
+              <div className="proc proc-green">
+                <div className="proc-num">02</div>
+                <div className="proc-ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                </div>
+                <h3>Propuestas Aprobadas</h3>
+                <p>{"Flujo semanal de avances. Cada propuesta pasa por tu revisión antes de continuar — sin sorpresas, sin retrabajos."}</p>
               </div>
-              <div className="value-card val-orange">
-                <div className="val-icon">{"📦"}</div>
-                <h3>Entregables</h3>
-                <p>{"Mockups finales, assets listos para producción, documentación completa. Todo lo que necesitas para lanzar, en tiempo y forma."}</p>
+
+              <div className="proc proc-orange">
+                <div className="proc-num">03</div>
+                <div className="proc-ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                </div>
+                <h3>Entregables Finales</h3>
+                <p>{"Mockups finales, assets listos para producción y documentación completa. Todo lo que necesitas para lanzar."}</p>
               </div>
+
             </div>
           </div>
         </section>
 
-        <div className="divider-gradient"></div>
-
-        {/* SOBRE NOSOTROS */}
-        <section className="about-section" id="nosotros">
-          <div className="container fade-up">
-            <img src="/wbi-logo-black.png" alt="WE BUILD IT" className="about-logo" />
-            <div className="section-tag">{"¿Quiénes somos?"}</div>
-            <h2 className="section-title">{"¿Por qué "}<span className="gradient-text">WE BUILD IT?</span></h2>
+        {/* ABOUT */}
+        <section className="about-sec" id="nosotros">
+          <div className="con">
+            <div className="fu">
+              <div className="tag">{"¿Quiénes somos?"}</div>
+              <h2 className="ttl">{"¿Por qué "}<span className="hl">WE BUILD IT?</span></h2>
+            </div>
             <div className="about-grid">
-              <div className="about-text">
-                <p>En <strong>WE BUILD IT</strong> somos el socio tecnológico y de marketing que tu empresa necesita. Nacimos como un grupo de especialistas en tecnología, diseño y estrategia digital, con la misión de transformar ideas de negocio en soluciones digitales que funcionan: escalables, bien construidas y con resultados medibles.</p>
-                <p>Nuestra operación latinoamericana está liderada desde <strong>WBInnova México (Mérida, Yucatán)</strong>, bajo la dirección de <strong>Samuel Quiroz Herrera</strong>, quien encabeza un equipo multidisciplinario de ingenieros, consultores, diseñadores UX/UI y especialistas en marketing digital.</p>
-                <div className="manager-tag">
-                  <span className="manager-dot"></span>
+              <div className="about-text fu">
+                <p>En <strong>WE BUILD IT</strong> somos el socio tecnológico y de marketing que tu empresa necesita. Transformamos ideas de negocio en soluciones digitales escalables, bien construidas y con resultados medibles.</p>
+                <p>Nuestra operación latinoamericana está liderada desde <strong>WBInnova México (Mérida, Yucatán)</strong>, bajo la dirección de <strong>Samuel Quiroz Herrera</strong>, con un equipo multidisciplinario de ingenieros, diseñadores UX/UI y especialistas en marketing digital.</p>
+                <div className="mgr">
+                  <span className="mgr-dot"></span>
                   <div>
-                    <div className="manager-name">Samuel Quiroz Herrera</div>
-                    <div className="manager-role">Country Manager — WBI México</div>
+                    <div className="mgr-name">Samuel Quiroz Herrera</div>
+                    <div className="mgr-role">Country Manager — WBI México</div>
                   </div>
                 </div>
-                <div className="presence">
-                  <span className="presence-pill">{"🇺🇸 Miami"}</span>
-                  <span className="presence-pill">{"🇲🇽 Mérida"}</span>
-                  <span className="presence-pill">{"🇨🇴 Bogotá"}</span>
-                  <span className="presence-pill">{"🇪🇸 Madrid"}</span>
-                  <span className="presence-pill">{"🇻🇪 Venezuela"}</span>
-                  <span className="presence-pill">{"🇵🇦 Panamá"}</span>
-                  <span className="presence-pill">{"🇵🇪 Perú"}</span>
+                <div className="flags">
+                  <span className="flag">{"🇺🇸 Miami"}</span>
+                  <span className="flag">{"🇲🇽 Mérida"}</span>
+                  <span className="flag">{"🇨🇴 Bogotá"}</span>
+                  <span className="flag">{"🇪🇸 Madrid"}</span>
+                  <span className="flag">{"🇻🇪 Venezuela"}</span>
+                  <span className="flag">{"🇵🇦 Panamá"}</span>
+                  <span className="flag">{"🇵🇪 Perú"}</span>
                 </div>
               </div>
-              <div className="stat-cards">
-                <div className="stat-card"><div className="stat-card-num">7+</div><div className="stat-card-lbl">Países activos</div></div>
-                <div className="stat-card"><div className="stat-card-num">6+</div><div className="stat-card-lbl">Años de exp.</div></div>
-                <div className="stat-card"><div className="stat-card-num">20+</div><div className="stat-card-lbl">Proyectos</div></div>
-                <div className="stat-card"><div className="stat-card-num">100%</div><div className="stat-card-lbl">Código entregado</div></div>
+              <div className="about-right fu">
+                <div className="a-stat"><div className="a-stat-num">7+</div><div className="a-stat-lbl">Países activos</div></div>
+                <div className="a-stat"><div className="a-stat-num">6+</div><div className="a-stat-lbl">Años de exp.</div></div>
+                <div className="a-stat"><div className="a-stat-num">20+</div><div className="a-stat-lbl">Proyectos</div></div>
+                <div className="a-stat"><div className="a-stat-num">100%</div><div className="a-stat-lbl">Código entregado</div></div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* CTA FINAL */}
-        <section className="cta-section">
-          <div className="container fade-up">
-            <div className="section-tag">{"¿Listo para construir?"}</div>
-            <h2>{"¿Listo para construir algo "}<span className="gradient-text">extraordinario?</span></h2>
-            <p className="cta-body">{"Si tienes una idea, un reto de marca o simplemente quieres saber qué podemos hacer por ti, escríbenos. Respondemos rápido y sin compromisos."}</p>
-            <div className="cta-actions">
-              <a href="mailto:squiroz@wbinnova.com" className="btn-gradient">
+        {/* CTA */}
+        <section className="cta-sec">
+          <div className="cta-inner fu">
+            <div className="tag">{"¿Listo para construir?"}</div>
+            <h2 className="ttl">{"Construyamos algo "}<span className="hl">extraordinario.</span></h2>
+            <p className="cta-p">{"¿Tienes una idea o un reto de marca? Escríbenos. Respondemos rápido y sin compromisos."}</p>
+            <div className="cta-btns">
+              <a href="mailto:squiroz@wbinnova.com" className="btn-fill">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                 squiroz@wbinnova.com
               </a>
-              <a href="https://webuildit.tech" target="_blank" rel="noopener noreferrer" className="btn-soft">webuildit.tech →</a>
+              <a href="https://webuildit.tech" target="_blank" rel="noopener noreferrer" className="btn-ghost">webuildit.tech →</a>
             </div>
           </div>
         </section>
 
         {/* FOOTER */}
-        <footer className="wbi-footer">
-          <div className="footer-inner">
-            <div className="footer-brand">
-              <div className="footer-logo">
-                <img src="/wbi-logo-black.png" alt="WE BUILD IT" />
-              </div>
-              <div className="footer-tagline">{"\"El futuro de su negocio empieza con la tecnología correcta\""}</div>
-              <div className="footer-flags">
-                <span className="footer-flag">{"🇺🇸"}</span>
-                <span className="footer-flag">{"🇲🇽"}</span>
-                <span className="footer-flag">{"🇨🇴"}</span>
-                <span className="footer-flag">{"🇪🇸"}</span>
-                <span className="footer-flag">{"🇻🇪"}</span>
-                <span className="footer-flag">{"🇵🇦"}</span>
-                <span className="footer-flag">{"🇵🇪"}</span>
+        <footer className="foot">
+          <div className="foot-inner">
+            <div>
+              <div className="foot-logo"><img src="/wbi-logo-black.png" alt="WE BUILD IT" /></div>
+              <div className="foot-tag">{"\"El futuro de su negocio empieza con la tecnología correcta\""}</div>
+              <div className="foot-flags">
+                <span>{"🇺🇸"}</span><span>{"🇲🇽"}</span><span>{"🇨🇴"}</span><span>{"🇪🇸"}</span><span>{"🇻🇪"}</span><span>{"🇵🇦"}</span><span>{"🇵🇪"}</span>
               </div>
             </div>
-            <div className="footer-contact">
-              <div className="footer-contact-title">Contacto</div>
+            <div className="foot-ct">
+              <div className="foot-ct-title">Contacto</div>
               <a href="mailto:squiroz@wbinnova.com">squiroz@wbinnova.com</a>
               <a href="mailto:info@webuildit.tech">info@webuildit.tech</a>
               <a href="https://webuildit.tech" target="_blank" rel="noopener noreferrer">webuildit.tech</a>
             </div>
-            <div className="footer-legal">
+            <div className="foot-legal">
               {"© 2026 WBInnova México SA de CV"}<br />
               {"RFC: WME231122U13"}<br />
               {"Mérida, Yucatán, México"}
             </div>
           </div>
-          <div className="footer-bottom">
-            {"Designed with ♥ by WBI · The life of a brand must be found in all spaces."}
+          <div className="foot-bar">
+            <span className="foot-bar-text">WE BUILD IT</span>
+            <span className="foot-bar-line"></span>
+            <span className="foot-bar-text">The life of a brand must be found in all spaces.</span>
           </div>
         </footer>
 
