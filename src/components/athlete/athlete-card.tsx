@@ -429,6 +429,20 @@ export function AtletaCard({
           )}
         </div>
 
+        {/* Recap CTA — super prominent */}
+        {scores.length > 0 && !isJudge && (
+          <div className="mt-6">
+            <Link
+              href={`/atleta/${athlete.id}/recap`}
+              className="group relative block w-full overflow-hidden rounded-xl bg-gradient-to-r from-orange-600 via-red-500 to-orange-600 p-[2px] shadow-[0_0_20px_rgba(234,88,12,0.4)] hover:shadow-[0_0_30px_rgba(234,88,12,0.6)] transition-shadow animate-pulse"
+            >
+              <span className="flex items-center justify-center gap-2 rounded-[10px] bg-gray-950 px-6 py-4 text-lg font-black tracking-widest text-white group-hover:bg-gray-900 transition-colors">
+                🔥 VER MI RECAP DEL OPEN 🔥
+              </span>
+            </Link>
+          </div>
+        )}
+
         {/* Event branding */}
         <div className="mt-8 text-center">
           <Image src="/logo-80.png" alt="GRIZZLYS" width={40} height={40} className="mx-auto rounded opacity-50" />

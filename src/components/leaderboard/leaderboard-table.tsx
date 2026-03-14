@@ -246,6 +246,17 @@ export function LeaderboardTable({ entries, wods, coachAthleteIds = [], isStaffD
                       </div>
                     )
                   })}
+                  {/* Recap button */}
+                  {!isStaffDivision && entry.wod_results && entry.wod_results.length > 0 && (
+                    <Link
+                      href={`/atleta/${entry.id}/recap`}
+                      className="flex-shrink-0 self-center ml-auto animate-pulse"
+                    >
+                      <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-orange-600 to-orange-500 px-3 py-1.5 text-[11px] font-bold tracking-wider text-white shadow-[0_0_12px_rgba(234,88,12,0.4)] hover:shadow-[0_0_20px_rgba(234,88,12,0.6)] transition-shadow">
+                        🔥 RECAP
+                      </span>
+                    </Link>
+                  )}
                 </div>
               )}
             </div>
@@ -267,6 +278,7 @@ export function LeaderboardTable({ entries, wods, coachAthleteIds = [], isStaffD
                   {wod.name}
                 </TableHead>
               ))}
+              {!isStaffDivision && <TableHead className="text-center text-gray-300 w-20">🔥</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -345,6 +357,20 @@ export function LeaderboardTable({ entries, wods, coachAthleteIds = [], isStaffD
                       </TableCell>
                     )
                   })}
+                  {!isStaffDivision && (
+                    <TableCell className="text-center">
+                      {entry.wod_results && entry.wod_results.length > 0 ? (
+                        <Link
+                          href={`/atleta/${entry.id}/recap`}
+                          className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-orange-600 to-orange-500 px-3 py-1.5 text-[11px] font-bold tracking-wider text-white shadow-[0_0_10px_rgba(234,88,12,0.3)] hover:shadow-[0_0_18px_rgba(234,88,12,0.5)] transition-all hover:scale-105"
+                        >
+                          🔥 RECAP
+                        </Link>
+                      ) : (
+                        <span className="text-gray-700">—</span>
+                      )}
+                    </TableCell>
+                  )}
                 </TableRow>
               )
             })}
