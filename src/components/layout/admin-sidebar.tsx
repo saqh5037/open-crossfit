@@ -19,6 +19,7 @@ import {
   Menu,
   X,
   FileText,
+  MousePointerClick,
 } from "lucide-react"
 import { SignOutButton } from "./sign-out-button"
 import { Button } from "@/components/ui/button"
@@ -41,6 +42,7 @@ const navItems = [
   { href: "/admin/athletes", label: "Atletas", shortLabel: "Atletas", icon: Users, roles: ["owner", "admin", "coach"], quickNav: true },
   { href: "/admin/wods", label: "WODs", shortLabel: "WODs", icon: Dumbbell, roles: ["owner", "admin", "coach"], quickNav: false },
   { href: "/admin/emails", label: "Emails", shortLabel: "Emails", icon: Mail, roles: ["owner", "admin"], quickNav: false },
+  { href: "/admin/wbi-clicks", label: "WBI Clicks", shortLabel: "WBI", icon: MousePointerClick, roles: ["owner", "admin"], quickNav: false },
   { href: "/admin/settings", label: "Configuración", shortLabel: "Config", icon: Settings, roles: ["owner"], quickNav: false },
   { href: "/admin/users", label: "Usuarios Admin", shortLabel: "Usuarios", icon: Shield, roles: ["owner"], quickNav: false },
 ]

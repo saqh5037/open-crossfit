@@ -83,6 +83,7 @@ model Athlete {
   created_at DateTime @default(now())
   scores     Score[]
   admin_user AdminUser?
+  wbi_clicks WbiBadgeClick[]
 
   @@index([division])
   @@index([gender])
@@ -164,4 +165,20 @@ model AdminUser {
   athlete Athlete? @relation(fields: [athlete_id], references: [id])
 
   @@map("admin_users")
+}
+
+// ── WBI Badge Clicks ─────────────────────────────
+
+model WbiBadgeClick {
+  id          String   @id @default(cuid())
+  athlete_id  String?
+  source_page String   @default("recap")
+  user_agent  String?
+  created_at  DateTime @default(now())
+
+  athlete Athlete? @relation(fields: [athlete_id], references: [id], onDelete: Cascade)
+
+  @@index([athlete_id])
+  @@index([created_at])
+  @@map("wbi_badge_clicks")
 }

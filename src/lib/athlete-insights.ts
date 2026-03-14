@@ -337,8 +337,17 @@ function detectPattern(wodResults: WodResult[], overallRank: number): Pattern {
 
 // ==================== GREETING GENERATOR ====================
 
-function generateGreeting(firstName: string, pattern: Pattern): string {
+function generateGreeting(firstName: string, pattern: Pattern, athleteIndex: number): string {
   const name = firstName.split(" ")[0] // Use first name only
+
+  const warriorGreetings = [
+    `${name}, 3 WODs, 3 semanas, cero excusas.`,
+    `${name}, no faltaste ni un solo Open.`,
+    `${name}, te la rifaste las 3 semanas.`,
+    `${name}, estuviste ahí y diste todo.`,
+    `${name}, el Open 2026 lleva tu nombre.`,
+  ]
+
   switch (pattern) {
     case "top":
       return `${name}, este Open fue TUYO.`
@@ -351,7 +360,7 @@ function generateGreeting(firstName: string, pattern: Pattern): string {
     case "consistent":
       return `${name}, la constancia es tu superpoder.`
     case "warrior":
-      return `${name}, estuviste ahí y diste todo.`
+      return warriorGreetings[athleteIndex % warriorGreetings.length]
     case "newcomer":
       return `${name}, ya diste el primer paso.`
   }
@@ -368,7 +377,8 @@ function generateStoryBullets(
   pattern: Pattern,
   gender: "M" | "F",
   isRx: boolean,
-  bestWod: WodResult | null
+  bestWod: WodResult | null,
+  athleteIndex: number
 ): string[] {
   const bullets: string[] = []
   const sorted = [...wodResults].sort((a, b) => a.displayOrder - b.displayOrder)
@@ -378,7 +388,7 @@ function generateStoryBullets(
     case "top": {
       if (bestWod) {
         bullets.push(
-          `En el ${bestWod.wodName} quedaste <strong>#${bestWod.rank} de ${bestWod.totalInDivision}</strong> en tu división. ${bestWod.rank === 1 ? "Primer lugar. Así de simple." : bestWod.rank <= 3 ? "Podio. Te lo ganaste." : "Top performers."}`
+          `En el ${bestWod.wodName} quedaste <strong>#${bestWod.rank} de ${bestWod.totalInDivision}</strong> en tu división. ${bestWod.rank === 1 ? "Primer lugar. Así de simple." : bestWod.rank <= 3 ? "Podio. Te lo ganaste." : "De los mejores de tu categoría."}`
         )
       }
       break
@@ -389,7 +399,7 @@ function generateStoryBullets(
       const improvement = first.rank - last.rank
       if (improvement > 0) {
         bullets.push(
-          `Del ${first.wodName} al ${last.wodName} subiste <strong>${improvement} posiciones</strong> en tu división. Eso no es suerte, es trabajo.`
+          `Del ${first.wodName} al ${last.wodName} subiste <strong>${improvement} posiciones</strong> en tu división. Semana a semana, más fuerte.`
         )
       }
       break
@@ -425,26 +435,39 @@ function generateStoryBullets(
     }
   }
 
-  // Bullet 2: Volume / Physical achievement
+  // Bullet 2: Volume — variamos la comparación
   if (totalReps > 0) {
-    bullets.push(
-      `En total moviste <strong>${totalReps} repeticiones</strong> en el Open. Eso es más ejercicio del que el 60% de los mexicanos hace en un mes.`
-    )
+    const volumeVariants = [
+      `En total moviste <strong>${totalReps} repeticiones</strong> en el Open. Eso es más de lo que la mayoría hace en un mes entero.`,
+      `Moviste tu cuerpo <strong>${totalReps} veces</strong> en 3 semanas. Eso es disciplina.`,
+      `<strong>${totalReps} reps</strong> en el Open. Si cada rep fuera un paso, habrías caminado <strong>${Math.round(totalReps * 0.7)}m</strong> — casi ${totalReps * 0.7 > 500 ? "medio kilómetro" : totalReps * 0.7 > 200 ? "dos cuadras" : "una cuadra"}.`,
+    ]
+    bullets.push(volumeVariants[athleteIndex % volumeVariants.length])
   }
 
-  // Bullet 3: Specific movement highlight
+  // Bullet 3: Specific movement highlight — peso personalizado por género
   if (totalWeightKg > 500) {
-    const comparison = totalWeightKg > 2000
-      ? `Eso es como levantar un carro del piso`
-      : totalWeightKg > 1000
-      ? `Eso es como levantar una moto del piso`
-      : `Eso es más de lo que la mayoría de la gente levanta en su vida`
+    let comparison: string
+    if (gender === "F") {
+      comparison = totalWeightKg > 1000
+        ? "Levantaste más de una tonelada. Literal."
+        : totalWeightKg > 600
+        ? "Levantaste lo que pesa un caballo"
+        : "Eso equivale a cargar a 8 personas"
+    } else {
+      comparison = totalWeightKg > 1500
+        ? "Levantaste más de lo que pesa un VW Beetle"
+        : totalWeightKg > 800
+        ? "Eso es como levantar una moto del piso"
+        : "Eso equivale a mover un piano de cola"
+    }
     bullets.push(
       `Levantaste <strong>${Math.round(totalWeightKg).toLocaleString()} kg</strong> del piso en el 26.3. ${comparison}.`
     )
   } else if (totalMovements.wallBalls > 50) {
+    // Fix: no repetir el número dos veces
     bullets.push(
-      `Hiciste <strong>${totalMovements.wallBalls} wall-balls</strong> en el 26.1. La mayoría de la gente no sobrevive 20. Tú hiciste ${totalMovements.wallBalls}.`
+      `Hiciste <strong>${totalMovements.wallBalls} wall-balls</strong> lanzando un balón de 6kg a 2.7 metros. La mayoría de la gente no sobrevive 20.`
     )
   }
 
@@ -463,14 +486,34 @@ function generateStoryBullets(
     }
   }
 
-  // Bullet: Burpees
+  // Bullet: Burpees — sin repetir número
   if (totalMovements.burpees > 30 && !bullets.some(b => b.includes("burpee"))) {
     bullets.push(
-      `Hiciste <strong>${totalMovements.burpees} burpees</strong> combinados con barra en el 26.3. La persona promedio no puede hacer 20 seguidos. Tú hiciste ${totalMovements.burpees}.`
+      `Hiciste <strong>${totalMovements.burpees} burpees</strong> combinados con barra en el 26.3. La persona promedio no puede hacer 20 seguidos.`
     )
   }
 
-  // Cap at 3-4 bullets
+  // Bullet: Experiencia física visceral (rotar entre opciones)
+  const physicalBullets = [
+    totalMovements.wallBalls > 50
+      ? `¿Te acuerdas del wall-ball 50? Cuando los hombros ardían y el balón pesaba el doble. Ahí fue cuando decidiste que ibas a seguir.`
+      : null,
+    totalMovements.burpees > 12 && totalMovements.cleans > 12
+      ? `Ese momento en el 26.3 cuando haces el burpee y sabes que tienes que agarrar la barra OTRA VEZ. Y la agarras.`
+      : null,
+    totalMovements.lunges > 16
+      ? `Las zancadas del 26.2 con la mancuerna arriba. Los cuádriceps temblando. Y el coach gritando tu nombre.`
+      : null,
+    totalMovements.cleans > 12 && totalMovements.thrusters > 0
+      ? `Después del clean 12, viene el thruster 1. Y tu cerebro dice 'descansa'. Pero tú dices 'uno más'.`
+      : null,
+  ].filter(Boolean) as string[]
+
+  if (physicalBullets.length > 0 && bullets.length < 4) {
+    bullets.push(physicalBullets[athleteIndex % physicalBullets.length])
+  }
+
+  // Cap at 4 bullets
   return bullets.slice(0, 4)
 }
 
@@ -480,36 +523,67 @@ function getWodInsight(
   wod: WodResult,
   movements: MovementBreakdown,
   gender: "M" | "F",
-  isRx: boolean
+  isRx: boolean,
+  finishedPerWod: Record<number, number>
 ): string {
+  const reps = wod.isFinished
+    ? (wod.displayOrder === 1 ? 354 : wod.displayOrder === 2 ? 168 : 288)
+    : wod.rawScore
+  const finishedCount = finishedPerWod[wod.displayOrder] || 0
+
+  // Si terminó el WOD y es raro, resaltar la rareza
+  if (wod.isFinished && finishedCount > 0 && finishedCount <= wod.totalInDivision * 0.4) {
+    return `Terminaste en ${wod.displayScore}. Solo ${finishedCount} de ${wod.totalInDivision} en tu categoría lo lograron.`
+  }
+
   switch (wod.displayOrder) {
     case 1: { // 26.1 wall-balls
-      const reachedTheWall = wod.rawScore >= 145 || wod.isFinished
-      const passedTheWall = wod.rawScore >= 211 || wod.isFinished
-      if (passedTheWall) {
+      if (wod.isFinished) {
+        return `Terminaste las 354 reps. Pasaste la sección de 66 wall-balls — ahí se quedó la mayoría. Tú no.`
+      }
+      if (reps > 210) {
         return `Pasaste la sección de 66 wall-balls — ahí se quedó la mayoría del mundo. Tú no.`
       }
-      if (reachedTheWall) {
+      if (reps >= 145) {
         return `Llegaste a la sección de 66 wall-balls. Ahí es donde el cuerpo pide parar y la mente decide seguir.`
       }
-      return `Cada wall-ball que lanzaste con los cuádriceps en llamas fue una decisión de no rendirte.`
+      if (reps >= 87) {
+        return `Pasaste de los box jumps a los wall-balls pesados. Eso requiere piernas Y hombros.`
+      }
+      return `Cada wall-ball fue una batalla. Y no soltaste el balón.`
     }
     case 2: { // 26.2 lunges + snatches + pull variation
+      if (wod.isFinished) {
+        const pullName = isRx ? "muscle-ups" : "jumping pull-ups"
+        return `Completaste las 168 reps: lunges, snatches y ${pullName}. Las 3 rondas. Hasta el final.`
+      }
       if (movements.pullVariation3 > 0) {
         const pullName = isRx ? "muscle-ups" : "jumping pull-ups"
         return `Llegaste a los ${pullName}: ronda 3. Después de lunges y snatches, todavía tenías para jalar.`
       }
-      if (movements.lunges > 32) {
-        return `${Math.round(movements.lunges * 1.5)} metros de zancadas con mancuerna. Los cuádriceps gritando. Y seguiste.`
+      if (reps > 112) {
+        return `Ya ibas por la segunda ronda. Lunges, snatches, jalones — de nuevo. Eso es aguante.`
       }
-      return `Zancadas con mancuerna. Snatches. Jalones. El 26.2 probó todo. Y tú respondiste.`
+      if (reps >= 37) {
+        return `Llegaste a los jalones. Eso es terminar ronda 1 completa. Sólido.`
+      }
+      return `Lunges con mancuerna y snatches: dos movimientos que piden todo. Tú les diste todo.`
     }
     case 3: { // 26.3 burpees + cleans + thrusters
-      if (movements.cleans > 24) {
-        return `Después de los burpees, agarrar la barra y hacer cleans... eso es mental. Tu cuerpo pedía parar. Tú no lo dejaste.`
+      if (wod.isFinished) {
+        return `Terminaste los 288 reps: 3 pesos, 6 secciones, burpees + barra sin parar. Completaste TODO.`
       }
-      if (movements.burpees > 0) {
-        return `Burpees, barra del piso, barra al cielo. Repetir. ${Math.round(wod.rawScore)} veces. No cualquiera.`
+      if (reps > 192) {
+        return `Tercer peso. Los brazos temblando. Y seguiste agarrando la barra.`
+      }
+      if (reps > 96) {
+        return `Llegaste al segundo peso. Ahí la barra pesa más pero tú ya estabas caliente.`
+      }
+      if (reps >= 48) {
+        return `Completaste la primera sección y seguiste. El peso todavía no subía. Pero tú sí.`
+      }
+      if (reps > 0) {
+        return `12 burpees + 12 cleans en la primera ronda. Eso ya es más de lo que la mayoría intenta.`
       }
       return `El 26.3 fue el WOD más brutal: burpees + barra + peso subiendo. Tú lo enfrentaste.`
     }
@@ -523,21 +597,36 @@ function getWodInsight(
 function pickGlobalFact(
   pattern: Pattern,
   wodResults: WodResult[],
-  gender: "M" | "F"
+  gender: "M" | "F",
+  athleteIndex: number
 ): string {
   const has261 = wodResults.some((w) => w.displayOrder === 1)
   const has262 = wodResults.some((w) => w.displayOrder === 2)
 
+  // Pool de facts generales que aplican a todos
+  const generalFacts = [
+    `Más de 300,000 atletas en el mundo hicieron este Open. Desde Islandia hasta México. Tú fuiste uno de ellos.`,
+    `Solo el 40% de los mexicanos hace ejercicio. Tú no solo haces ejercicio — compites.`,
+    `El Open es el evento deportivo participativo más grande del planeta. Y tú estuviste ahí.`,
+    `59% de los participantes del Open son masters (+34 años). El fitness no tiene edad.`,
+    `Participaste en el evento deportivo más grande del planeta junto a más de 300,000 atletas. Piénsalo.`,
+  ]
+
+  // Facts específicos por WOD
+  const specificFacts: string[] = []
   if (has261) {
-    return `Más de 300,000 atletas en el mundo hicieron este Open. Menos del 1% terminó el 26.1. Nadie esperaba que fuera fácil.`
+    specificFacts.push(`Menos del 1% del mundo terminó el 26.1. Nadie esperaba que fuera fácil.`)
   }
   if (has262 && gender === "F") {
-    return `Solo el 4% de las mujeres en el mundo terminaron el 26.2 RX. Que hayas estado ahí compitiendo ya es elite.`
+    specificFacts.push(`Solo el 4% de las mujeres en el mundo terminaron el 26.2 RX. Que hayas estado ahí compitiendo ya es elite.`)
   }
   if (has262 && gender === "M") {
-    return `Solo el 13% de los hombres en el mundo terminaron el 26.2 RX. El Open no es para cualquiera.`
+    specificFacts.push(`Solo el 13% de los hombres en el mundo terminaron el 26.2 RX. El Open no es para cualquiera.`)
   }
-  return `Participaste en el evento deportivo más grande del planeta junto a más de 300,000 atletas. Piénsalo.`
+
+  // Combinar y rotar
+  const allFacts = [...specificFacts, ...generalFacts]
+  return allFacts[athleteIndex % allFacts.length]
 }
 
 // ==================== BEST WOD MESSAGE ====================
@@ -566,9 +655,18 @@ const CLOSING_MESSAGES = [
   "No entrenamos para ganar medallas. Entrenamos para sentirnos vivos, para dormir mejor, para tener energía para nuestra familia, para soltar el estrés del día.",
   "El leaderboard se olvida. Lo que queda es que fuiste más fuerte que tu excusa de no ir.",
   "Cada rep fue una inversión en tu salud. Cada gota de sudor fue estrés que soltaste. Cada WOD fue una versión mejor de ti.",
-  "Solo el 40% de los mexicanos hace ejercicio. Tú no solo haces ejercicio — compites. Eso te pone en otro nivel.",
   "No importa si quedaste primero o último. Importa que estuviste ahí cuando tu cuerpo quería parar, y seguiste.",
   "Tu cuerpo te lo agradece. Tu mente te lo agradece. Tu familia te lo agradece. Sigue así, Grizzly. 🐻",
+  "Entrenar es elegirte a ti. Y tú te elegiste 3 veces en 3 semanas.",
+  "La persona más fuerte del box no es la que levanta más — es la que siempre regresa. Tú siempre regresas.",
+  "El Open se acaba. El hábito que construiste, no. Eso se queda contigo.",
+  "Hoy te duele. Mañana te enorgullece. Siempre valió la pena.",
+  "Nadie te obligó a estar ahí. Elegiste el sudor, el dolor, la incomodidad. Y lo volverías a hacer. Eso dice todo.",
+  "Hay gente que paga Netflix para ver a otros hacer cosas difíciles. Tú las HACES.",
+  "¿Sabes qué es más difícil que un burpee? Ir al gym cuando nadie te está viendo. Y tú fuiste.",
+  "Tus hijos, tu pareja, tu familia... ellos ven que no te rindes. Eso se hereda mejor que cualquier gen.",
+  "No necesitas un six-pack para ser atleta. Necesitas presentarte. Y tú lo hiciste.",
+  "El Open te enseñó algo: que puedes más de lo que crees. No lo olvides cuando venga el siguiente reto.",
 ]
 
 function pickClosingMessage(pattern: Pattern, index: number): string {
@@ -585,6 +683,89 @@ function pickClosingMessage(pattern: Pattern, index: number): string {
   }
 }
 
+// ==================== ACHIEVEMENT SCANNER ====================
+
+function detectAchievements(
+  wodResults: WodResult[],
+  finishedPerWod: Record<number, number>
+): string[] {
+  const achievements: string[] = []
+  const sorted = [...wodResults].sort((a, b) => a.displayOrder - b.displayOrder)
+
+  // 1. Terminó un WOD donde pocos lo lograron (rarity check)
+  for (const wod of sorted) {
+    if (!wod.isFinished) continue
+    const finishedCount = finishedPerWod[wod.displayOrder] || 0
+    const totalInDiv = wod.totalInDivision
+    // Solo resaltar si menos del 40% de la división terminó
+    if (finishedCount > 0 && finishedCount <= totalInDiv * 0.4) {
+      achievements.push(
+        `Terminaste el <strong>${wod.wodName}</strong> en <strong>${wod.displayScore}</strong>. Solo <strong>${finishedCount} de ${totalInDiv}</strong> en tu categoría lo lograron.`
+      )
+    }
+  }
+
+  // 2. Terminó TODOS los WODs dentro del time cap
+  if (sorted.length === 3 && sorted.every((w) => w.isFinished)) {
+    achievements.push(
+      `Terminaste los <strong>3 WODs</strong> dentro del time cap. Eso es completar CADA prueba.`
+    )
+  }
+
+  // 3. Top 3 en un WOD específico (resaltar cada podio)
+  for (const wod of sorted) {
+    if (wod.rank <= 3) {
+      const medal = wod.rank === 1 ? "🥇" : wod.rank === 2 ? "🥈" : "🥉"
+      achievements.push(
+        `${medal} Podio en el <strong>${wod.wodName}</strong>: <strong>#${wod.rank} de ${wod.totalInDivision}</strong>.`
+      )
+    }
+  }
+
+  // 4. Top 10% en un WOD (solo si no ya tiene podio)
+  for (const wod of sorted) {
+    if (wod.rank > 3 && wod.rank / wod.totalInDivision <= 0.10) {
+      achievements.push(
+        `<strong>Top 10%</strong> de tu categoría en el <strong>${wod.wodName}</strong>: #${wod.rank} de ${wod.totalInDivision}.`
+      )
+    }
+  }
+
+  // 5. Mejoró mucho entre WODs (>10 posiciones)
+  if (sorted.length >= 2) {
+    const first = sorted[0]
+    const last = sorted[sorted.length - 1]
+    const improvement = first.rank - last.rank
+    if (improvement > 10) {
+      achievements.push(
+        `Del <strong>${first.wodName}</strong> al <strong>${last.wodName}</strong>, subiste <strong>${improvement} posiciones</strong>. Cada semana más fuerte.`
+      )
+    }
+  }
+
+  // 6. Easter eggs por score específico
+  const wod262 = sorted.find((w) => w.displayOrder === 2)
+  if (wod262 && (wod262.isFinished || wod262.rawScore === 168)) {
+    // Solo agregar si no ya hay un achievement de "terminaste 26.2"
+    if (!achievements.some(a => a.includes(wod262.wodName) && a.includes("Terminaste"))) {
+      achievements.push("Terminaste TODAS las reps del 26.2. Hasta la última. Eso es acabar lo que empiezas.")
+    }
+  }
+
+  const wod261 = sorted.find((w) => w.displayOrder === 1)
+  if (wod261 && (wod261.isFinished || wod261.rawScore > 300)) {
+    if (!achievements.some(a => a.includes("300 reps"))) {
+      achievements.push("Pasaste las 300 reps en el 26.1. En un WOD que menos del 1% del mundo terminó.")
+    }
+  }
+
+  if (sorted.length === 3 && sorted.every((w) => w.rank <= 5)) {
+    achievements.push("Top 5 en TODOS los WODs. Eso no es talento, es obsesión sana.")
+  }
+
+  return achievements
+}
+
 // ==================== MAIN ANALYZER ====================
 
 export function analyzeAthlete(
@@ -594,7 +775,8 @@ export function analyzeAthlete(
   wodResults: WodResult[],
   overallRank: number,
   totalAthletes: number,
-  athleteIndex: number = 0
+  athleteIndex: number = 0,
+  finishedPerWod: Record<number, number> = {}
 ): AthleteInsight {
   const isRx = isDivisionRx(division)
   const sorted = [...wodResults].sort((a, b) => a.displayOrder - b.displayOrder)
@@ -647,21 +829,40 @@ export function analyzeAthlete(
   const pattern = detectPattern(sorted, overallRank)
 
   // Generate all content
-  const greeting = generateGreeting(fullName, pattern)
+  const greeting = generateGreeting(fullName, pattern, athleteIndex)
 
-  const storyBullets = generateStoryBullets(
+  // Achievement scanner — detectar logros notables primero
+  const achievements = detectAchievements(sorted, finishedPerWod)
+
+  const patternBullets = generateStoryBullets(
     sorted, totalReps, totalWeightKg, totalLungeMeters,
-    totalMovements, pattern, gender, isRx, bestWod
+    totalMovements, pattern, gender, isRx, bestWod, athleteIndex
   )
 
-  const globalFact = pickGlobalFact(pattern, sorted, gender)
+  // Merge: achievements first (max 2), then pattern bullets, cap at 5
+  const achievementBullets = achievements.slice(0, 2)
+  // Filter pattern bullets that don't duplicate achievement content
+  const filteredPatternBullets = patternBullets.filter((bullet) => {
+    // Skip generic "3 WODs" bullet if we already have specific finish achievements
+    if (achievementBullets.some(a => a.includes("Terminaste")) && bullet.includes("3 WODs del Open")) {
+      return false
+    }
+    // Skip generic podio bullet if achievement already mentions it
+    if (achievementBullets.some(a => a.includes("Podio")) && bullet.includes("Podio")) {
+      return false
+    }
+    return true
+  })
+  const storyBullets = [...achievementBullets, ...filteredPatternBullets].slice(0, 5)
+
+  const globalFact = pickGlobalFact(pattern, sorted, gender, athleteIndex)
   const bestWodMessage = generateBestWodMessage(bestWod)
   const closingMessage = pickClosingMessage(pattern, athleteIndex)
 
-  // Per-WOD visceral insights
+  // Per-WOD visceral insights (with rarity data)
   const wodInsights = sorted.map((wod) => ({
     wodName: wod.wodName,
-    phrase: getWodInsight(wod, movementsByWod[wod.wodName], gender, isRx),
+    phrase: getWodInsight(wod, movementsByWod[wod.wodName], gender, isRx, finishedPerWod),
   }))
 
   // Apply personal overrides if this athlete has one

@@ -9,6 +9,7 @@ import { getDivisionLabel, getDivisionBadge } from "@/lib/divisions"
 import { analyzeAthlete, getAndreaSpecialMessage, type WodResult } from "@/lib/athlete-insights"
 import Link from "next/link"
 import type { Metadata } from "next"
+import WbiBadge from "@/components/wbi-badge"
 
 interface PageProps {
   params: { id: string }
@@ -151,6 +152,29 @@ export default async function RecapPage({ params }: PageProps) {
 
   const overall = overallData[0] || { total_points: 0, overall_rank: 0, total_athletes: 0 }
 
+  // Count how many athletes in this division finished each WOD
+  const finisherData: Array<{
+    display_order: number
+    finished_count: number
+  }> = await prisma.$queryRaw`
+    SELECT
+      w.display_order,
+      COUNT(*)::int as finished_count
+    FROM scores s
+    JOIN wods w ON s.wod_id = w.id
+    JOIN athletes a ON s.athlete_id = a.id
+    WHERE ${divisionFilter}
+      AND a.is_active = true
+      AND w.is_active = true
+      AND s.status = 'confirmed'
+      AND s.display_score LIKE '%:%'
+    GROUP BY w.display_order
+  `
+  const finishedPerWod: Record<number, number> = {}
+  for (const row of finisherData) {
+    finishedPerWod[row.display_order] = row.finished_count
+  }
+
   // Build WodResult array
   const wodResults: WodResult[] = rankingData.map((r) => ({
     wodName: r.wod_name,
@@ -171,6 +195,8 @@ export default async function RecapPage({ params }: PageProps) {
     wodResults,
     overall.overall_rank,
     overall.total_athletes,
+    0,
+    finishedPerWod,
   )
 
   const badge = getDivisionBadge(division)
@@ -362,7 +388,16 @@ export default async function RecapPage({ params }: PageProps) {
             OPEN 2026
           </h1>
           <div className="mt-2 mx-auto h-1 w-32 rounded-full animate-shimmer" />
-          <p className="mt-5 text-3xl font-bold text-white animate-fade-in-1 animate-float">
+          {athlete.photo_url ? (
+            <div className="mt-5 mx-auto h-28 w-28 overflow-hidden rounded-full border-[3px] border-orange-500/70 shadow-[0_0_30px_rgba(234,88,12,0.4)] animate-fade-in-1">
+              <img
+                src={athlete.photo_url}
+                alt={athlete.full_name}
+                className="h-full w-full object-cover"
+              />
+            </div>
+          ) : null}
+          <p className={`${athlete.photo_url ? "mt-3" : "mt-5"} text-3xl font-bold text-white animate-fade-in-1 animate-float`}>
             {athlete.full_name}
           </p>
           <div className="mt-3 flex items-center justify-center gap-3 animate-fade-in-2">
@@ -620,6 +655,11 @@ export default async function RecapPage({ params }: PageProps) {
         >
           ← VOLVER A MI PERFIL
         </Link>
+      </section>
+
+      {/* ===== WBI BADGE ===== */}
+      <section className="px-5 pb-6 flex justify-center animate-fade-in-6">
+        <WbiBadge athleteId={athlete.id} sourcePage="recap" />
       </section>
 
       {/* ===== FOOTER ===== */}
