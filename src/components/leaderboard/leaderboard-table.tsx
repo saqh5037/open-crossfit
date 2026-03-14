@@ -23,6 +23,16 @@ interface WodHeader {
 interface LeaderboardTableProps {
   entries: LeaderboardEntry[]
   wods: WodHeader[]
+  coachAthleteIds?: string[]
+  isStaffDivision?: boolean
+}
+
+function CoachBadge() {
+  return (
+    <span className="ml-1.5 inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500/20 to-teal-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-emerald-400 ring-1 ring-emerald-500/30 shadow-[0_0_8px_rgba(16,185,129,0.25)]">
+      COACH
+    </span>
+  )
 }
 
 const medalConfig: Record<number, { emoji: string; bg: string; glow: string }> = {
@@ -98,7 +108,15 @@ function formatScore(displayScore: string, scoreType: string) {
   return <span className="text-xs text-gray-400">{displayScore}</span>
 }
 
-export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
+function StaffBadge() {
+  return (
+    <span className="ml-1.5 inline-flex items-center rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-amber-400 ring-1 ring-amber-500/30 shadow-[0_0_8px_rgba(245,158,11,0.25)]">
+      🐻 STAFF
+    </span>
+  )
+}
+
+export function LeaderboardTable({ entries, wods, coachAthleteIds = [], isStaffDivision = false }: LeaderboardTableProps) {
   const hasConfettied = useRef(false)
 
   useEffect(() => {
@@ -106,18 +124,41 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
     hasConfettied.current = true
 
     const timer = setTimeout(() => {
-      confetti({
-        particleCount: 80,
-        spread: 90,
-        origin: { x: 0.5, y: 0.3 },
-        colors: ["#FF6600", "#FFB800", "#FFFFFF", "#FF3D00"],
-        gravity: 1.2,
-        ticks: 150,
-      })
+      if (isStaffDivision) {
+        // Confetti dorado especial para Grizzlys
+        const end = Date.now() + 1500
+        const frame = () => {
+          confetti({
+            particleCount: 4,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors: ["#FFD700", "#FFA500", "#DAA520", "#F5DEB3"],
+          })
+          confetti({
+            particleCount: 4,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors: ["#FFD700", "#FFA500", "#DAA520", "#F5DEB3"],
+          })
+          if (Date.now() < end) requestAnimationFrame(frame)
+        }
+        frame()
+      } else {
+        confetti({
+          particleCount: 80,
+          spread: 90,
+          origin: { x: 0.5, y: 0.3 },
+          colors: ["#FF6600", "#FFB800", "#FFFFFF", "#FF3D00"],
+          gravity: 1.2,
+          ticks: 150,
+        })
+      }
     }, 600)
 
     return () => clearTimeout(timer)
-  }, [entries.length])
+  }, [entries.length, isStaffDivision])
 
   if (entries.length === 0) {
     return (
@@ -138,43 +179,56 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
       <div className="flex flex-col gap-2 sm:hidden">
         {entries.map((entry, index) => {
           const rank = Number(entry.overall_rank)
-          const rowBg = rowStyles[rank] || ""
+          const rowBg = isStaffDivision
+            ? "bg-gradient-to-r from-emerald-900/30 via-yellow-900/20 to-amber-900/30 border-amber-500/40"
+            : (rowStyles[rank] || "")
 
           return (
             <div
               key={entry.id}
-              className={`animate-fade-up rounded-lg border border-gray-800 p-3 ${rowBg || "bg-gray-950"}`}
-              style={{ animationDelay: `${index * 60}ms` }}
+              className={`animate-fade-up rounded-lg border p-3 ${isStaffDivision ? `${rowBg} shadow-[0_0_15px_rgba(234,179,8,0.15)] animate-pulse-subtle` : `border-gray-800 ${rowBg || "bg-gray-950"}`}`}
+              style={{ animationDelay: `${index * (isStaffDivision ? 150 : 60)}ms` }}
             >
               {/* Top row: rank + name + points */}
               <div className="flex items-center gap-2">
                 <div className="flex-shrink-0">
-                  <MedalBadge rank={rank} />
-                </div>
-                <Link
-                  href={`/atleta/${entry.id}`}
-                  className="min-w-0 flex-1 transition-colors hover:text-primary"
-                >
-                  {rank === 1 ? (
-                    <span className="bg-gradient-to-r from-yellow-400 via-orange-400 to-primary bg-clip-text text-sm font-bold text-transparent">
-                      {entry.full_name}
+                  {isStaffDivision ? (
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full text-lg bg-gradient-to-br from-yellow-400/30 via-yellow-500/40 to-amber-600/30 shadow-[0_0_16px_rgba(234,179,8,0.5)]">
+                      🥇
                     </span>
                   ) : (
-                    <span className="text-sm font-medium text-white">{entry.full_name}</span>
+                    <MedalBadge rank={rank} />
                   )}
-                </Link>
-                <div className="flex-shrink-0 text-right">
-                  {rank === 1 ? (
-                    <span className="text-xl font-black text-primary animate-count-up inline-block" style={{ animationDelay: "800ms" }}>
-                      <AnimatedPoints value={Number(entry.total_points)} />
-                    </span>
-                  ) : (
-                    <span className="text-lg font-black text-primary">
-                      {Number(entry.total_points) || "—"}
-                    </span>
-                  )}
-                  <span className="ml-1 text-[10px] text-gray-500">pts</span>
                 </div>
+                <div className="min-w-0 flex-1">
+                  <Link
+                    href={`/atleta/${entry.id}`}
+                    className="transition-colors hover:text-primary"
+                  >
+                    {isStaffDivision || rank === 1 ? (
+                      <span className="bg-gradient-to-r from-yellow-400 via-orange-400 to-primary bg-clip-text text-sm font-bold text-transparent">
+                        {entry.full_name}
+                      </span>
+                    ) : (
+                      <span className="text-sm font-medium text-white">{entry.full_name}</span>
+                    )}
+                  </Link>
+                  {isStaffDivision ? <StaffBadge /> : coachAthleteIds.includes(entry.id) && <CoachBadge />}
+                </div>
+                {!isStaffDivision && (
+                  <div className="flex-shrink-0 text-right">
+                    {rank === 1 ? (
+                      <span className="text-xl font-black text-primary animate-count-up inline-block" style={{ animationDelay: "800ms" }}>
+                        <AnimatedPoints value={Number(entry.total_points)} />
+                      </span>
+                    ) : (
+                      <span className="text-lg font-black text-primary">
+                        {Number(entry.total_points) || "—"}
+                      </span>
+                    )}
+                    <span className="ml-1 text-[10px] text-gray-500">pts</span>
+                  </div>
+                )}
               </div>
               {/* WOD scores row */}
               {wods.length > 0 && (
@@ -187,9 +241,13 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
                         {result ? (
                           <>
                             <span className="text-xs text-gray-400">{result.display_score}</span>
-                            <br />
-                            <span className="text-xs font-bold text-primary">{result.points ?? 0}</span>
-                            <span className="ml-0.5 text-[9px] text-gray-600">({result.placement}°)</span>
+                            {!isStaffDivision && (
+                              <>
+                                <br />
+                                <span className="text-xs font-bold text-primary">{result.points ?? 0}</span>
+                                <span className="ml-0.5 text-[9px] text-gray-600">({result.placement}°)</span>
+                              </>
+                            )}
                           </>
                         ) : (
                           <span className="text-xs text-gray-700">—</span>
@@ -209,9 +267,10 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
         <Table>
           <TableHeader>
             <TableRow className="border-gray-800 bg-gray-900 hover:bg-gray-900">
-              <TableHead className="w-16 text-center text-gray-300">#</TableHead>
+              {!isStaffDivision && <TableHead className="w-16 text-center text-gray-300">#</TableHead>}
+              {isStaffDivision && <TableHead className="w-16 text-center text-gray-300">🥇</TableHead>}
               <TableHead className="text-gray-300">Atleta</TableHead>
-              <TableHead className="text-center font-bold text-gray-300">Puntos</TableHead>
+              {!isStaffDivision && <TableHead className="text-center font-bold text-gray-300">Puntos</TableHead>}
               {wods.map((wod) => (
                 <TableHead key={wod.id} className="text-center text-gray-300 whitespace-nowrap">
                   {wod.name}
@@ -223,24 +282,33 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
             {entries.map((entry, index) => {
               const rank = Number(entry.overall_rank)
               const isTop3 = rank <= 3
-              const rowBg = rowStyles[rank] || "hover:bg-gray-900/50"
-              const borderClass = rank === 4 ? "border-t-2 border-t-gray-700" : "border-gray-800"
+
+              const rowBg = isStaffDivision
+                ? "bg-gradient-to-r from-emerald-900/20 via-yellow-900/15 to-amber-900/20 border-l-2 border-l-amber-500 shadow-[0_0_12px_rgba(234,179,8,0.12)]"
+                : (rowStyles[rank] || "hover:bg-gray-900/50")
+              const borderClass = !isStaffDivision && rank === 4 ? "border-t-2 border-t-gray-700" : "border-gray-800"
 
               return (
                 <TableRow
                   key={entry.id}
-                  className={`animate-fade-up ${borderClass} ${rowBg} ${isTop3 ? "transition-transform duration-200 hover:scale-[1.01]" : ""}`}
-                  style={{ animationDelay: `${index * 60}ms` }}
+                  className={`animate-fade-up ${borderClass} ${rowBg} ${isStaffDivision ? "transition-all duration-300 hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(234,179,8,0.2)]" : isTop3 ? "transition-transform duration-200 hover:scale-[1.01]" : ""}`}
+                  style={{ animationDelay: `${index * (isStaffDivision ? 200 : 60)}ms` }}
                 >
                   <TableCell className="text-center">
-                    <MedalBadge rank={rank} />
+                    {isStaffDivision ? (
+                      <span className="inline-flex h-9 w-9 items-center justify-center rounded-full text-lg bg-gradient-to-br from-yellow-400/30 via-yellow-500/40 to-amber-600/30 shadow-[0_0_16px_rgba(234,179,8,0.5)]">
+                        🥇
+                      </span>
+                    ) : (
+                      <MedalBadge rank={rank} />
+                    )}
                   </TableCell>
                   <TableCell className="font-medium">
                     <Link
                       href={`/atleta/${entry.id}`}
                       className="transition-colors hover:text-primary hover:underline"
                     >
-                      {rank === 1 ? (
+                      {isStaffDivision || rank === 1 ? (
                         <span className="bg-gradient-to-r from-yellow-400 via-orange-400 to-primary bg-clip-text font-bold text-transparent">
                           {entry.full_name}
                         </span>
@@ -248,18 +316,21 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
                         <span className="text-white">{entry.full_name}</span>
                       )}
                     </Link>
+                    {isStaffDivision ? <StaffBadge /> : coachAthleteIds.includes(entry.id) && <CoachBadge />}
                   </TableCell>
-                  <TableCell className="text-center">
-                    {rank === 1 ? (
-                      <span className="text-2xl font-black text-primary animate-count-up inline-block" style={{ animationDelay: "800ms" }}>
-                        <AnimatedPoints value={Number(entry.total_points)} />
-                      </span>
-                    ) : (
-                      <span className="text-lg font-black text-primary">
-                        {Number(entry.total_points) || "—"}
-                      </span>
-                    )}
-                  </TableCell>
+                  {!isStaffDivision && (
+                    <TableCell className="text-center">
+                      {rank === 1 ? (
+                        <span className="text-2xl font-black text-primary animate-count-up inline-block" style={{ animationDelay: "800ms" }}>
+                          <AnimatedPoints value={Number(entry.total_points)} />
+                        </span>
+                      ) : (
+                        <span className="text-lg font-black text-primary">
+                          {Number(entry.total_points) || "—"}
+                        </span>
+                      )}
+                    </TableCell>
+                  )}
                   {wods.map((wod) => {
                     const result = entry.wod_results?.find(
                       (r) => r.wod_id === wod.id
@@ -269,9 +340,13 @@ export function LeaderboardTable({ entries, wods }: LeaderboardTableProps) {
                         {result ? (
                           <div>
                             {formatScore(result.display_score ?? "", wod.score_type)}
-                            <br />
-                            <span className="text-sm font-bold text-primary">{result.points ?? 0}</span>
-                            <span className="ml-1 text-[10px] text-gray-600">({result.placement}°)</span>
+                            {!isStaffDivision && (
+                              <>
+                                <br />
+                                <span className="text-sm font-bold text-primary">{result.points ?? 0}</span>
+                                <span className="ml-1 text-[10px] text-gray-600">({result.placement}°)</span>
+                              </>
+                            )}
                           </div>
                         ) : (
                           <span className="text-gray-500">—</span>

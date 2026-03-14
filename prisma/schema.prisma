@@ -79,8 +79,10 @@ model Athlete {
   division   String
   photo_url  String?
   is_active  Boolean  @default(true)
+  is_staff   Boolean  @default(false)
   created_at DateTime @default(now())
   scores     Score[]
+  admin_user AdminUser?
 
   @@index([division])
   @@index([gender])
@@ -156,7 +158,10 @@ model AdminUser {
   email         String    @unique
   password_hash String
   role          AdminRole @default(judge)
+  athlete_id    String?   @unique
   created_at    DateTime  @default(now())
+
+  athlete Athlete? @relation(fields: [athlete_id], references: [id])
 
   @@map("admin_users")
 }

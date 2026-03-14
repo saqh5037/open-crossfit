@@ -7,6 +7,7 @@ const SHORT_LABELS: Record<string, string> = {
   rx_female: "RX F",
   foundation_male: "Found. M",
   foundation_female: "Found. F",
+  equipo_grizzlys: "🐻 Grizzlys",
 }
 
 interface DivisionTabsProps {

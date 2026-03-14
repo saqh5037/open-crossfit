@@ -24,6 +24,7 @@ interface LeaderboardClientProps {
   eventName?: string
   autoRefresh?: boolean
   refreshInterval?: number
+  initialCoachAthleteIds?: string[]
 }
 
 export function LeaderboardClient({
@@ -34,13 +35,16 @@ export function LeaderboardClient({
   eventName = "GRIZZLYS Open 2026",
   autoRefresh = true,
   refreshInterval = 30000,
+  initialCoachAthleteIds = [],
 }: LeaderboardClientProps) {
   const [division, setDivision] = useState(initialDivision)
   const [data, setData] = useState<LeaderboardEntry[]>(initialData)
   const [wods, setWods] = useState<WodHeader[]>(initialWods)
+  const [coachAthleteIds, setCoachAthleteIds] = useState<string[]>(initialCoachAthleteIds)
   const [loading, setLoading] = useState(false)
   const [exporting, setExporting] = useState<"pdf" | "excel" | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [isStaffDivision, setIsStaffDivision] = useState(initialDivision === "equipo_grizzlys")
 
   const fetchLeaderboard = useCallback(async (div: string) => {
     try {
@@ -50,6 +54,8 @@ export function LeaderboardClient({
       const json = await res.json()
       if (json.data) setData(json.data)
       if (json.wods) setWods(json.wods)
+      if (json.coachAthleteIds) setCoachAthleteIds(json.coachAthleteIds)
+      setIsStaffDivision(!!json.isStaffDivision)
     } catch (err) {
       console.error("Error fetching leaderboard:", err)
       setError("Error al cargar. Intenta de nuevo.")
@@ -127,6 +133,7 @@ export function LeaderboardClient({
           selected={division}
           onChange={handleDivisionChange}
         />
+        {!isStaffDivision && (
         <div className="flex items-center justify-end gap-1">
           <Button
             variant="ghost"
@@ -187,6 +194,7 @@ export function LeaderboardClient({
           </DialogContent>
         </Dialog>
         </div>
+        )}
       </div>
 
       {error && (
@@ -200,7 +208,7 @@ export function LeaderboardClient({
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-primary" />
         </div>
       ) : (
-        <LeaderboardTable entries={data} wods={wods} />
+        <LeaderboardTable entries={data} wods={wods} coachAthleteIds={coachAthleteIds} isStaffDivision={isStaffDivision} />
       )}
     </div>
   )

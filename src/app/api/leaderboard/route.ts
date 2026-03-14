@@ -11,6 +11,11 @@ export async function GET(request: NextRequest) {
     ? Prisma.sql``
     : Prisma.sql`AND s.status = 'confirmed'`
 
+  const isStaffDivision = division === "equipo_grizzlys"
+  const divisionFilter = isStaffDivision
+    ? Prisma.sql`a.is_staff = true`
+    : Prisma.sql`a.division = ${division}`
+
   try {
     const leaderboard = await prisma.$queryRaw`
       WITH wod_rankings AS (
@@ -37,7 +42,7 @@ export async function GET(request: NextRequest) {
         FROM scores s
         JOIN wods w ON s.wod_id = w.id
         JOIN athletes a ON s.athlete_id = a.id
-        WHERE a.division = ${division}
+        WHERE ${divisionFilter}
           AND a.is_active = true
           AND w.is_active = true
           ${statusFilter}
@@ -73,7 +78,7 @@ export async function GET(request: NextRequest) {
         ) as wod_results
       FROM athletes a
       LEFT JOIN total_points tp ON a.id = tp.athlete_id
-      WHERE a.division = ${division}
+      WHERE ${divisionFilter}
         AND a.is_active = true
       ORDER BY COALESCE(tp.total_points, 0) DESC, a.full_name ASC
     `
@@ -85,7 +90,14 @@ export async function GET(request: NextRequest) {
       select: { id: true, name: true, score_type: true },
     })
 
-    return NextResponse.json({ data: leaderboard, wods })
+    // Get athlete IDs linked to coach accounts (for badge display)
+    const coachAthletes = await prisma.adminUser.findMany({
+      where: { role: "coach", athlete_id: { not: null } },
+      select: { athlete_id: true },
+    })
+    const coachAthleteIds = coachAthletes.map(c => c.athlete_id).filter(Boolean) as string[]
+
+    return NextResponse.json({ data: leaderboard, wods, coachAthleteIds, isStaffDivision })
   } catch (error) {
     console.error("Leaderboard error:", error)
     return NextResponse.json({ error: "Error al calcular leaderboard" }, { status: 500 })

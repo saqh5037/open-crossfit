@@ -55,6 +55,15 @@ const config: Config = {
   				'5': 'hsl(var(--chart-5))'
   			}
   		},
+  		keyframes: {
+  			'pulse-subtle': {
+  				'0%, 100%': { opacity: '1' },
+  				'50%': { opacity: '0.92' },
+  			},
+  		},
+  		animation: {
+  			'pulse-subtle': 'pulse-subtle 3s ease-in-out infinite',
+  		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',

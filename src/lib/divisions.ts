@@ -5,6 +5,7 @@ export const DIVISIONS: Record<string, DivisionInfo> = {
   rx_female: { key: "rx_female", label: "RX Femenino", gender: "F", description: "Avanzado" },
   foundation_male: { key: "foundation_male", label: "Foundation Masculino", gender: "M", description: "Principiante" },
   foundation_female: { key: "foundation_female", label: "Foundation Femenino", gender: "F", description: "Principiante" },
+  equipo_grizzlys: { key: "equipo_grizzlys", label: "Equipo Grizzlys 🐻", gender: "M", description: "Staff" },
 }
 
 export function getDivisionsByGender(gender: "M" | "F"): DivisionInfo[] {
@@ -26,5 +27,6 @@ export function isDivisionRx(divisionKey: string): boolean {
 export function getDivisionBadge(divisionKey: string): { text: string; bgColor: string } {
   if (divisionKey.startsWith("rx_")) return { text: "RX", bgColor: "#16a34a" }
   if (divisionKey.startsWith("foundation_")) return { text: "Foundation", bgColor: "#2563eb" }
+  if (divisionKey === "equipo_grizzlys") return { text: "🐻 STAFF", bgColor: "#d97706" }
   return { text: divisionKey.replace(/_/g, " "), bgColor: "" }
 }
