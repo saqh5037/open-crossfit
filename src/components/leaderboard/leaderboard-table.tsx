@@ -25,6 +25,7 @@ interface LeaderboardTableProps {
   wods: WodHeader[]
   coachAthleteIds?: string[]
   isStaffDivision?: boolean
+  showRecap?: boolean
 }
 
 function CoachBadge() {
@@ -116,7 +117,7 @@ function StaffBadge() {
   )
 }
 
-export function LeaderboardTable({ entries, wods, coachAthleteIds = [], isStaffDivision = false }: LeaderboardTableProps) {
+export function LeaderboardTable({ entries, wods, coachAthleteIds = [], isStaffDivision = false, showRecap = false }: LeaderboardTableProps) {
   const hasConfettied = useRef(false)
 
   useEffect(() => {
@@ -247,7 +248,7 @@ export function LeaderboardTable({ entries, wods, coachAthleteIds = [], isStaffD
                     )
                   })}
                   {/* Recap button */}
-                  {!isStaffDivision && entry.wod_results && entry.wod_results.length > 0 && (
+                  {showRecap && !isStaffDivision && entry.wod_results && entry.wod_results.length > 0 && (
                     <Link
                       href={`/atleta/${entry.id}/recap`}
                       className="flex-shrink-0 self-center ml-auto animate-pulse"
@@ -278,7 +279,7 @@ export function LeaderboardTable({ entries, wods, coachAthleteIds = [], isStaffD
                   {wod.name}
                 </TableHead>
               ))}
-              {!isStaffDivision && <TableHead className="text-center text-gray-300 w-20">🔥</TableHead>}
+              {showRecap && !isStaffDivision && <TableHead className="text-center text-gray-300 w-20">🔥</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -357,7 +358,7 @@ export function LeaderboardTable({ entries, wods, coachAthleteIds = [], isStaffD
                       </TableCell>
                     )
                   })}
-                  {!isStaffDivision && (
+                  {showRecap && !isStaffDivision && (
                     <TableCell className="text-center">
                       {entry.wod_results && entry.wod_results.length > 0 ? (
                         <Link

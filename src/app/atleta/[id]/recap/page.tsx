@@ -1,7 +1,9 @@
 export const dynamic = "force-dynamic"
 
 import prisma from "@/lib/prisma"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 import { Prisma } from "@prisma/client"
 import { getDivisionLabel, getDivisionBadge } from "@/lib/divisions"
 import { analyzeAthlete, type WodResult } from "@/lib/athlete-insights"
@@ -27,6 +29,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function RecapPage({ params }: PageProps) {
+  // Only admin/coach/owner can see recaps for now
+  const session = await getServerSession(authOptions)
+  const userRole = (session?.user as { role?: string } | undefined)?.role
+  if (!userRole || !["admin", "owner", "coach"].includes(userRole)) {
+    redirect("/leaderboard")
+  }
+
   const athlete = await prisma.athlete.findUnique({
     where: { id: params.id },
     include: {

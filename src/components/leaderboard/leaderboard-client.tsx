@@ -25,6 +25,7 @@ interface LeaderboardClientProps {
   autoRefresh?: boolean
   refreshInterval?: number
   initialCoachAthleteIds?: string[]
+  showRecap?: boolean
 }
 
 export function LeaderboardClient({
@@ -36,6 +37,7 @@ export function LeaderboardClient({
   autoRefresh = true,
   refreshInterval = 30000,
   initialCoachAthleteIds = [],
+  showRecap = false,
 }: LeaderboardClientProps) {
   const [division, setDivision] = useState(initialDivision)
   const [data, setData] = useState<LeaderboardEntry[]>(initialData)
@@ -208,7 +210,7 @@ export function LeaderboardClient({
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-primary" />
         </div>
       ) : (
-        <LeaderboardTable entries={data} wods={wods} coachAthleteIds={coachAthleteIds} isStaffDivision={isStaffDivision} />
+        <LeaderboardTable entries={data} wods={wods} coachAthleteIds={coachAthleteIds} isStaffDivision={isStaffDivision} showRecap={showRecap} />
       )}
     </div>
   )

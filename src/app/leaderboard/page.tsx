@@ -18,11 +18,14 @@ export default async function LeaderboardPage({
     prisma.eventConfig.findFirst(),
     getServerSession(authOptions),
   ])
+  const userRole = (session?.user as { role?: string } | undefined)?.role
+  const showRecap = !!userRole && ["admin", "owner", "coach"].includes(userRole)
   const availableDivisions = (config?.divisions as string[]) ?? ["rx_male", "rx_female"]
 
   // Fetch initial leaderboard data
   let initialData: unknown[] = []
   let initialWods: { id: string; name: string; score_type: string }[] = []
+  let initialCoachIds: string[] = []
 
   try {
     const res = await fetch(
@@ -32,6 +35,7 @@ export default async function LeaderboardPage({
     const json = await res.json()
     initialData = json.data ?? []
     initialWods = json.wods ?? []
+    initialCoachIds = json.coachAthleteIds ?? []
   } catch {
     // Fallback: fetch directly with Prisma
     initialWods = await prisma.wod.findMany({
@@ -55,6 +59,8 @@ export default async function LeaderboardPage({
             initialDivision={division}
             availableDivisions={availableDivisions}
             eventName={config?.name ?? "GRIZZLYS Open 2026"}
+            initialCoachAthleteIds={initialCoachIds}
+            showRecap={showRecap}
           />
         </div>
       </main>

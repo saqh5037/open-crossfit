@@ -429,8 +429,8 @@ export function AtletaCard({
           )}
         </div>
 
-        {/* Recap CTA — super prominent */}
-        {scores.length > 0 && !isJudge && (
+        {/* Recap CTA — super prominent (only for admin/coach) */}
+        {scores.length > 0 && isJudge && (
           <div className="mt-6">
             <Link
               href={`/atleta/${athlete.id}/recap`}
