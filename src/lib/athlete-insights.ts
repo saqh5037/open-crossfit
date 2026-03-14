@@ -261,7 +261,7 @@ function calculateTotalWeight263Precise(
 
 export function calculateMovementsForWod(
   wodDisplayOrder: number,
-  rawScore: number,
+  rawScore: number, // unfinished = rep count, finished = seconds (ignored when isFinished=true)
   isFinished: boolean,
   isRx: boolean
 ): MovementBreakdown {

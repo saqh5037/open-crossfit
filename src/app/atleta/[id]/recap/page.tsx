@@ -159,7 +159,7 @@ export default async function RecapPage({ params }: PageProps) {
     rank: r.placement,
     totalInDivision: r.total_in_div,
     points: Math.max(0, 100 - (r.placement - 1) * 3),
-    isFinished: !r.display_score.includes("reps"),
+    isFinished: r.display_score.includes(":"), // "mm:ss" = finished, "XXX reps" = unfinished
     displayOrder: r.display_order,
   }))
 
