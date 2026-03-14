@@ -26,8 +26,9 @@ export default function ShareRecapButton({ athleteId, athleteName }: ShareRecapB
     ? `${window.location.origin}/atleta/${athleteId}/recap`
     : `/atleta/${athleteId}/recap`
 
-  function getImgUrl(v: number) {
-    return `/api/recap/share-image?id=${athleteId}&v=${v}`
+  function getImgUrl(v: number, bust = false) {
+    const base = `/api/recap/share-image?id=${athleteId}&v=${v}`
+    return bust ? `${base}&t=${Date.now()}` : base
   }
 
   // Track which card is visible
@@ -76,8 +77,9 @@ export default function ShareRecapButton({ athleteId, athleteName }: ShareRecapB
     for (const v of VARIANTS) {
       if (!previews[v.id]) {
         const img = new Image()
-        img.src = getImgUrl(v.id)
-        img.onload = () => setPreviews((p) => ({ ...p, [v.id]: getImgUrl(v.id) }))
+        const url = getImgUrl(v.id, true)
+        img.src = url
+        img.onload = () => setPreviews((p) => ({ ...p, [v.id]: url }))
       }
     }
   }
