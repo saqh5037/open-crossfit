@@ -52,7 +52,7 @@ export default async function RecapPage({ params }: PageProps) {
   // Check if athlete has any scores
   if (athlete.scores.length === 0) {
     // Special case: Andrea Fernandez — was judge, not competitor
-    if (athlete.full_name.toLowerCase() === "andrea fernandez") {
+    if (athlete.full_name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === "andrea fernandez") {
       return <AndreaSpecialView name={athlete.full_name} id={athlete.id} />
     }
     return <NoScoresView name={athlete.full_name} id={athlete.id} />

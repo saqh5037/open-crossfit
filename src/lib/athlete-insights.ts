@@ -71,10 +71,15 @@ const CREW_6PM_NAMES: Record<string, string> = {
   "andrea fernandez": "Andrea",
 }
 
+// Normalize accented characters for matching
+function normalize(str: string): string {
+  return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+}
+
 function getCrewBullet(fullName: string): string {
-  const key = fullName.toLowerCase()
+  const key = normalize(fullName)
   const others = Object.entries(CREW_6PM_NAMES)
-    .filter(([k]) => k !== key)
+    .filter(([k]) => normalize(k) !== key)
     .map(([, name]) => name)
   return `Eres parte del crew de las 6pm: ${others.join(", ")}. Los que se levantan cuando el cuerpo dice no. Los que gritan tu nombre cuando ya no puedes. Los que se quedan a recoger la barra contigo. Eso no es un gym — es familia.`
 }
@@ -90,7 +95,7 @@ interface PersonalOverride {
 }
 
 function getPersonalOverride(fullName: string): PersonalOverride | null {
-  const key = fullName.toLowerCase()
+  const key = normalize(fullName)
 
   // Martha Sofia Lares — esposa de Samuel
   if (key === "martha sofia lares") {
