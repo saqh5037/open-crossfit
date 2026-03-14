@@ -10,6 +10,7 @@ import { analyzeAthlete, getAndreaSpecialMessage, type WodResult } from "@/lib/a
 import Link from "next/link"
 import type { Metadata } from "next"
 import WbiBadge from "@/components/wbi-badge"
+import ShareRecapButton from "@/components/share-recap-button"
 
 interface PageProps {
   params: { id: string }
@@ -25,6 +26,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: `${firstName} — Mi Recap del Open 2026 🔥`,
       description: `Mira el recap de ${athlete.full_name} en el GRIZZLYS CrossFit Open 2026`,
+      images: [`/api/recap/share-image?id=${params.id}`],
     },
   }
 }
@@ -642,7 +644,8 @@ export default async function RecapPage({ params }: PageProps) {
       </section>
 
       {/* ===== CTAs ===== */}
-      <section className="px-5 pb-8 flex flex-col items-center gap-3">
+      <section className="px-5 pb-8 flex flex-col items-center gap-4">
+        <ShareRecapButton athleteId={athlete.id} athleteName={athlete.full_name} />
         <Link
           href="/leaderboard"
           className="inline-block rounded-lg bg-gradient-to-r from-orange-600 to-red-600 px-8 py-4 text-xs font-bold tracking-[0.2em] text-white hover:from-orange-500 hover:to-red-500 transition-all shadow-[0_0_20px_rgba(234,88,12,0.3)] hover:shadow-[0_0_30px_rgba(234,88,12,0.5)] hover:scale-105"
