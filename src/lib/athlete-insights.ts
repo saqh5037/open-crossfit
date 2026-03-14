@@ -80,7 +80,7 @@ function getCrewBullet(fullName: string): string {
 }
 
 function getCrewClosing(): string {
-  return "Hay días que no quieres ir. Días que el cuerpo pesa, que la cabeza dice 'hoy no'. Pero llegas. Y ahí están ellos. Mirna echándote porras, Félix sudando a tu lado, Ricardo empujando, Mariel sin parar. El crew de las 6 no te deja caer. Y tú tampoco los dejas caer a ellos. Somos compañeros, somos equipo, somos familia. Eso es lo que nos hace GRIZZLYS. 🐻🔥"
+  return "Hay días que no quieres ir. Días que el cuerpo pesa, que la cabeza dice 'hoy no'. Pero llegas. Y ahí están ellos. Mirna echándote porras, Félix sudando a tu lado, Ricardo empujando, Mariel sin parar. El crew de las 6 no te deja caer. Y tú tampoco los dejas caer a ellos. Somos compañeros, somos equipo, somos familia. Eso es lo que nos hace el mejor horario. 🐻🔥"
 }
 
 interface PersonalOverride {
