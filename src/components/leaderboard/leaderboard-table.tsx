@@ -124,37 +124,28 @@ export function LeaderboardTable({ entries, wods, coachAthleteIds = [], isStaffD
     hasConfettied.current = true
 
     const timer = setTimeout(() => {
-      if (isStaffDivision) {
-        // Confetti dorado especial para Grizzlys
-        const end = Date.now() + 1500
-        const frame = () => {
-          confetti({
-            particleCount: 4,
-            angle: 60,
-            spread: 55,
-            origin: { x: 0 },
-            colors: ["#FFD700", "#FFA500", "#DAA520", "#F5DEB3"],
-          })
-          confetti({
-            particleCount: 4,
-            angle: 120,
-            spread: 55,
-            origin: { x: 1 },
-            colors: ["#FFD700", "#FFA500", "#DAA520", "#F5DEB3"],
-          })
-          if (Date.now() < end) requestAnimationFrame(frame)
-        }
-        frame()
-      } else {
+      const colors = isStaffDivision
+        ? ["#FFD700", "#FFA500", "#DAA520", "#F5DEB3"]
+        : ["#FF6600", "#FFB800", "#FFFFFF", "#FF3D00"]
+      const end = Date.now() + 1500
+      const frame = () => {
         confetti({
-          particleCount: 80,
-          spread: 90,
-          origin: { x: 0.5, y: 0.3 },
-          colors: ["#FF6600", "#FFB800", "#FFFFFF", "#FF3D00"],
-          gravity: 1.2,
-          ticks: 150,
+          particleCount: 4,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors,
         })
+        confetti({
+          particleCount: 4,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors,
+        })
+        if (Date.now() < end) requestAnimationFrame(frame)
       }
+      frame()
     }, 600)
 
     return () => clearTimeout(timer)
