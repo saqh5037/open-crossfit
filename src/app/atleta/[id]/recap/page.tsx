@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic"
 
 import prisma from "@/lib/prisma"
-import { notFound, redirect } from "next/navigation"
+import { notFound } from "next/navigation"
 import { Prisma } from "@prisma/client"
 import { getDivisionLabel, getDivisionBadge } from "@/lib/divisions"
 import { analyzeAthlete, getAndreaSpecialMessage, type WodResult } from "@/lib/athlete-insights"
