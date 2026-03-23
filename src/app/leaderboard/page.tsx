@@ -19,7 +19,7 @@ export default async function LeaderboardPage({
     getServerSession(authOptions),
   ])
   const userRole = (session?.user as { role?: string } | undefined)?.role
-  const showRecap = !!userRole && ["admin", "owner", "coach"].includes(userRole)
+  const showRecap = true // Recaps are now public
   const availableDivisions = (config?.divisions as string[]) ?? ["rx_male", "rx_female"]
 
   // Fetch initial leaderboard data
