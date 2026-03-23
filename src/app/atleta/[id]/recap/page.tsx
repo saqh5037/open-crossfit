@@ -2,8 +2,6 @@ export const dynamic = "force-dynamic"
 
 import prisma from "@/lib/prisma"
 import { notFound, redirect } from "next/navigation"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
 import { Prisma } from "@prisma/client"
 import { getDivisionLabel, getDivisionBadge } from "@/lib/divisions"
 import { analyzeAthlete, getAndreaSpecialMessage, type WodResult } from "@/lib/athlete-insights"
@@ -32,12 +30,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function RecapPage({ params }: PageProps) {
-  // Only admin/coach/owner can see recaps for now
-  const session = await getServerSession(authOptions)
-  const userRole = (session?.user as { role?: string } | undefined)?.role
-  if (!userRole || !["admin", "owner", "coach"].includes(userRole)) {
-    redirect("/leaderboard")
-  }
+  // Recaps are now public for all athletes
 
   const athlete = await prisma.athlete.findUnique({
     where: { id: params.id },
@@ -56,7 +49,7 @@ export default async function RecapPage({ params }: PageProps) {
   if (athlete.scores.length === 0) {
     // Special case: Andrea Fernandez — was judge, not competitor
     if (athlete.full_name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === "andrea fernandez") {
-      return <AndreaSpecialView name={athlete.full_name} id={athlete.id} />
+      return <AndreaSpecialView name={athlete.full_name} id={athlete.id} photoUrl={athlete.photo_url} />
     }
     return <NoScoresView name={athlete.full_name} id={athlete.id} />
   }
@@ -197,7 +190,7 @@ export default async function RecapPage({ params }: PageProps) {
     wodResults,
     overall.overall_rank,
     overall.total_athletes,
-    0,
+    athlete.participant_number,
     finishedPerWod,
   )
 
@@ -777,51 +770,173 @@ function NoScoresView({ name, id }: { name: string; id: string }) {
   )
 }
 
-function AndreaSpecialView({ name, id }: { name: string; id: string }) {
+function AndreaSpecialView({ name, id, photoUrl }: { name: string; id: string; photoUrl: string | null }) {
   const msg = getAndreaSpecialMessage()
   return (
     <main className="min-h-screen bg-black text-white">
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(24px); }
+          from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes glowPulse {
+          0%, 100% { box-shadow: 0 0 20px rgba(234,88,12,0.3), 0 0 60px rgba(234,88,12,0.1); }
+          50% { box-shadow: 0 0 40px rgba(234,88,12,0.5), 0 0 80px rgba(234,88,12,0.2); }
+        }
+        @keyframes spin3d {
+          0% { transform: perspective(600px) rotateY(0deg); }
+          100% { transform: perspective(600px) rotateY(360deg); }
+        }
+        @keyframes floatBounce {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.5); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes shimmer {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        @keyframes borderGlow {
+          0%, 100% { border-color: rgba(234,88,12,0.3); }
+          50% { border-color: rgba(234,88,12,0.8); }
+        }
+        @keyframes fireFlicker {
+          0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+          25% { transform: scale(1.1) rotate(-3deg); opacity: 0.9; }
+          50% { transform: scale(1.2) rotate(2deg); opacity: 1; }
+          75% { transform: scale(1.05) rotate(-1deg); opacity: 0.95; }
+        }
+        @keyframes goldenPulse {
+          0%, 100% { transform: scale(1); filter: brightness(1) drop-shadow(0 0 3px rgba(255,215,0,0.3)); }
+          50% { transform: scale(1.15); filter: brightness(1.3) drop-shadow(0 0 10px rgba(255,215,0,0.6)); }
+        }
+        @keyframes heartbeat {
+          0%, 100% { transform: scale(1); }
+          15% { transform: scale(1.3); }
+          30% { transform: scale(1); }
+          45% { transform: scale(1.2); }
+          60% { transform: scale(1); }
+        }
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes rocketShake {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          10% { transform: translateY(-2px) rotate(-5deg); }
+          20% { transform: translateY(1px) rotate(5deg); }
+          30% { transform: translateY(-3px) rotate(-3deg); }
+          40% { transform: translateY(0px) rotate(4deg); }
+          50% { transform: translateY(-1px) rotate(-2deg); }
+        }
+        @keyframes particleFloat {
+          0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
         .animate-fade-in { animation: fadeInUp 0.8s ease-out both; }
-        .animate-fade-in-2 { animation: fadeInUp 0.8s ease-out 0.2s both; }
-        .animate-fade-in-3 { animation: fadeInUp 0.8s ease-out 0.4s both; }
+        .animate-fade-in-1 { animation: fadeInUp 0.8s ease-out 0.15s both; }
+        .animate-fade-in-2 { animation: fadeInUp 0.8s ease-out 0.3s both; }
+        .animate-fade-in-3 { animation: fadeInUp 0.8s ease-out 0.45s both; }
+        .animate-fade-in-4 { animation: fadeInUp 0.8s ease-out 0.6s both; }
+        .animate-fade-in-5 { animation: fadeInUp 0.8s ease-out 0.75s both; }
+        .animate-fade-in-6 { animation: fadeInUp 0.8s ease-out 0.9s both; }
+        .animate-fade-in-7 { animation: fadeInUp 0.8s ease-out 1.05s both; }
+        .animate-glow { animation: glowPulse 3s ease-in-out infinite; }
+        .animate-spin3d { animation: spin3d 2s ease-in-out 0.5s both; }
+        .animate-float { animation: floatBounce 3s ease-in-out infinite; }
+        .animate-scale-in { animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+        .animate-fire { animation: fireFlicker 1.5s ease-in-out infinite; }
+        .animate-shimmer {
+          background: linear-gradient(90deg, transparent 0%, rgba(234,88,12,0.3) 50%, transparent 100%);
+          background-size: 200% 100%;
+          animation: shimmer 3s linear infinite;
+        }
+        .animate-border-glow { animation: borderGlow 2s ease-in-out infinite; }
+        .animate-golden { animation: goldenPulse 2s ease-in-out infinite; }
+        .animate-heartbeat { animation: heartbeat 2s ease-in-out infinite; }
+        .animate-rocket { animation: rocketShake 2s ease-in-out infinite; }
+        .text-gradient-fire {
+          background: linear-gradient(135deg, #ff6b00, #ff3d00, #ff8c00, #ff4500);
+          background-size: 300% 300%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: gradientShift 4s ease infinite;
+        }
+        .particle {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: rgba(234,88,12,0.6);
+          animation: particleFloat 6s linear infinite;
+        }
       `}} />
 
-      {/* Hero */}
+      {/* ===== HERO ===== */}
       <section className="relative overflow-hidden px-6 pt-14 pb-10 text-center">
         <div className="absolute inset-0 bg-gradient-to-b from-orange-950/40 via-orange-950/10 to-black" />
-        <div className="relative z-10 animate-fade-in">
-          <img
-            src="/logo-200.png"
-            alt="GRIZZLYS"
-            className="mx-auto h-20 w-20 rounded-xl border-2 border-orange-600/60 shadow-[0_0_30px_rgba(234,88,12,0.3)]"
-          />
-          <p className="mt-5 text-xs font-bold tracking-[0.4em] text-orange-400">TU RECAP</p>
+        <div className="particle" style={{ left: '10%', bottom: '0', animationDelay: '0s' }} />
+        <div className="particle" style={{ left: '25%', bottom: '0', animationDelay: '1s', width: '6px', height: '6px' }} />
+        <div className="particle" style={{ left: '50%', bottom: '0', animationDelay: '2s' }} />
+        <div className="particle" style={{ left: '70%', bottom: '0', animationDelay: '0.5s', width: '5px', height: '5px' }} />
+        <div className="particle" style={{ left: '85%', bottom: '0', animationDelay: '3s' }} />
+        <div className="relative z-10">
+          <div className="animate-spin3d mx-auto w-fit">
+            <img
+              src="/logo-200.png"
+              alt="GRIZZLYS"
+              className="mx-auto h-24 w-24 rounded-xl border-2 border-orange-600/60 shadow-[0_0_40px_rgba(234,88,12,0.4)]"
+            />
+          </div>
+          <p className="mt-5 text-xs font-bold tracking-[0.5em] text-orange-400 animate-fade-in">
+            TU RECAP
+          </p>
           <h1
-            className="mt-1 text-5xl font-black tracking-wider text-white"
-            style={{ fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif' }}
+            className="mt-1 text-6xl font-black tracking-wider text-gradient-fire animate-scale-in"
+            style={{ fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif', animationDelay: '0.3s' }}
           >
             OPEN 2026
           </h1>
-          <p className="mt-5 text-3xl font-bold text-white">{name}</p>
+          <div className="mt-2 mx-auto h-1 w-32 rounded-full animate-shimmer" />
+          {photoUrl ? (
+            <div className="mt-5 mx-auto h-28 w-28 overflow-hidden rounded-full border-[3px] border-orange-500/70 shadow-[0_0_30px_rgba(234,88,12,0.4)] animate-fade-in-1">
+              <img src={photoUrl} alt={name} className="h-full w-full object-cover" />
+            </div>
+          ) : (
+            <div className="mt-5 mx-auto h-28 w-28 rounded-full border-[3px] border-orange-500/70 shadow-[0_0_30px_rgba(234,88,12,0.4)] animate-fade-in-1 flex items-center justify-center bg-gradient-to-br from-orange-900/40 to-neutral-900">
+              <span className="text-4xl font-black text-orange-400" style={{ fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif' }}>AF</span>
+            </div>
+          )}
+          <p className="mt-3 text-3xl font-bold text-white animate-fade-in-1 animate-float">
+            {name}
+          </p>
+          <div className="mt-3 animate-fade-in-2">
+            <span className="rounded-md px-3 py-1 text-xs font-bold tracking-wider text-white border-2 animate-border-glow bg-yellow-700/60">
+              ⚖️ JUEZ OFICIAL
+            </span>
+          </div>
         </div>
       </section>
 
-      <div className="flex h-1.5">
+      {/* ===== GRADIENT BAR ===== */}
+      <div className="flex h-2 animate-shimmer rounded-full mx-4 overflow-hidden">
         <div className="flex-1 bg-gradient-to-r from-orange-700 to-orange-500" />
         <div className="flex-1 bg-gradient-to-r from-orange-500 to-red-500" />
         <div className="flex-1 bg-gradient-to-r from-red-500 to-orange-700" />
       </div>
 
-      {/* Message */}
+      {/* ===== TU HISTORIA ===== */}
       <section className="px-5 pt-8 pb-4 animate-fade-in-2">
-        <div className="rounded-xl border-2 border-orange-600/50 bg-neutral-950 p-6">
+        <div className="rounded-xl border-2 border-orange-600/50 bg-neutral-950 p-6 animate-glow">
           <div className="mb-4 flex items-center gap-2">
-            <span className="text-2xl">🔥</span>
+            <span className="text-3xl animate-fire">🔥</span>
             <h2 className="text-xs font-bold tracking-[0.25em] text-orange-500">TU HISTORIA</h2>
           </div>
           <p className="mb-5 text-2xl font-bold leading-tight text-white">{msg.greeting}</p>
@@ -829,8 +944,68 @@ function AndreaSpecialView({ name, id }: { name: string; id: string }) {
         </div>
       </section>
 
-      {/* Closing */}
-      <section className="px-5 pt-6 pb-8 animate-fade-in-3">
+      {/* ===== JUEZ OFICIAL ===== */}
+      <section className="px-5 pb-4 animate-fade-in-3">
+        <div className="rounded-xl border-2 border-yellow-600/40 bg-gradient-to-br from-yellow-950/20 to-neutral-950 p-6 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-yellow-900/5 via-transparent to-yellow-900/5" />
+          <div className="relative z-10">
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-2xl animate-golden">⚖️</span>
+              <h2 className="text-xs font-bold tracking-[0.25em] text-yellow-500">JUEZ OFICIAL</h2>
+            </div>
+            <p className="text-sm leading-relaxed text-neutral-300">{msg.judgeSection}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== CREW DE LAS 6PM ===== */}
+      <section className="px-5 pb-4 animate-fade-in-4">
+        <div className="rounded-xl border border-yellow-600/30 bg-gradient-to-br from-yellow-950/20 to-neutral-950 p-6">
+          <p className="text-[10px] font-bold tracking-[0.2em] text-yellow-500/70 mb-3">
+            <span className="inline-block animate-golden">💛</span> CREW DE LAS 6PM
+          </p>
+          <p className="text-sm leading-relaxed text-neutral-200">{msg.crewSection}</p>
+        </div>
+      </section>
+
+      {/* ===== TU VOZ ===== */}
+      <section className="px-5 pb-4 animate-fade-in-5">
+        <div className="rounded-xl border-2 animate-border-glow bg-neutral-950 p-8 text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-950/10 via-transparent to-orange-950/10" />
+          <div className="relative z-10">
+            <p className="text-xs font-bold tracking-[0.3em] text-orange-500 mb-4">
+              <span className="inline-block animate-heartbeat">📣</span> TU VOZ
+            </p>
+            <div className="mx-auto mb-4 h-px w-16 bg-gradient-to-r from-transparent via-orange-600/60 to-transparent" />
+            <p className="text-lg leading-relaxed text-neutral-200 italic font-medium px-2">
+              &ldquo;{msg.voiceSection}&rdquo;
+            </p>
+            <div className="mx-auto mt-4 h-px w-16 bg-gradient-to-r from-transparent via-orange-600/60 to-transparent" />
+          </div>
+        </div>
+      </section>
+
+      {/* ===== OPEN 2027 ===== */}
+      <section className="px-5 pb-4 animate-fade-in-6">
+        <div className="rounded-xl border-2 border-green-600/40 bg-gradient-to-br from-green-950/20 to-neutral-950 p-6 text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-900/5 via-transparent to-green-900/5" />
+          <div className="relative z-10">
+            <p className="text-xs font-bold tracking-[0.3em] text-green-500 mb-3">
+              <span className="inline-block animate-rocket">🚀</span> OPEN 2027
+            </p>
+            <p
+              className="text-5xl font-black text-gradient-fire animate-scale-in mb-4"
+              style={{ fontFamily: '"Bebas Neue", Impact, "Arial Black", sans-serif' }}
+            >
+              TE ESPERAMOS
+            </p>
+            <p className="text-sm leading-relaxed text-neutral-300 px-2">{msg.comeback}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== MENSAJE FINAL ===== */}
+      <section className="px-5 pt-4 pb-8 animate-fade-in-7">
         <div className="rounded-xl bg-gradient-to-br from-orange-950/20 via-neutral-950 to-orange-950/10 p-8 text-center border border-orange-900/20">
           <div className="mx-auto mb-5 h-px w-20 bg-gradient-to-r from-transparent via-orange-600/60 to-transparent" />
           <p className="text-lg leading-relaxed text-neutral-200 italic px-2 font-medium">
@@ -840,8 +1015,8 @@ function AndreaSpecialView({ name, id }: { name: string; id: string }) {
         </div>
       </section>
 
-      {/* CTAs */}
-      <section className="px-5 pb-8 flex flex-col items-center gap-3">
+      {/* ===== CTAs ===== */}
+      <section className="px-5 pb-8 flex flex-col items-center gap-4">
         <Link
           href="/leaderboard"
           className="inline-block rounded-lg bg-gradient-to-r from-orange-600 to-red-600 px-8 py-4 text-xs font-bold tracking-[0.2em] text-white hover:from-orange-500 hover:to-red-500 transition-all shadow-[0_0_20px_rgba(234,88,12,0.3)] hover:shadow-[0_0_30px_rgba(234,88,12,0.5)] hover:scale-105"
@@ -856,10 +1031,21 @@ function AndreaSpecialView({ name, id }: { name: string; id: string }) {
         </Link>
       </section>
 
+      {/* ===== WBI BADGE ===== */}
+      <section className="px-5 pb-6 flex justify-center animate-fade-in-7">
+        <WbiBadge athleteId={id} sourcePage="recap" />
+      </section>
+
+      {/* ===== FOOTER ===== */}
       <footer className="border-t border-neutral-900 px-5 py-8 text-center">
         <p className="text-[10px] font-bold tracking-[0.2em] text-neutral-600">
           GRIZZLYS — ENTRENAMIENTO FUNCIONAL — MÉRIDA
         </p>
+        <div className="mt-2 flex justify-center gap-4 text-[10px] text-orange-600/60">
+          <a href="https://instagram.com/grizzlysmerida">IG @grizzlysmerida</a>
+          <span className="text-neutral-800">|</span>
+          <a href="https://facebook.com/GrizzlysMerida">FB GrizzlysMerida</a>
+        </div>
       </footer>
     </main>
   )
