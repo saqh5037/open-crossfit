@@ -123,12 +123,20 @@ function getPersonalOverride(fullName: string): PersonalOverride | null {
 export function getAndreaSpecialMessage(): {
   greeting: string
   message: string
+  judgeSection: string
+  crewSection: string
+  voiceSection: string
+  comeback: string
   closing: string
 } {
   return {
     greeting: "Andrea, tú también eres parte de este Open.",
-    message: "No pudiste competir por lesión, pero no te perdiste ni un solo Open. Estuviste ahí como juez, contando reps, validando scores, echándole porras a Félix y al crew de las 6. Ser juez es ser parte del Open tanto como ser atleta. Sin ti, esto no funciona.",
-    closing: "La lesión te frenó, pero no te detuvo. Estuviste ahí para los demás cuando no podías estar para ti. Eso es más fuerte que cualquier WOD. Cuando regreses, el crew va a estar ahí para ti. 🐻❤️",
+    message: "No pudiste competir por lesión, pero no te perdiste ni un solo Open. Estuviste ahí como juez, contando reps, validando scores, echándole porras al crew de las 6. Ser juez es ser parte del Open tanto como ser atleta. Sin ti, esto no funciona.",
+    judgeSection: "Ser juez es ser la persona que sostiene el Open desde adentro. La que cuenta cada rep con honestidad, la que valida cada score, la que asegura que todo sea justo. Tú fuiste esa persona en cada uno de los 3 Opens. Lo hiciste por amor al box, no por obligación. Y eso se nota.",
+    crewSection: "Eres parte del crew de las 6pm. Los que sudan juntos, los que gritan cuando el otro ya no puede, los que se quedan a recoger las barras. Mirna, Ricardo, Félix, Mariel, César, Gerardo, Rogelio, María — todos saben que Andrea siempre está ahí. Incluso cuando no puede competir, está apoyando. Eso no es un gym — es familia.",
+    voiceSection: "Gracias por esa voz que nos inspira y que nos hace sacar la última energía que ya no tenemos. Cuando ya no puedes más y escuchas a Andrea gritando tu nombre — sacas una rep más. Eso vale más que cualquier score en el leaderboard. Tu energía movió barras que tú no tocaste.",
+    comeback: "Para el Open 2027, te esperamos. Recupérate, regresa más fuerte. El crew de las 6 te va a estar esperando con los brazos abiertos y una barra lista. Esto no se acaba aquí — apenas empieza. 🐻💪",
+    closing: "Gracias por apoyarnos en cada Open. Por cada rep que contaste, por cada 'no rep' que tuviste el valor de cantar, por cada grito de apoyo que nos sacó una rep más. La lesión te frenó, pero no te detuvo. Estuviste ahí para los demás cuando no podías estar para ti. Eso es más fuerte que cualquier WOD. Te queremos, Grizzly. 🐻❤️",
   }
 }
 
@@ -346,23 +354,68 @@ function generateGreeting(firstName: string, pattern: Pattern, athleteIndex: num
     `${name}, te la rifaste las 3 semanas.`,
     `${name}, estuviste ahí y diste todo.`,
     `${name}, el Open 2026 lleva tu nombre.`,
+    `${name}, fuiste guerrero cada semana.`,
+    `${name}, 3 sábados, 3 batallas, y aquí sigues.`,
+    `${name}, nadie te obligó y eso lo hace más valioso.`,
+    `${name}, lo dejaste TODO en cada WOD.`,
+    `${name}, este Open fue tu campo de batalla.`,
+    `${name}, viniste, sudaste, conquistaste.`,
+    `${name}, el Open 2026 no hubiera sido lo mismo sin ti.`,
+  ]
+
+  const topGreetings = [
+    `${name}, este Open fue TUYO.`,
+    `${name}, dominaste el Open 2026.`,
+    `${name}, demostraste de qué estás hecho.`,
+    `${name}, el leaderboard habla solo — tú mandas.`,
+  ]
+
+  const improvingGreetings = [
+    `${name}, tu progreso habla por sí solo.`,
+    `${name}, cada semana mejor que la anterior.`,
+    `${name}, tu evolución fue impresionante.`,
+    `${name}, mejoraste semana a semana y eso se nota.`,
+  ]
+
+  const specialistGreetings = [
+    `${name}, cuando brillas, BRILLAS.`,
+    `${name}, encontraste TU WOD y lo dominaste.`,
+    `${name}, tu mejor momento fue épico.`,
+  ]
+
+  const finisherGreetings = [
+    `${name}, cruzar la línea siempre será ganar.`,
+    `${name}, terminaste lo que empezaste. Eso es carácter.`,
+    `${name}, pocos terminan. Tú sí.`,
+  ]
+
+  const consistentGreetings = [
+    `${name}, la constancia es tu superpoder.`,
+    `${name}, sólido en cada WOD. Eso es consistencia.`,
+    `${name}, sin altibajos — pura constancia.`,
+  ]
+
+  const newcomerGreetings = [
+    `${name}, ya diste el primer paso.`,
+    `${name}, empezaste algo grande.`,
+    `${name}, lo importante es que estuviste ahí.`,
   ]
 
   switch (pattern) {
     case "top":
-      return `${name}, este Open fue TUYO.`
+      return topGreetings[athleteIndex % topGreetings.length]
     case "improving":
-      return `${name}, tu progreso habla por sí solo.`
+      return improvingGreetings[athleteIndex % improvingGreetings.length]
     case "specialist":
-      return `${name}, cuando brillas, BRILLAS.`
+      return specialistGreetings[athleteIndex % specialistGreetings.length]
     case "finisher":
-      return `${name}, cruzar la línea siempre será ganar.`
+      return finisherGreetings[athleteIndex % finisherGreetings.length]
     case "consistent":
-      return `${name}, la constancia es tu superpoder.`
+      return consistentGreetings[athleteIndex % consistentGreetings.length]
     case "warrior":
       return warriorGreetings[athleteIndex % warriorGreetings.length]
     case "newcomer":
-      return `${name}, ya diste el primer paso.`
+      return newcomerGreetings[athleteIndex % newcomerGreetings.length]
   }
 }
 
@@ -441,6 +494,9 @@ function generateStoryBullets(
       `En total moviste <strong>${totalReps} repeticiones</strong> en el Open. Eso es más de lo que la mayoría hace en un mes entero.`,
       `Moviste tu cuerpo <strong>${totalReps} veces</strong> en 3 semanas. Eso es disciplina.`,
       `<strong>${totalReps} reps</strong> en el Open. Si cada rep fuera un paso, habrías caminado <strong>${Math.round(totalReps * 0.7)}m</strong> — casi ${totalReps * 0.7 > 500 ? "medio kilómetro" : totalReps * 0.7 > 200 ? "dos cuadras" : "una cuadra"}.`,
+      `<strong>${totalReps} repeticiones</strong> en el Open. Cada una fue una decisión de no rendirte.`,
+      `En 3 semanas acumulaste <strong>${totalReps} reps</strong>. Hay gente que no hace eso en 3 meses.`,
+      `<strong>${totalReps} reps</strong>. Ese número representa cada vez que tu cuerpo dijo 'no' y tú dijiste 'una más'.`,
     ]
     bullets.push(volumeVariants[athleteIndex % volumeVariants.length])
   }
@@ -506,6 +562,15 @@ function generateStoryBullets(
       : null,
     totalMovements.cleans > 12 && totalMovements.thrusters > 0
       ? `Después del clean 12, viene el thruster 1. Y tu cerebro dice 'descansa'. Pero tú dices 'uno más'.`
+      : null,
+    totalReps > 100
+      ? `¿Te acuerdas de ese momento cuando los pulmones ardían y el coach gritó tu nombre? Ahí fue cuando te convertiste en atleta.`
+      : null,
+    totalMovements.snatches > 20
+      ? `Los snatches del 26.2: agarre, tirón, recepción. Repetir. Cuando la mancuerna pesa el doble de lo que pesa. Pero tú la sigues subiendo.`
+      : null,
+    totalMovements.thrusters > 12
+      ? `El thruster es el movimiento más completo del CrossFit: sentadilla + push press. Tú hiciste ${totalMovements.thrusters}. Eso es fuerza de cuerpo completo.`
       : null,
   ].filter(Boolean) as string[]
 
@@ -667,6 +732,17 @@ const CLOSING_MESSAGES = [
   "Tus hijos, tu pareja, tu familia... ellos ven que no te rindes. Eso se hereda mejor que cualquier gen.",
   "No necesitas un six-pack para ser atleta. Necesitas presentarte. Y tú lo hiciste.",
   "El Open te enseñó algo: que puedes más de lo que crees. No lo olvides cuando venga el siguiente reto.",
+  "El gym es la terapia que nadie te recetó. Sueltas el estrés, la ansiedad, los problemas del día. Y sales más ligero. Sigue yendo.",
+  "Cada vez que entrenas, le regalas tiempo a tu futuro. Menos doctor, más energía, mejor ánimo. Tu cuerpo te lo va a agradecer a los 60.",
+  "No lo hiciste por el ranking. Lo hiciste porque el ejercicio es tu escape, tu momento, tu hora sagrada. Y nadie te la quita.",
+  "Dale para adelante. Lo que hiciste en este Open demuestra que tienes algo que la mayoría no tiene: disciplina de ir cuando no quieres.",
+  "Tu familia no ve tus puntos. Ve que llegas de mejor humor, que tienes energía para jugar con tus hijos, que duermes mejor. ESO es el verdadero score.",
+  "Lo hiciste bien. No perfecto — BIEN. Y eso es suficiente. Lo que importa es que vas a regresar.",
+  "El CrossFit no te hace mejor atleta nada más. Te hace mejor papá, mejor mamá, mejor persona. Porque te enseña que puedes con más de lo que crees.",
+  "Mientras el mundo scrollea, tú sudas. Mientras otros buscan excusas, tú buscas la barra. Eso ya te hace diferente.",
+  "La salud no se compra. Se entrena. Cada WOD fue una inversión en ti que nunca vas a perder.",
+  "Un día tus hijos van a decir 'mi mamá/papá iba al gym sin falta'. Y van a hacer lo mismo. Eso es legado.",
+  "No necesitas motivación todos los días. Necesitas hábito. Y ya lo tienes. Nos vemos en el siguiente Open, Grizzly. 🐻🔥",
 ]
 
 function pickClosingMessage(pattern: Pattern, index: number): string {

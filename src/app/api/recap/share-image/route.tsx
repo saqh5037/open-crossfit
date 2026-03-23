@@ -363,7 +363,7 @@ export async function GET(request: NextRequest) {
     for (const r of finisherData) fMap[r.display_order] = r.finished_count
 
     const wods: WodResult[] = rankingData.map((r) => ({ wodName: r.wod_name, displayScore: r.display_score, rawScore: r.raw_score, rank: r.placement, totalInDivision: r.total_in_div, points: Math.max(0, 100 - (r.placement - 1) * 3), isFinished: r.display_score.includes(":"), displayOrder: r.display_order }))
-    const insight = analyzeAthlete(athlete.full_name, division, athlete.gender as "M" | "F", wods, overall.overall_rank, overall.total_athletes, 0, fMap)
+    const insight = analyzeAthlete(athlete.full_name, division, athlete.gender as "M" | "F", wods, overall.overall_rank, overall.total_athletes, athlete.participant_number, fMap)
 
     const bebasData = readFileSync(join(process.cwd(), "public", "fonts", "BebasNeue-Regular.ttf"))
     const logoB64 = `data:image/png;base64,${readFileSync(join(process.cwd(), "public", "logo-200.png")).toString("base64")}`
